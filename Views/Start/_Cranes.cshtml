@@ -1,0 +1,34 @@
+﻿@model IEnumerable<AutoBot.Models.Crane>
+
+@{ int counter = 0; }
+
+@foreach (var item in Model)
+{
+    counter++;
+
+    <div id="@counter.ToString()_Row" class="row mb-2">
+        <div class="col-1"></div>
+
+        <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
+            <div class="mt-2 mb-2"><span>@item.URL</span></div>
+        </div>
+
+        <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
+            <div class="mt-2 mb-2"><span>@item.ActivityTime.ToString(@"hh\:mm\:ss")</span></div>
+        </div>
+
+        <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
+            <div class="mt-2 mb-2"><span>@item.StatusCrane</span></div>
+        </div>
+
+        <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
+            <div class="mt-2 mb-2"><span>@item.BalanceOnCrane</span></div>
+        </div>
+
+        <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
+            <div class="mt-2 mb-2"><span>@item.TypeCurrencies</span></div>
+        </div>
+
+        <div class="col-1"></div>
+    </div>
+}

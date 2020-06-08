@@ -1,0 +1,72 @@
+﻿@model List<AutoBot.Models.Crane>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Краны</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="~/Content/jquery/jquery.js"></script>
+    <script src="~/Content/ajax/jquery.unobtrusive-ajax.js"></script>
+    <script src="~/Content/Scripts.js"></script>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="col-12">
+
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="text-center">Список всех кранов</h1>
+                </div>
+            </div>
+
+            <div class="row mt-4 mb-1 text-center">
+                <div class="col-1"></div>
+
+                <div class="col-2" style="background-color: rgb(138,198,66); border: 2px solid white;">
+                    <div class="mt-2 mb-2">
+                        <span class="text-light" style="font-size: 20px">URL</span>
+                    </div>
+                </div>
+
+                <div class="col-2" style="background-color: rgb(138,198,66); border: 2px solid white;">
+                    <div class="mt-2 mb-2">
+                        <span class="text-light" style="font-size: 20px">Время до активации</span>
+                    </div>
+                </div>
+
+                <div class="col-2" style="background-color: rgb(138,198,66); border: 2px solid white;">
+                    <div class="mt-2 mb-2">
+                        <span class="text-light" style="font-size: 20px">Статус крана</span>
+                    </div>
+                </div>
+
+                <div class="col-2" style="background-color: rgb(138,198,66); border: 2px solid white;">
+                    <div class="mt-2 mb-2">
+                        <span class="text-light" style="font-size: 20px">Баланс на кране</span>
+                    </div>
+                </div>
+
+                <div class="col-2" style="background-color: rgb(138,198,66); border: 2px solid white;">
+                    <div class="mt-2 mb-2">
+                        <span class="text-light" style="font-size: 20px">Тип валюты</span>
+                    </div>
+                </div>
+
+                <div class="col-1"></div>
+            </div>
+
+            <div id="Notes">
+                @await Html.PartialAsync("_Cranes", Model)
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
