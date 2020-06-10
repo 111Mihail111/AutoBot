@@ -1,4 +1,6 @@
-﻿@model IEnumerable<AutoBot.Models.Crane>
+﻿@using AutoBot.Enums
+
+@model IEnumerable<AutoBot.Models.Crane>
 
 @{ int counter = 0; }
 
@@ -17,9 +19,18 @@
             <div class="mt-2 mb-2"><span>@item.ActivityTime.ToString(@"hh\:mm\:ss")</span></div>
         </div>
 
-        <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
-            <div class="mt-2 mb-2"><span>@item.StatusCrane</span></div>
-        </div>
+        @if (item.StatusCrane == Status.Work)
+        {
+            <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
+                <div class="mt-2 mb-2"><span>@item.StatusCrane</span></div>
+            </div>
+        }
+        else
+        {
+            <div class="col-2 text-center text-danger" style="background-color: rgb(222,243,202); border: 2px solid white;">
+                <div class="mt-2 mb-2"><span>@item.StatusCrane</span></div>
+            </div>
+        }
 
         <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
             <div class="mt-2 mb-2"><span>@item.BalanceOnCrane</span></div>

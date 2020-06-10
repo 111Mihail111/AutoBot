@@ -4,14 +4,16 @@
         let timerRow = notes.children[i].children[2].innerText;
         if (timerRow === "00:00:00") {
             //Ajax запрос с переходом на сайт
+            debugger;
             GoToCrane(GetDataCrane(notes.children[i]));
         }
         else {
             //Ajax запрос с обновление таймера
-            UpdatingTimerCrane(notes.children[i].children[2].firstElementChild.firstElementChild);
+            UpdatingTimerCrane(GetDataCrane(notes.children[i]));
         }
     }
-}, 1000)
+}, 10000)
+
 
 function GetDataCrane(row) {
     return {
@@ -23,14 +25,20 @@ function GetDataCrane(row) {
     }
 }
 
-function UpdatingTimerCrane(timer) {
+function UpdatingTimerCrane(crane) {
     $.ajax({
         type: "GET",
-        data: { 'timer': timer.innerText },
+        data: {
+            'URL': crane.URL,
+            'ActivityTime': crane.ActivityTime,
+            'StatusCrane': crane.StatusCrane,
+            'MyBalanceOnCrane': crane.MyBalanceOnCrane,
+            'TypeCurrencies': crane.TypeCurrencies,
+        },
         contentType: "application/json; charset=utf-8",
         url: "/Start/UpdateTimerCrane",
-        success: function (result) {
-            timer.innerText = result;
+        success: function (data) {
+            $('#Notes').html(data);
         }
     });
 }

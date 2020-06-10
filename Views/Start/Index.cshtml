@@ -62,7 +62,7 @@
             </div>
 
             <div id="Notes">
-                @await Html.PartialAsync("_Cranes", Model)
+                @{await Html.RenderPartialAsync("_Cranes", Model);}
             </div>
 
         </div>
