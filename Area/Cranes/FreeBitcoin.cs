@@ -1,4 +1,5 @@
-﻿using AutoBot.Area.Managers;
+﻿using AutoBot.Area.API;
+using AutoBot.Area.Managers;
 using AutoBot.Enums;
 using AutoBot.Models;
 using OpenQA.Selenium;
@@ -23,6 +24,8 @@ namespace AutoBot.Area.Cranes
             {
                 string imageByte = GetCaptcha(Captcha.RegularCaptcha);
                 //TODO: Отправка капчи на сервак 
+                RuCaptchaController ruCaptchaController = new RuCaptchaController();
+                ruCaptchaController.SendCaptcha(imageByte);
 
                 AuthorizationOnCrane("signup_form_email", "signup_form_password", "signup_button", LOGIN, PASSWORD);
                 GoToUrl(urlCrane);

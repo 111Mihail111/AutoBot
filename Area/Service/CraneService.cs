@@ -9,7 +9,7 @@ namespace AutoBot.Area.Service
     {
         public static List<Crane> _cranes = new List<Crane>
             {
-                new Crane { URL = "https://freebitco.in/", ActivityTime = TimeSpan.FromHours(0),
+                new Crane { URL = "https://freebitco.in/", ActivityTime = TimeSpan.FromHours(1),
                     BalanceOnCrane = 0, StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.Bitcoin, TypeCrane = TypeCrane.FreeBitcoin },
             };
 

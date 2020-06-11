@@ -20,8 +20,4 @@
     <None Include="wwwroot\Content\Scripts.js" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Area\API\" />
-  </ItemGroup>
-
 </Project>
