@@ -1,19 +1,22 @@
 ﻿using AutoBot.Area.Cranes;
-using AutoBot.Area.Managers;
+using AutoBot.Area.Interface;
 using AutoBot.Area.Service;
 using AutoBot.Enums;
 using AutoBot.Models;
 using Microsoft.AspNetCore.Mvc;
-using OpenQA.Selenium.Chrome;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AutoBot.Controllers
 {
     public class StartController : Controller
-    {       
+    {
+        private IFreeBitcoin _freeBitcoin;
+
+        public StartController(IFreeBitcoin freeBitcoin)
+        {
+            _freeBitcoin = freeBitcoin;
+        }
+
         public ActionResult Index() => View(CraneService.GetCranes());
             
         [HttpGet]
@@ -31,10 +34,8 @@ namespace AutoBot.Controllers
             switch (crane.TypeCrane)
             {
                 case TypeCrane.FreeBitcoin:
-                    FreeBitcoin freeBitcoin = new FreeBitcoin();
-                    freeBitcoin.GoTo(crane);
-                    //После выполнения кран возвращает модель. Отдаем ее на обновление
-                    //CraneService.UpdateCrane(crane);
+                    crane = _freeBitcoin.GoTo(crane).Result;
+                    CraneService.UpdateCrane(crane);
                     break;
             }
 

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace AutoBot.Area.Managers
 {
@@ -24,6 +25,20 @@ namespace AutoBot.Area.Managers
         {
             Browser.Navigate().GoToUrl(url);
         }
+
+        public void GoToUrlNewTab(string url)
+        {
+            Browser.ExecuteScript("window.open();");
+            SwitchToTab();
+            Browser.Navigate().GoToUrl(url);
+        }
+
+        public void SwitchToTab()
+        {
+            var newTabInstance = Browser.WindowHandles[Browser.WindowHandles.Count - 1];
+            Browser.SwitchTo().Window(newTabInstance);
+        }
+
         /// <summary>
         /// Авторизация на кране
         /// </summary>
@@ -34,9 +49,9 @@ namespace AutoBot.Area.Managers
         /// <param name="password">Пароль</param>
         public void AuthorizationOnCrane(string loginFieldId, string passwordFieldId, string buttonId, string login, string password)
         {
-            Browser.FindElementById(loginFieldId).SendKeys(login);
-            Browser.FindElementById(passwordFieldId).SendKeys(password);
-            Browser.FindElementById(buttonId).Click();
+            GetElementById(loginFieldId).SendKeys(login);
+            GetElementById(passwordFieldId).SendKeys(password);
+            GetElementById(buttonId).Click();
         }
         /// <summary>
         /// Установить позицию верхнего скрола
@@ -45,6 +60,21 @@ namespace AutoBot.Area.Managers
         public void SetScrollPosition(int scrollVerticalPosition = 0, int scrollHorizontalPosition = 0)
         {
             Browser.ExecuteScript($"window.scroll({scrollHorizontalPosition}, {scrollVerticalPosition})");
+        }
+        /// <summary>
+        /// Выполнить скрипт
+        /// </summary>
+        /// <param name="jsScript">Скрипт</param>
+        public string ExecuteScript(string jsScript)
+        {
+            return Browser.ExecuteScript(jsScript)?.ToString();
+        }
+        /// <summary>
+        /// Закрыть вкладку
+        /// </summary>
+        public void CloseTab()
+        {
+            Browser.ExecuteScript("window.close();");
         }
 
 

@@ -1,3 +1,6 @@
+using AutoBot.Area.API;
+using AutoBot.Area.Cranes;
+using AutoBot.Area.Interface;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +13,7 @@ namespace AutoBot
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddScoped<IFreeBitcoin, FreeBitcoin>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

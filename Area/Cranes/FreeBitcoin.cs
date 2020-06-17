@@ -1,71 +1,103 @@
 ﻿using AutoBot.Area.API;
+using AutoBot.Area.Interface;
 using AutoBot.Area.Managers;
 using AutoBot.Enums;
 using AutoBot.Models;
 using OpenQA.Selenium;
 using System;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AutoBot.Area.Cranes
 {
-    public class FreeBitcoin : BrowserManager
+    public class FreeBitcoin : BrowserManager, IFreeBitcoin
     {
         const string LOGIN = "polowinckin.mixail@yandex.ru";
         const string PASSWORD = "xHkKv78SvV2o7rSX";
+        private RuCaptchaController _ruCaptchaController = new RuCaptchaController();
 
-        public void GoTo(Crane crane)
+
+        public async Task<Crane> GoTo(Crane crane)
         {
             string urlCrane = crane.URL;
 
             GoToUrl(urlCrane);
+            await AuthorizationOnCrane(urlCrane);
 
-            if (!CheckPage(urlCrane))
-            {
-                string imageByte = GetCaptcha(Captcha.RegularCaptcha);
-                //TODO: Отправка капчи на сервак 
-                RuCaptchaController ruCaptchaController = new RuCaptchaController();
-                ruCaptchaController.SendCaptcha(imageByte);
-
-                AuthorizationOnCrane("signup_form_email", "signup_form_password", "signup_button", LOGIN, PASSWORD);
-                GoToUrl(urlCrane);
-            }
-
-            //Закрытие рекламного окна
-            GetElementByXPath("/html/body/div[24]").Click();
-
-            //Подтверждение о куках сайта
-            GetElementByXPath("/html/body/div[1]/div/a[1]").Click();
-
+            Thread.Sleep(2000);
+            GetElementByXPath("/html/body/div[24]").Click(); //Закрытие рекламного окна
+            GetElementByXPath("/html/body/div[1]/div/a[1]").Click(); //Подтверждение о куках сайта
             SetScrollPosition(1000);
 
             if (IsTimerExist())
             {
-                crane.ActivityTime = TimeSpan.Parse(GetTimer());
-                crane.BalanceOnCrane = BalanceCrane();
+                return GetDetailsWithCrane(crane);
             }
 
-            string token = GetCaptcha(Captcha.ReCaptcha_V2);
-            //TODO: Отправка капчи на сервак
+            string token = GetElementByXPath("//*[@id='free_play_recaptcha']/form/div").GetAttribute("data-sitekey");
+            string responseOnCaptcha = await _ruCaptchaController.SendCaptcha_v2(token, urlCrane);
 
+            HiddenFieldVisible("g-recaptcha-response");
+            GetElementByXPath("//*[@id='g-recaptcha-response']").SendKeys(responseOnCaptcha);
+            HiddenFieldInVisible("g-recaptcha-response");
+            GetElementById("free_play_form_button").Click(); // Нажать на ROLL
+
+            return GetDetailsWithCrane(crane);
         }
 
+
+        public async Task AuthorizationOnCrane(string urlCrane)
+        {
+            bool isAuthorization = CheckPage(urlCrane);
+            if (!isAuthorization)
+            {
+                string imageByte = GetDataCaptcha(Captcha.RegularCaptcha);
+                string responseOnCaptcha = await _ruCaptchaController.SendCaptcha(imageByte);
+
+                while (isAuthorization == false)
+                {
+                    GetElementByXPath("//*[@id='botdetect_signup_captcha']/input[2]").SendKeys(responseOnCaptcha);
+                    AuthorizationOnCrane("signup_form_email", "signup_form_password", "signup_button", LOGIN, PASSWORD);
+                    Thread.Sleep(1000);
+                    isAuthorization = CheckPage(urlCrane);
+                }
+
+                GoToUrl(urlCrane);
+            }
+        }
+
+        public void HiddenFieldVisible(string xPath)
+        {
+            Browser.ExecuteScript($"var textArea = document.getElementById('{xPath}');" +
+                "textArea.style.position = 'absolute';" +
+                "textArea.style.display = 'inline';");
+        }
+        public void HiddenFieldInVisible(string xPath)
+        {
+            Browser.ExecuteScript($"var textArea = document.getElementById('{xPath}');" +
+                "textArea.style.position = '';" +
+                "textArea.style.display = 'none';");
+        }
 
         /// <summary>
         /// Получить капчу
         /// </summary>
         /// <param name="captcha">Тип капчи</param>
         /// <returns>Данные для API запроса</returns>
-        public string GetCaptcha(Captcha captcha)
+        public string GetDataCaptcha(Captcha captcha)
         {
             switch (captcha)
             {
                 case Captcha.ReCaptcha_V2:
-                    var url = GetElementByXPath("//*[@id='free_play_recaptcha']/form/div/div/div/iframe").GetAttribute("src");
+                    var url = GetElementByXPath("//*[@id='free_play_recaptcha']/form/div").GetAttribute("data-sitekey");
                     return GetTokenCaptcha(url);
                 case Captcha.RegularCaptcha:
                     var imageSrc = GetElementByXPath("//*[@id='botdetect_signup_captcha']/div[1]/img").GetAttribute("src");
-                    return ConvertImageToByte(imageSrc);
+                    GoToUrlNewTab(imageSrc);
+                    return ConvertImageToByte();
             }
 
             return string.Empty;
@@ -87,10 +119,21 @@ namespace AutoBot.Area.Cranes
         /// </summary>
         /// <param name="imageSrc">Изображение</param>
         /// <returns>Строка байтов</returns>
-        public string ConvertImageToByte(string imageSrc)
+        public string ConvertImageToByte()
         {
-            var bytes = Encoding.UTF8.GetBytes(imageSrc);
-            return Convert.ToBase64String(bytes);
+            string result = ExecuteScript(
+            "var c = document.createElement(\"canvas\");" +
+            "var ctx = c.getContext(\"2d\");" +
+            "var img = document.querySelector(\"body > img\");" +
+            "c.height = img.height;" +
+            "c.width = img.width;" +
+            "ctx.drawImage(img, 0, 0);" +
+            "return c.toDataURL(\"image/jpeg\");").Replace("data:image/jpeg;base64,", string.Empty);
+
+            CloseTab();
+            SwitchToTab();
+            
+            return result;
         }
         /// <summary>
         /// Проверка страницы
@@ -99,12 +142,7 @@ namespace AutoBot.Area.Cranes
         /// <returns>True если открыта нужная страница, иначе - false</returns>
         public bool CheckPage(string url)
         {
-            if (Browser.Url == url)
-            {
-                return true;
-            }
-
-            return false;
+            return Browser.Url == url || Browser.Url == "https://freebitco.in/?op=home" ? true : false;
         }
         /// <summary>
         /// Существует ли таймер
@@ -138,6 +176,18 @@ namespace AutoBot.Area.Cranes
         public double BalanceCrane()
         {
             return Convert.ToDouble(GetElementByXPath("//*[@id='balance']").Text);
+        }
+        /// <summary>
+        /// Получить подробности с крана
+        /// </summary>
+        /// <param name="crane">Модель крана</param>
+        /// <returns>Модель с обновленными данными</returns>
+        public Crane GetDetailsWithCrane(Crane crane)
+        {
+            crane.ActivityTime = TimeSpan.Parse(GetTimer());
+            crane.BalanceOnCrane = BalanceCrane();
+
+            return crane;
         }
     }
 }
