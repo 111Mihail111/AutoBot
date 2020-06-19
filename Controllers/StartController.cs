@@ -23,8 +23,12 @@ namespace AutoBot.Controllers
         public PartialViewResult UpdateTimerCrane(Crane crane)
         {
             crane.ActivityTime = crane.ActivityTime - TimeSpan.FromMinutes(1);
-            CraneService.UpdateCrane(crane);
+            if (crane.ActivityTime < TimeSpan.FromSeconds(1))
+            {
+                crane.ActivityTime = TimeSpan.FromSeconds(0);
+            }
 
+            CraneService.UpdateCrane(crane);
             return PartialView("_Cranes", CraneService.GetCranes());
         }
 

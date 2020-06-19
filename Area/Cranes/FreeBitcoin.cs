@@ -25,11 +25,8 @@ namespace AutoBot.Area.Cranes
             string urlCrane = crane.URL;
 
             GoToUrl(urlCrane);
-            await AuthorizationOnCrane(urlCrane);
-
             Thread.Sleep(2000);
-            GetElementByXPath("/html/body/div[24]").Click(); //Закрытие рекламного окна
-            GetElementByXPath("/html/body/div[1]/div/a[1]").Click(); //Подтверждение о куках сайта
+            await AuthorizationOnCrane(urlCrane);
             SetScrollPosition(1000);
 
             if (IsTimerExist())
@@ -54,19 +51,41 @@ namespace AutoBot.Area.Cranes
             bool isAuthorization = CheckPage(urlCrane);
             if (!isAuthorization)
             {
-                string imageByte = GetDataCaptcha(Captcha.RegularCaptcha);
-                string responseOnCaptcha = await _ruCaptchaController.SendCaptcha(imageByte);
-
-                while (isAuthorization == false)
+                GetElementByXPath("/html/body/div[1]/div/a[1]").Click(); //Подтверждение о куках сайта
+                await InsertToField();
+                AuthorizationOnCrane("signup_form_email", "signup_form_password", "signup_button", LOGIN, PASSWORD);
+                Thread.Sleep(2000);
+                bool isErrorCapthca = true;
+                while (isErrorCapthca)
                 {
-                    GetElementByXPath("//*[@id='botdetect_signup_captcha']/input[2]").SendKeys(responseOnCaptcha);
-                    AuthorizationOnCrane("signup_form_email", "signup_form_password", "signup_button", LOGIN, PASSWORD);
-                    Thread.Sleep(1000);
-                    isAuthorization = CheckPage(urlCrane);
-                }
+                    isErrorCapthca = GetElementByXPath("//*[@id='reward_point_redeem_result_container_div']").Displayed;
+                    if (!isErrorCapthca)
+                    {
+                        _ruCaptchaController.SendReportOnCaptcha(_ruCaptchaController.GetKeyCaptcha(), "reportgood");
+                        break;
+                    }
 
-                GoToUrl(urlCrane);
+                    _ruCaptchaController.SendReportOnCaptcha(_ruCaptchaController.GetKeyCaptcha(), "reportbad");
+                    await InsertToField();
+                    GetElementById("signup_button").Click();
+                }
             }
+
+            GoToUrl(urlCrane);
+            Thread.Sleep(5000);
+
+            if (GetElementByXPath("//*[@id='push_notification_modal']/div[1]/div[2]/div/div[1]").Displayed)
+            {
+                GetElementByXPath("//*[@id='push_notification_modal']/div[1]/div[2]/div/div[1]").Click(); //Закрытие рекламного окна
+            }
+        }
+
+        public async Task InsertToField()
+        {
+            string imageByte = GetDataCaptcha(Captcha.RegularCaptcha);
+            string responseOnCaptcha = await _ruCaptchaController.SendCaptcha(imageByte);
+
+            GetElementByXPath("//*[@id='botdetect_signup_captcha']/input[2]").SendKeys(responseOnCaptcha);
         }
 
         public void HiddenFieldVisible(string xPath)
@@ -93,7 +112,7 @@ namespace AutoBot.Area.Cranes
             {
                 case Captcha.ReCaptcha_V2:
                     var url = GetElementByXPath("//*[@id='free_play_recaptcha']/form/div").GetAttribute("data-sitekey");
-                    return GetTokenCaptcha(url);
+                    return GetTokenReCaptcha(url);
                 case Captcha.RegularCaptcha:
                     var imageSrc = GetElementByXPath("//*[@id='botdetect_signup_captcha']/div[1]/img").GetAttribute("src");
                     GoToUrlNewTab(imageSrc);
@@ -107,7 +126,7 @@ namespace AutoBot.Area.Cranes
         /// </summary>
         /// <param name="url">Url-адрес капчи</param>
         /// <returns>Токен</returns>
-        public string GetTokenCaptcha(string url)
+        public string GetTokenReCaptcha(string url)
         {
             var array = url.Split('&');
             string token = array[1].Trim('k', '=');
@@ -132,7 +151,7 @@ namespace AutoBot.Area.Cranes
 
             CloseTab();
             SwitchToTab();
-            
+
             return result;
         }
         /// <summary>
@@ -142,7 +161,7 @@ namespace AutoBot.Area.Cranes
         /// <returns>True если открыта нужная страница, иначе - false</returns>
         public bool CheckPage(string url)
         {
-            return Browser.Url == url || Browser.Url == "https://freebitco.in/?op=home" ? true : false;
+            return Browser.Url == url ? true : false;
         }
         /// <summary>
         /// Существует ли таймер
@@ -162,20 +181,27 @@ namespace AutoBot.Area.Cranes
         /// Получить таймер
         /// </summary>
         /// <returns>Время таймера</returns>
-        public string GetTimer()
+        public TimeSpan GetTimer()
         {
-            var timer = GetElementByXPath("//*[@id='time_remaining']/span/").Text;
-            timer = timer.Replace("Minutes", ":").Replace("Seconds", "");
-
-            return TimeSpan.Parse(timer).ToString(@"hh\:mm\:ss");
+            Thread.Sleep(1000);
+            string timer = "00:";
+            timer += GetElementByXPath("//*[@id='time_remaining']/span").Text;
+            timer = timer.Replace("Minutes", ":")
+                         .Replace("Minute", string.Empty)
+                         .Replace("Seconds", string.Empty)
+                         .Replace("Second", string.Empty)
+                         .Replace("\r", string.Empty)
+                         .Replace("\n", string.Empty);
+           
+            return TimeSpan.Parse(timer);
         }
         /// <summary>
         /// Получить баланс на кране
         /// </summary>
         /// <returns>Баланс</returns>
-        public double BalanceCrane()
+        public string BalanceCrane()
         {
-            return Convert.ToDouble(GetElementByXPath("//*[@id='balance']").Text);
+            return GetElementByXPath("//*[@id='balance']").Text;
         }
         /// <summary>
         /// Получить подробности с крана
@@ -184,7 +210,7 @@ namespace AutoBot.Area.Cranes
         /// <returns>Модель с обновленными данными</returns>
         public Crane GetDetailsWithCrane(Crane crane)
         {
-            crane.ActivityTime = TimeSpan.Parse(GetTimer());
+            crane.ActivityTime = GetTimer();
             crane.BalanceOnCrane = BalanceCrane();
 
             return crane;

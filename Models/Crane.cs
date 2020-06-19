@@ -23,7 +23,7 @@ namespace AutoBot.Models
         /// <summary>
         /// Мой баланс на кране
         /// </summary>
-        public double BalanceOnCrane { get; set; }
+        public string BalanceOnCrane { get; set; }
         /// <summary>
         /// Тип валюты
         /// </summary>

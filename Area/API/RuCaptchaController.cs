@@ -16,6 +16,7 @@ namespace AutoBot.Area.API
         private readonly string _urlForPostQuery = "/in.php";
         private readonly string _urlForGetQuery = "/res.php";
         private readonly string _APIKey = "bdeac7db70fa1dfbabc955a4826f7775";
+        private string _keyCaptcha;
 
         [HttpPost]
         public async Task<string> SendCaptcha(string image)
@@ -37,7 +38,8 @@ namespace AutoBot.Area.API
             var array = status.Split("|");
             if (array[0] == "OK")
             {
-                return await GetResponseOnCaptcha(array[1]);
+                _keyCaptcha = array[1];
+                return await GetResponseOnCaptcha(_keyCaptcha);
             }
 
             return string.Empty;
@@ -61,6 +63,17 @@ namespace AutoBot.Area.API
             }
 
             return status.Replace("OK|", string.Empty);
+        }
+
+        [HttpGet]
+        public async void SendReportOnCaptcha(string captchaId, string typeReport)
+        {
+            var url = $"{_urlRuCaptcha + _urlForGetQuery}?key={_APIKey}&action={typeReport}&id={captchaId}";
+            using (var client = new HttpClient { BaseAddress = _urlRuCaptcha })
+            {
+                var result = await client.GetAsync(url);
+                string status = await GetStatusRequest(result);
+            }
         }
 
         [HttpPost]
@@ -91,6 +104,8 @@ namespace AutoBot.Area.API
             return string.Empty;
         }
 
+
+
         /// <summary>
         /// Получить статус запроса
         /// </summary>
@@ -100,6 +115,11 @@ namespace AutoBot.Area.API
         {
             var bytes = await responseMessage.Content.ReadAsByteArrayAsync();
             return Encoding.GetEncoding("utf-8").GetString(bytes, 0, bytes.Length).ToString();
+        }
+
+        public string GetKeyCaptcha()
+        {
+            return _keyCaptcha;
         }
     }
 }

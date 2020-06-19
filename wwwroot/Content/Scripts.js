@@ -12,7 +12,7 @@
             UpdatingTimerCrane(GetDataCrane(notes.children[i]));
         }
     }
-}, 10000)
+}, 60000)
 
 
 function GetDataCrane(row) {
@@ -20,7 +20,7 @@ function GetDataCrane(row) {
         URL: row.children[1].innerText,
         ActivityTime: row.children[2].innerText,
         StatusCrane: row.children[3].innerText,
-        MyBalanceOnCrane: row.children[4].innerText,
+        BalanceOnCrane: row.children[4].innerText,
         TypeCurrencies: row.children[5].innerText,
     }
 }
@@ -32,7 +32,7 @@ function UpdatingTimerCrane(crane) {
             'URL': crane.URL,
             'ActivityTime': crane.ActivityTime,
             'StatusCrane': crane.StatusCrane,
-            'MyBalanceOnCrane': crane.MyBalanceOnCrane,
+            'BalanceOnCrane': crane.BalanceOnCrane,
             'TypeCurrencies': crane.TypeCurrencies,
         },
         contentType: "application/json; charset=utf-8",
@@ -50,9 +50,12 @@ function GoToCrane(crane) {
             'URL': crane.URL,
             'ActivityTime': crane.ActivityTime,
             'StatusCrane': crane.StatusCrane,
-            'MyBalanceOnCrane': crane.MyBalanceOnCrane,
+            'BalanceOnCrane': crane.BalanceOnCrane,
             'TypeCurrencies': crane.TypeCurrencies,
         },
         url: "/Start/GoToCrane",
+        success: function (data) {
+            $('#Notes').html(data);
+        }
     });
 }
