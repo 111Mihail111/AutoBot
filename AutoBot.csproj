@@ -5,9 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="WebExtention\**" />
     <Compile Remove="wwwroot\node_modules - Копировать\**" />
+    <Content Remove="WebExtention\**" />
     <Content Remove="wwwroot\node_modules - Копировать\**" />
+    <EmbeddedResource Remove="WebExtention\**" />
     <EmbeddedResource Remove="wwwroot\node_modules - Копировать\**" />
+    <None Remove="WebExtention\**" />
     <None Remove="wwwroot\node_modules - Копировать\**" />
   </ItemGroup>
 

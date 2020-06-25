@@ -1,5 +1,4 @@
-﻿using AutoBot.Area.Cranes;
-using AutoBot.Area.Interface;
+﻿using AutoBot.Area.Interface;
 using AutoBot.Area.Service;
 using AutoBot.Enums;
 using AutoBot.Models;
@@ -11,14 +10,16 @@ namespace AutoBot.Controllers
     public class StartController : Controller
     {
         private IFreeBitcoin _freeBitcoin;
+        private IRuCaptcha _ruCaptcha;
 
-        public StartController(IFreeBitcoin freeBitcoin)
+        public StartController(IFreeBitcoin freeBitcoin, IRuCaptcha ruCaptcha)
         {
             _freeBitcoin = freeBitcoin;
+            _ruCaptcha = ruCaptcha;
         }
 
         public ActionResult Index() => View(CraneService.GetCranes());
-            
+
         [HttpGet]
         public PartialViewResult UpdateTimerCrane(Crane crane)
         {
@@ -35,6 +36,8 @@ namespace AutoBot.Controllers
         [HttpGet]
         public PartialViewResult GoToCrane(Crane crane)
         {
+            CheckingBid();
+
             switch (crane.TypeCrane)
             {
                 case TypeCrane.FreeBitcoin:
@@ -44,6 +47,11 @@ namespace AutoBot.Controllers
             }
 
             return PartialView("_Cranes", CraneService.GetCranes());
+        }
+
+        protected void CheckingBid()
+        {
+            _ruCaptcha.GoTo();
         }
     }
 }

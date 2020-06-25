@@ -1,4 +1,4 @@
-using AutoBot.Area.API;
+using AutoBot.Area;
 using AutoBot.Area.Cranes;
 using AutoBot.Area.Interface;
 using Microsoft.AspNetCore.Builder;
@@ -13,7 +13,9 @@ namespace AutoBot
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+
             services.AddScoped<IFreeBitcoin, FreeBitcoin>();
+            services.AddScoped<IRuCaptcha, RuCaptcha>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

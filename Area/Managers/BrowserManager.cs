@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Interactions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace AutoBot.Area.Managers
     public class BrowserManager
     {
         public static readonly ChromeDriver Browser = Initialization(new ChromeOptions());
-
+        
         public static ChromeDriver Initialization(ChromeOptions options)
         {
             return new ChromeDriver("/Project/AutoBot/bin/Debug/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
@@ -25,13 +26,24 @@ namespace AutoBot.Area.Managers
         {
             Browser.Navigate().GoToUrl(url);
         }
-
-        public void GoToUrlNewTab(string url)
+        /// <summary>
+        /// Открыть страницу в новой вкладке
+        /// </summary>
+        /// <param name="url">Url-адрес страницы</param>
+        public void OpenPageInNewTab(string url)
         {
             Browser.ExecuteScript("window.open();");
             SwitchToTab();
             Browser.Navigate().GoToUrl(url);
         }
+        /// <summary>
+        /// Закрыть вкладку
+        /// </summary>
+        public void CloseTab()
+        {
+            Browser.ExecuteScript("window.close();");
+        }
+
 
         public void SwitchToTab()
         {
@@ -39,25 +51,26 @@ namespace AutoBot.Area.Managers
             Browser.SwitchTo().Window(newTabInstance);
         }
 
+
         /// <summary>
-        /// Авторизация на кране
+        /// Авторизация на сайте
         /// </summary>
         /// <param name="loginFieldId">Id поля логина</param>
         /// <param name="passwordFieldId">Id поля пароля</param>
         /// <param name="buttonId">Id кнопки</param>
         /// <param name="login">Логин</param>
         /// <param name="password">Пароль</param>
-        public void AuthorizationOnCrane(string loginFieldId, string passwordFieldId, string buttonId, string login, string password)
+        public void AuthorizationOnSite(string loginFieldId, string passwordFieldId, string buttonId, string login, string password)
         {
             GetElementById(loginFieldId).SendKeys(login);
             GetElementById(passwordFieldId).SendKeys(password);
             GetElementById(buttonId).Click();
         }
         /// <summary>
-        /// Установить позицию верхнего скрола
+        /// Установить позицию скрола
         /// </summary>
         /// <param name="scrollTopPosition">Позиция верхнего скрола</param>
-        public void SetScrollPosition(int scrollVerticalPosition = 0, int scrollHorizontalPosition = 0)
+        public void SetScrollPosition(int scrollHorizontalPosition = 0, int scrollVerticalPosition = 0)
         {
             Browser.ExecuteScript($"window.scroll({scrollHorizontalPosition}, {scrollVerticalPosition})");
         }
@@ -69,14 +82,7 @@ namespace AutoBot.Area.Managers
         {
             return Browser.ExecuteScript(jsScript)?.ToString();
         }
-        /// <summary>
-        /// Закрыть вкладку
-        /// </summary>
-        public void CloseTab()
-        {
-            Browser.ExecuteScript("window.close();");
-        }
-
+        
 
         public IWebElement GetElementByXPath(string xPath, int waitingTimeSecond = 5)
         {
@@ -127,5 +133,52 @@ namespace AutoBot.Area.Managers
             //TODO: ОБЕРНУТЬ В TRY CATCH И ОЖИДАТЬ ОШИБКУ ЗДЕСЬ, если элемент не найден
             return null;
         }
+
+
+        /// <summary>
+        /// Создать действие в браузере
+        /// </summary>
+        /// <returns>Действие</returns>
+        public Actions CreateActionToBrowser()
+        {
+            return new Actions(Browser);
+        }
+        /// <summary>
+        /// Получить URL страницы
+        /// </summary>
+        /// <returns>URL</returns>
+        public string GetUrlPage()
+        {
+            return Browser.Url;
+        }
+
+        #region Запуск хрома под другим профилем
+        //РАБОЧИЙ ВАРИАНТ
+        //option.AddArgument("--user-data-dir=C:\\Users\\PolovinkinMV\\AppData\\Local\\Google\\Chrome\\User Data\\");
+        //option.AddArgument("--profile-directory=Profile 4");
+        //option.AddArgument("--start-maximized");
+
+
+        //ChromeOptions option = new ChromeOptions();
+
+        //option.AddArgument("--user-data-dir=C:\\Users\\PolovinkinMV\\AppData\\Local\\Google\\Chrome\\User Data\\");
+        //option.AddArgument("--load-extension=chrome-extension");
+        //option.AddArgument("--profile-directory=Profile 4");
+        //option.AddArgument("--disable-extensions");
+
+        //option.AddArguments("--disable-infobars");
+        //option.AddAdditionalCapability("useAutomationExtension", true);
+        //option.AddArgument("--no-sandbox");
+        //option.AddArgument("--headless");
+        //option.AddArgument("--disable-dev-shm-usage");
+
+        //option.AddArgument("--user-data-dir=C:\\Users\\PolovinkinMV\\AppData\\Local\\Google\\Chrome\\User Data\\");
+        //    option.AddArgument("--profile-directory=Profile 4");
+        //    option.AddArgument("--start-maximized");
+        //    option.AddExtension("C:\\Project\\AutoBot\\WebExtention\\internal.crx");
+
+
+        //    var Browser = new ChromeDriver("/Project/AutoBot/bin/Debug/netcoreapp2.0", option, TimeSpan.FromSeconds(200));
+        #endregion Запуск хрома под другим профилем
     }
 }

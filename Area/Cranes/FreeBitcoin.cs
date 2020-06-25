@@ -15,10 +15,9 @@ namespace AutoBot.Area.Cranes
 {
     public class FreeBitcoin : BrowserManager, IFreeBitcoin
     {
-        const string LOGIN = "polowinckin.mixail@yandex.ru";
-        const string PASSWORD = "xHkKv78SvV2o7rSX";
-        private RuCaptchaController _ruCaptchaController = new RuCaptchaController();
-
+        private RuCaptchaController _ruCaptchaController = new RuCaptchaController(); //TODO: Обернуть интерфейсом и прокинуть через DI
+        const string LOGIN = "polowinckin.mixail@yandex.ru"; //TODO: Настройки вынести отдельно на страницу
+        const string PASSWORD = "xHkKv78SvV2o7rSX";  //TODO: Настройки вынести отдельно на страницу
 
         public async Task<Crane> GoTo(Crane crane)
         {
@@ -27,7 +26,7 @@ namespace AutoBot.Area.Cranes
             GoToUrl(urlCrane);
             Thread.Sleep(2000);
             await AuthorizationOnCrane(urlCrane);
-            SetScrollPosition(1000);
+            SetScrollPosition(0, 1000);
 
             if (IsTimerExist())
             {
@@ -53,8 +52,9 @@ namespace AutoBot.Area.Cranes
             {
                 GetElementByXPath("/html/body/div[1]/div/a[1]").Click(); //Подтверждение о куках сайта
                 await InsertToField();
-                AuthorizationOnCrane("signup_form_email", "signup_form_password", "signup_button", LOGIN, PASSWORD);
+                AuthorizationOnSite("signup_form_email", "signup_form_password", "signup_button", LOGIN, PASSWORD);
                 Thread.Sleep(2000);
+
                 bool isErrorCapthca = true;
                 while (isErrorCapthca)
                 {
@@ -74,9 +74,10 @@ namespace AutoBot.Area.Cranes
             GoToUrl(urlCrane);
             Thread.Sleep(5000);
 
-            if (GetElementByXPath("//*[@id='push_notification_modal']/div[1]/div[2]/div/div[1]").Displayed)
+            var advertisingWindow = GetElementByXPath("//*[@id='push_notification_modal']/div[1]/div[2]/div/div[1]");
+            if (advertisingWindow.Displayed)
             {
-                GetElementByXPath("//*[@id='push_notification_modal']/div[1]/div[2]/div/div[1]").Click(); //Закрытие рекламного окна
+                advertisingWindow.Click();
             }
         }
 
@@ -115,14 +116,14 @@ namespace AutoBot.Area.Cranes
                     return GetTokenReCaptcha(url);
                 case Captcha.RegularCaptcha:
                     var imageSrc = GetElementByXPath("//*[@id='botdetect_signup_captcha']/div[1]/img").GetAttribute("src");
-                    GoToUrlNewTab(imageSrc);
+                    OpenPageInNewTab(imageSrc);
                     return ConvertImageToByte();
             }
 
             return string.Empty;
         }
         /// <summary>
-        /// Получить токен капчи
+        /// Получить токен Рекапчи
         /// </summary>
         /// <param name="url">Url-адрес капчи</param>
         /// <returns>Токен</returns>
@@ -161,7 +162,7 @@ namespace AutoBot.Area.Cranes
         /// <returns>True если открыта нужная страница, иначе - false</returns>
         public bool CheckPage(string url)
         {
-            return Browser.Url == url ? true : false;
+            return GetUrlPage() == url ? true : false;
         }
         /// <summary>
         /// Существует ли таймер
@@ -183,17 +184,13 @@ namespace AutoBot.Area.Cranes
         /// <returns>Время таймера</returns>
         public TimeSpan GetTimer()
         {
-            Thread.Sleep(1000);
             string timer = "00:";
-            timer += GetElementByXPath("//*[@id='time_remaining']/span").Text;
-            timer = timer.Replace("Minutes", ":")
-                         .Replace("Minute", string.Empty)
-                         .Replace("Seconds", string.Empty)
-                         .Replace("Second", string.Empty)
-                         .Replace("\r", string.Empty)
-                         .Replace("\n", string.Empty);
-           
-            return TimeSpan.Parse(timer);
+            timer += GetElementByXPath("//*[@id='time_remaining']/span", 15).Text;
+            timer = timer.Replace("Minutes", ":").Replace("Minute", string.Empty)
+                         .Replace("Seconds", string.Empty).Replace("Second", string.Empty)
+                         .Replace("\r", string.Empty).Replace("\n", string.Empty);
+
+            return TimeSpan.Parse(timer == "00:60:0" ? timer + "0" : timer);
         }
         /// <summary>
         /// Получить баланс на кране
@@ -201,7 +198,7 @@ namespace AutoBot.Area.Cranes
         /// <returns>Баланс</returns>
         public string BalanceCrane()
         {
-            return GetElementByXPath("//*[@id='balance']").Text;
+            return GetElementByXPath("//*[@id='balance']", 15).Text;
         }
         /// <summary>
         /// Получить подробности с крана

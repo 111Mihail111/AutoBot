@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoBot.Area.Interface;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -12,6 +13,7 @@ namespace AutoBot.Area.API
     [ApiController]
     public class RuCaptchaController : ControllerBase
     {
+        private readonly IRuCaptcha _ruCaptcha = new RuCaptcha();
         private readonly Uri _urlRuCaptcha = new Uri("http://rucaptcha.com");
         private readonly string _urlForPostQuery = "/in.php";
         private readonly string _urlForGetQuery = "/res.php";
@@ -58,7 +60,12 @@ namespace AutoBot.Area.API
                 using (var client = new HttpClient { BaseAddress = _urlRuCaptcha })
                 {
                     var result = await client.GetAsync(url);
+
                     status = await GetStatusRequest(result);
+                    if (status == "ERROR_NO_SLOT_AVAILABLE")
+                    {
+                        _ruCaptcha.GoTo();
+                    }
                 }
             }
 
