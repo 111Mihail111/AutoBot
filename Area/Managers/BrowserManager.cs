@@ -143,6 +143,8 @@ namespace AutoBot.Area.Managers
         {
             return new Actions(Browser);
         }
+
+
         /// <summary>
         /// Получить URL страницы
         /// </summary>
@@ -151,6 +153,16 @@ namespace AutoBot.Area.Managers
         {
             return Browser.Url;
         }
+        /// <summary>
+        /// Получить титул страницы
+        /// </summary>
+        /// <returns>Титул</returns>
+        public string GetTitlePage()
+        {
+            return Browser.Title;
+        }
+
+
 
         #region Запуск хрома под другим профилем
         //РАБОЧИЙ ВАРИАНТ

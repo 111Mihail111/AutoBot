@@ -20,7 +20,7 @@ namespace AutoBot.Area
             string url = "https://rucaptcha.com/setting";
             GoToUrl(url);
 
-            if (!IsAuthorazition(url)) //TODO: Придумать способ как понимать, что мы не авторизовались
+            if (!IsAuthorazition())
             {
                 GetElementByXPath("/html/body/div[1]/div[1]/div/div/div/div[2]/div/ul/li[2]/a").Click();
                 Thread.Sleep(2000);
@@ -97,9 +97,9 @@ namespace AutoBot.Area
         /// </summary>
         /// <param name="url">Url адрес страницы, доступной после авторизации</param>
         /// <returns>Если true - авторизация есть, иначе false</returns>
-        protected bool IsAuthorazition(string url)
+        protected bool IsAuthorazition()
         {
-            return GetUrlPage() == url ? true : false;
+            return GetTitlePage() == "401 Unauthorized" ? false : true;
         }
     }
 }
