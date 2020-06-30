@@ -9,5 +9,9 @@
         /// https://freebitco.in/
         /// </summary>
         FreeBitcoin = 0,
+        /// <summary>
+        /// https://moonbit.co.in/faucet
+        /// </summary>
+        MoonBitcoin = 1,
     }
 }

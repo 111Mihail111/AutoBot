@@ -11,7 +11,7 @@ namespace AutoBot.Area.Managers
 {
     public class BrowserManager
     {
-        public static readonly ChromeDriver Browser = Initialization(new ChromeOptions());
+        private static readonly ChromeDriver Browser = Initialization(new ChromeOptions());
         
         public static ChromeDriver Initialization(ChromeOptions options)
         {
@@ -80,9 +80,8 @@ namespace AutoBot.Area.Managers
         /// <param name="jsScript">Скрипт</param>
         public string ExecuteScript(string jsScript)
         {
-            return Browser.ExecuteScript(jsScript)?.ToString();
+            return Browser.ExecuteScript(jsScript)?.ToString() ?? string.Empty;
         }
-        
 
         public IWebElement GetElementByXPath(string xPath, int waitingTimeSecond = 5)
         {
