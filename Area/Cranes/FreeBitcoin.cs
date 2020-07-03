@@ -27,7 +27,7 @@ namespace AutoBot.Area.Cranes
             GoToUrl(urlCrane);
             Thread.Sleep(2000);
             await AuthorizationOnCrane(urlCrane);
-            SetScrollPosition(0, 1000);
+            SetScrollPosition(1000);
 
             if (IsTimerExist())
             {

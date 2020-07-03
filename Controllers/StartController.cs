@@ -11,11 +11,13 @@ namespace AutoBot.Controllers
     {
         private IFreeBitcoin _freeBitcoin;
         private IRuCaptcha _ruCaptcha;
+        private IMoonBitcoin _moonBitcoin;
 
-        public StartController(IFreeBitcoin freeBitcoin, IRuCaptcha ruCaptcha)
+        public StartController(IFreeBitcoin freeBitcoin, IRuCaptcha ruCaptcha, IMoonBitcoin moonBitcoin)
         {
             _freeBitcoin = freeBitcoin;
             _ruCaptcha = ruCaptcha;
+            _moonBitcoin = moonBitcoin;
         }
 
         public ActionResult Index() => View(CraneService.GetCranes());
@@ -42,9 +44,13 @@ namespace AutoBot.Controllers
             {
                 case TypeCrane.FreeBitcoin:
                     crane = _freeBitcoin.GoTo(crane).Result;
-                    CraneService.UpdateCrane(crane);
+                    break;
+                case TypeCrane.MoonBitcoin:
+                    crane = _moonBitcoin.GoTo(crane).Result;
                     break;
             }
+
+            CraneService.UpdateCrane(crane);
 
             return PartialView("_Cranes", CraneService.GetCranes());
         }

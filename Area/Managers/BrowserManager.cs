@@ -33,7 +33,7 @@ namespace AutoBot.Area.Managers
         public void OpenPageInNewTab(string url)
         {
             Browser.ExecuteScript("window.open();");
-            SwitchToTab();
+            SwitchToLastTab();
             Browser.Navigate().GoToUrl(url);
         }
         /// <summary>
@@ -43,14 +43,15 @@ namespace AutoBot.Area.Managers
         {
             Browser.ExecuteScript("window.close();");
         }
-
-
-        public void SwitchToTab()
+        private void SwitchToLastTab()
         {
             var newTabInstance = Browser.WindowHandles[Browser.WindowHandles.Count - 1];
             Browser.SwitchTo().Window(newTabInstance);
         }
-
+        public void SwitchToTab(int indexTab = 0)
+        {
+            Browser.SwitchTo().Window(Browser.WindowHandles[indexTab]);
+        }
 
         /// <summary>
         /// Авторизация на сайте
@@ -70,7 +71,7 @@ namespace AutoBot.Area.Managers
         /// Установить позицию скрола
         /// </summary>
         /// <param name="scrollTopPosition">Позиция верхнего скрола</param>
-        public void SetScrollPosition(int scrollHorizontalPosition = 0, int scrollVerticalPosition = 0)
+        public void SetScrollPosition(int scrollVerticalPosition  = 0, int scrollHorizontalPosition = 0)
         {
             Browser.ExecuteScript($"window.scroll({scrollHorizontalPosition}, {scrollVerticalPosition})");
         }

@@ -18,7 +18,7 @@ namespace AutoBot.Area
         public void GoTo()
         {
             string url = "https://rucaptcha.com/setting";
-            GoToUrl(url);
+            OpenPageInNewTab(url);
 
             if (!IsAuthorazition())
             {
@@ -29,7 +29,10 @@ namespace AutoBot.Area
             }
             
             ToChangeBet();
+            CloseTab();
+            SwitchToTab();
         }
+
         /// <summary>
         /// Поменять ставку
         /// </summary>
@@ -40,11 +43,9 @@ namespace AutoBot.Area
                 return;
             }
 
-            var move = CreateActionToBrowser();
-            var slider = GetElementByXPath("//*[@id='slider']/a");
-            var direction = GetMyCurrentRate() < GetCurrentRate() ? true : false;
-
-            MoveSlider(move, slider, direction);
+            ExecuteScript($"document.getElementById('price').value = {GetCurrentRate()};");
+            SetScrollPosition(900);
+            GetElementByXPath("/html/body/div[1]/div[2]/div[2]/div/div[1]/div/form/div/div[30]/input").Click();
         }
         /// <summary>
         /// Получить текущую ставку за простые капчи
@@ -63,34 +64,6 @@ namespace AutoBot.Area
         {
             var webElement = GetElementById("price2").GetValue().Split(".").First();
             return Convert.ToInt32(webElement);
-        }
-        /// <summary>
-        /// Движение слайдера
-        /// </summary>
-        /// <param name="actions">Действие в браузере</param>
-        /// <param name="webElement">Веб-элемент, с которым производится действие</param>
-        /// <param name="direction">Если true, элемент двигается влево, false - вправо</param>
-        protected void MoveSlider(Actions actions, IWebElement webElement, bool direction)
-        {
-            for (int i = 1; i == 1;)
-            {
-                switch (direction)
-                {
-                    case true:
-                        actions.DragAndDropToOffset(webElement, i, 0).Build().Perform();
-                        break;
-                    case false:
-                        actions.DragAndDropToOffset(webElement, 0, i).Build().Perform();
-                        break;
-                }
-
-                if (GetMyCurrentRate() >= GetCurrentRate())
-                {
-                    SetScrollPosition(0, 900);
-                    GetElementByXPath("/html/body/div[1]/div[2]/div[2]/div/div[1]/div/form/div/div[30]/input").Click();
-                    return;
-                }
-            }
         }
         /// <summary>
         /// Проверка авторизации

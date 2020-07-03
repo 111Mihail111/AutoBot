@@ -1,7 +1,7 @@
 ﻿setInterval(function () {
     let notes = document.getElementById("Notes");
     for (var i = 0; i < notes.childElementCount; i++) {
-        let timerRow = notes.children[i].children[2].innerText;
+        let timerRow = notes.children[i].children[1].innerText;
         if (timerRow === "00:00:00") {
             //Ajax запрос с переходом на сайт
             debugger;
@@ -17,11 +17,12 @@
 
 function GetDataCrane(row) {
     return {
-        URL: row.children[1].innerText,
-        ActivityTime: row.children[2].innerText,
-        StatusCrane: row.children[3].innerText,
-        BalanceOnCrane: row.children[4].innerText,
-        TypeCurrencies: row.children[5].innerText,
+        URL: row.children[0].innerText,
+        ActivityTime: row.children[1].innerText,
+        StatusCrane: row.children[2].innerText,
+        BalanceOnCrane: row.children[3].innerText,
+        TypeCurrencies: row.children[4].innerText,
+        TypeCrane: row.children[5].innerText,
     }
 }
 
@@ -34,6 +35,7 @@ function UpdatingTimerCrane(crane) {
             'StatusCrane': crane.StatusCrane,
             'BalanceOnCrane': crane.BalanceOnCrane,
             'TypeCurrencies': crane.TypeCurrencies,
+            'TypeCrane': crane.TypeCrane,
         },
         contentType: "application/json; charset=utf-8",
         url: "/Start/UpdateTimerCrane",
@@ -52,6 +54,7 @@ function GoToCrane(crane) {
             'StatusCrane': crane.StatusCrane,
             'BalanceOnCrane': crane.BalanceOnCrane,
             'TypeCurrencies': crane.TypeCurrencies,
+            'TypeCrane': crane.TypeCrane,
         },
         url: "/Start/GoToCrane",
         success: function (data) {

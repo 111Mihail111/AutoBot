@@ -55,8 +55,6 @@ namespace AutoBot.Area.API
 
             while (status == "CAPCHA_NOT_READY")
             {
-                Thread.Sleep(5000);
-
                 using (var client = new HttpClient { BaseAddress = _urlRuCaptcha })
                 {
                     var result = await client.GetAsync(url);
@@ -67,6 +65,8 @@ namespace AutoBot.Area.API
                         _ruCaptcha.GoTo();
                     }
                 }
+
+                Thread.Sleep(5000);
             }
 
             return status.Replace("OK|", string.Empty);
