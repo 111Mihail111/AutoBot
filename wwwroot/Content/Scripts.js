@@ -1,14 +1,18 @@
 ﻿setInterval(function () {
     let notes = document.getElementById("Notes");
+    debugger;
     for (var i = 0; i < notes.childElementCount; i++) {
-        let timerRow = notes.children[i].children[1].innerText;
-        if (timerRow === "00:00:00") {
-            //Ajax запрос с переходом на сайт
-            debugger;
+        let timer = notes.children[i].getElementsByTagName("input")[1].value;
+        if (timer === "00:00:00") {
+
+            let statusCrane = notes.children[i].getElementsByTagName("input")[2].value;
+            if (statusCrane === "NoWork") {
+                continue;
+            }
+            
             GoToCrane(GetDataCrane(notes.children[i]));
         }
         else {
-            //Ajax запрос с обновление таймера
             UpdatingTimerCrane(GetDataCrane(notes.children[i]));
         }
     }
@@ -17,14 +21,15 @@
 
 function GetDataCrane(row) {
     return {
-        URL: row.children[0].innerText,
-        ActivityTime: row.children[1].innerText,
-        StatusCrane: row.children[2].innerText,
-        BalanceOnCrane: row.children[3].innerText,
-        TypeCurrencies: row.children[4].innerText,
-        TypeCrane: row.children[5].innerText,
+        URL: row.getElementsByTagName("input")[0].value,
+        ActivityTime: row.getElementsByTagName("input")[1].value,
+        StatusCrane: row.getElementsByTagName("input")[2].value,
+        BalanceOnCrane: row.getElementsByTagName("input")[3].value,
+        TypeCurrencies: row.getElementsByTagName("input")[4].value,
+        TypeCrane: row.getElementsByTagName("input")[5].value,
     }
 }
+
 
 function UpdatingTimerCrane(crane) {
     $.ajax({
@@ -44,6 +49,7 @@ function UpdatingTimerCrane(crane) {
         }
     });
 }
+
 
 function GoToCrane(crane) {
     $.ajax({

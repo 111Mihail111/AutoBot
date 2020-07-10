@@ -8,12 +8,14 @@ namespace AutoBot.Area.Service
     public static class CraneService
     {
         public static List<Crane> _cranes = new List<Crane>
-            {
-                //new Crane { URL = "https://freebitco.in/", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
-                //    StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.Bitcoin, TypeCrane = TypeCrane.FreeBitcoin },
-                new Crane { URL = "https://moonbit.co.in/faucet", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
-                    StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.Bitcoin, TypeCrane = TypeCrane.MoonBitcoin },
-            };
+        {
+            new Crane { URL = "https://freebitco.in/", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
+                StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.Bitcoin, TypeCrane = TypeCrane.FreeBitcoin },
+            new Crane { URL = "https://moonbit.co.in/faucet", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
+                StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.Bitcoin, TypeCrane = TypeCrane.MoonBitcoin },
+            new Crane { URL = "http://bonusbitcoin.co/faucet", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
+                StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.Bitcoin, TypeCrane = TypeCrane.BonusBitcoin },
+        };
 
         /// <summary>
         /// Получить краны

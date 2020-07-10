@@ -1,5 +1,6 @@
 ﻿using AutoBot.Area.Interface;
 using AutoBot.Area.Managers;
+using AutoBot.Enums;
 using AutoBot.Extentions;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
@@ -24,7 +25,7 @@ namespace AutoBot.Area
             {
                 GetElementByXPath("/html/body/div[1]/div[1]/div/div/div/div[2]/div/ul/li[2]/a").Click();
                 Thread.Sleep(2000);
-                AuthorizationOnSite("email", "password", "btn_register", LOGIN, PASSWORD);
+                AuthorizationOnSite(SearchMethod.Id, "email", "password", "btn_register", LOGIN, PASSWORD);
                 GoToUrl(url);
             }
             

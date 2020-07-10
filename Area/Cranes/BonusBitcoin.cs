@@ -1,21 +1,21 @@
 ﻿using AutoBot.Area.API;
 using AutoBot.Area.Interface;
 using AutoBot.Area.Managers;
+using AutoBot.Enums;
 using AutoBot.Extentions;
 using AutoBot.Models;
 using System;
-using System.Security.Policy;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace AutoBot.Area.Cranes
 {
-    public class MoonBitcoin : BrowserManager, IMoonBitcoin
+    public class BonusBitcoin : BrowserManager, IBonusBitcoin
     {
         private RuCaptchaController _ruCaptchaController = new RuCaptchaController(); //TODO: Обернуть интерфейсом и прокинуть через DI
-        const string LOGIN = "polowinckin.mixail@yandex.ru"; //TODO: Настройки вынести отдельно на страницу
-        
-
+        const string LOGIN = "desiptikon.bot@yandex.ru"; //TODO: Настройки вынести отдельно на страницу
+        const string PASSWORD = "123q_Q*W(*E&*R^*Z$*X!*C?*V";  //TODO: Настройки вынести отдельно на страницу
 
         public async Task<Crane> GoTo(Crane crane)
         {
@@ -23,24 +23,23 @@ namespace AutoBot.Area.Cranes
 
             GoToUrl(urlCrane);
             await Authorization(urlCrane);
-            RemovePromotionalBlock();
 
-            if (IsButtonEnabled())
+            if (CheckTimer())
             {
                 return GetDetailsWithCrane(crane);
             }
-            
-            GetElementByXPath("//*[@id='Faucet']/div[2]/button").Click();
 
-            string token = GetElementById("ClaimForm").GetDataFvAddonsRecaptcha2Sitekey();
-            string response = await DecipherCaptcha(token, urlCrane);
+            SetScrollPosition(1200);
+
+            string token = GetElementById("FaucetForm").GetDataFvAddonsRecaptcha2Sitekey();
+            string response = await DecipherCaptcha("g-recaptcha-response", token, urlCrane);
 
             if (response == ERROR_CAPTCHA_UNSOLVABLE)
             {
                 return await GoTo(crane);
             }
-                        
-            GetElementByXPath("//*[@id='ClaimModal']/div/div/div[3]/button[1]").Click();
+
+            GetElementByXPath("//*[@id='FaucetForm']/button[2]").Click();
             GetElementByXPath("//*[@id='FaucetClaimModal']/div/div/div[3]/button").Click();
 
             return GetDetailsWithCrane(crane);
@@ -53,21 +52,22 @@ namespace AutoBot.Area.Cranes
         /// <returns>Асинхронная задача</returns>
         protected async Task Authorization(string urlCrane)
         {
-            if (GetUrlPage() == urlCrane)
+            if (urlCrane == GetUrlPage())
             {
                 return;
             }
 
+            GetElementByXPath("/html/body/div[1]/div/a[1]").Click();
+
             string response = ERROR_CAPTCHA_UNSOLVABLE;
             while (response == ERROR_CAPTCHA_UNSOLVABLE)
             {
-                SetScrollPosition(300);
-                GetElementByXPath("//*[@id='PageContent_UnauthorisedButtons']/button").Click(); 
-                Thread.Sleep(1200);
-                GetElementById("SignInEmailInput").SendKeys(LOGIN);
+                GetElementById("PageContent_SignInButton").Click();
+                Thread.Sleep(1000);
+                SetScrollPositionInWindow("SignInModal", 300);
 
                 string token = GetElementById("SignInForm").GetDataFvAddonsRecaptcha2Sitekey();
-                response = await DecipherCaptcha(token, urlCrane);
+                response = await DecipherCaptcha("g-recaptcha-response-1", token, urlCrane);
 
                 if (response == ERROR_CAPTCHA_UNSOLVABLE)
                 {
@@ -75,17 +75,9 @@ namespace AutoBot.Area.Cranes
                     continue;
                 }
 
-                ExecuteScript("document.querySelector('#SignInModal>div>div>div.modal-footer>button').click();");
-            }
-
-            int tabs = GetTabsCount();
-            while (tabs != 1)
-            {
-                SwitchToLastTab();
-                CloseTab();
-                SwitchToTab();
-                ExecuteScript("document.querySelector('#SignInModal>div>div>div.modal-footer>button').click();");
-                tabs = GetTabsCount();
+                GetElementByXPath("//*[@id='SignInEmailInput']").SendKeys(LOGIN);
+                GetElementByXPath("//*[@id='SignInPasswordInput']").SendKeys(PASSWORD);
+                ExecuteScript("document.querySelector('#SignInModal>div>div>div.modal-footer>button.btn.btn-primary').click()");
             }
         }
         /// <summary>
@@ -109,11 +101,32 @@ namespace AutoBot.Area.Cranes
                 "element.style.display = 'none';");
         }
         /// <summary>
-        /// Удалить рекламный блок
+        /// Проверка авторизации
         /// </summary>
-        protected void RemovePromotionalBlock()
+        /// <param name="urlCrane">URL адрес крана</param>
+        /// <returns></returns>
+        protected bool CheckAuthorization(string urlCrane)
         {
-            ExecuteScript("document.getElementById('slideIn').remove();");
+            return urlCrane != GetUrlPage();
+        }
+        /// <summary>
+        /// Получить баланс с крана
+        /// </summary>
+        /// <returns>Баланс</returns>
+        protected string GetBalanceOnCrane()
+        {
+            return GetElementById("BalanceInput").GetValue();
+        }
+        /// <summary>
+        /// Получить таймер
+        /// </summary>
+        /// <returns>Время таймера</returns>
+        protected TimeSpan GetTimer()
+        {
+            var timer = "00:";
+            timer += GetElementByXPath("//*[@id='FaucetForm']/button[2]").GetInnerText();
+
+            return TimeSpan.Parse(timer.Replace("Claim again in ", string.Empty));
         }
         /// <summary>
         /// Получить детали с крана.
@@ -122,18 +135,18 @@ namespace AutoBot.Area.Cranes
         /// <returns>Обновленная модель крана</returns>
         protected Crane GetDetailsWithCrane(Crane crane)
         {
-            crane.BalanceOnCrane = GetElementByXPath("//*[@id='Navigation']/div/span/a").Text;
-            crane.ActivityTime = TimeSpan.FromHours(1);
+            crane.ActivityTime = GetTimer();
+            crane.BalanceOnCrane = GetBalanceOnCrane();
 
             return crane;
         }
         /// <summary>
-        /// Заблокированна ли кнопка (снятия валюты)
+        /// Проверка таймера
         /// </summary>
-        /// <returns></returns>
-        protected bool IsButtonEnabled()
+        /// <returns>True элемент не доступен, иначе false</returns>
+        public bool CheckTimer()
         {
-            return GetElementByXPath("//*[@id='Faucet']/div[2]/button").Enabled == false;
+            return GetElementByXPath("//*[@id='FaucetForm']/button[2]").Enabled == false;
         }
         /// <summary>
         /// Расшифровать капчу
@@ -141,14 +154,14 @@ namespace AutoBot.Area.Cranes
         /// <param name="token">Токен рекапчи</param>
         /// <param name="urlCrane">Url-адрес крана</param>
         /// <returns>Расшифрованный токен капчи или ошибку от сервиса RuCaptcha</returns>
-        protected async Task<string> DecipherCaptcha(string token, string urlCrane)
+        protected async Task<string> DecipherCaptcha(string elementId, string token, string urlCrane)
         {
             string responseOnCaptcha = await _ruCaptchaController.SendCaptcha_v2(token, urlCrane);
-            
-            HiddenFieldVisible("g-recaptcha-response");
-            GetElementByXPath("//*[@id='g-recaptcha-response']").SendKeys(responseOnCaptcha);
-            HiddenFieldInVisible("g-recaptcha-response");
 
+            HiddenFieldVisible(elementId);
+            GetElementByXPath(elementId).SendKeys(responseOnCaptcha);
+            HiddenFieldInVisible(elementId);
+            
             return responseOnCaptcha;
         }
     }

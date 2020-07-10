@@ -13,5 +13,9 @@
         /// https://moonbit.co.in/faucet
         /// </summary>
         MoonBitcoin = 1,
+        /// <summary>
+        /// http://bonusbitcoin.co/faucet
+        /// </summary>
+        BonusBitcoin = 2,
     }
 }

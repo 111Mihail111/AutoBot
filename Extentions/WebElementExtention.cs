@@ -43,5 +43,15 @@ namespace AutoBot.Extentions
         {
             return webElement.GetAttribute("data-fv-addons-recaptcha2-sitekey");
         }
+
+        /// <summary>
+        /// Получить содержимое innerText атрибута
+        /// </summary>
+        /// <param name="webElement">Вэб-элемент</param>
+        /// <returns>Значение атрибута</returns>
+        public static string GetInnerText(this IWebElement webElement)
+        {
+            return webElement.GetAttribute("innerText");
+        }
     }
 }

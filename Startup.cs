@@ -17,6 +17,7 @@ namespace AutoBot
             services.AddScoped<IFreeBitcoin, FreeBitcoin>();
             services.AddScoped<IRuCaptcha, RuCaptcha>();
             services.AddScoped<IMoonBitcoin, MoonBitcoin>();
+            services.AddScoped<IBonusBitcoin, BonusBitcoin>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

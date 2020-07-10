@@ -2,13 +2,19 @@
 
 @model IEnumerable<AutoBot.Models.Crane>
 
-@{ int counter = 0; }
-
 @foreach (var item in Model)
 {
-    counter++;
 
-    <div id="@counter.ToString()_Row" class="row mb-2">
+    <div id="Row" class="row mb-2">
+
+        <div class="row-cols-12" style="display: none">
+            <div><input id="URL" value="@item.URL" /></div>
+            <div><input id="ActivityTime" value="@item.ActivityTime.ToString(@"hh\:mm\:ss")" /></div>
+            <div><input id="StatusCrane" value="@item.StatusCrane" /></div>
+            <div><input id="BalanceOnCrane" value="@item.BalanceOnCrane" /></div>
+            <div><input id="TypeCurrencies" value="@item.TypeCurrencies" /></div>
+            <div><input id="TypeCrane" value="@item.TypeCrane" /></div>
+        </div>
 
         <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
             <div class="mt-2 mb-2"><span>@item.URL</span></div>
@@ -18,18 +24,9 @@
             <div class="mt-2 mb-2"><span>@item.ActivityTime.ToString(@"hh\:mm\:ss")</span></div>
         </div>
 
-        @if (item.StatusCrane == Status.Work)
-        {
-            <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
-                <div class="mt-2 mb-2"><span>@item.StatusCrane</span></div>
-            </div>
-        }
-        else
-        {
-            <div class="col-2 text-center text-danger" style="background-color: rgb(222,243,202); border: 2px solid white;">
-                <div class="mt-2 mb-2"><span>@item.StatusCrane</span></div>
-            </div>
-        }
+        <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
+            <div class="mt-2 mb-2"><span>@item.StatusCrane</span></div>
+        </div>
 
         <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
             <div class="mt-2 mb-2"><span>@item.BalanceOnCrane</span></div>
@@ -43,4 +40,6 @@
             <div class="mt-2 mb-2"><span>@item.TypeCrane</span></div>
         </div>
     </div>
+
+    
 }

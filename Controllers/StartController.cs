@@ -12,12 +12,14 @@ namespace AutoBot.Controllers
         private IFreeBitcoin _freeBitcoin;
         private IRuCaptcha _ruCaptcha;
         private IMoonBitcoin _moonBitcoin;
+        private IBonusBitcoin _bonusBitcoin;
 
-        public StartController(IFreeBitcoin freeBitcoin, IRuCaptcha ruCaptcha, IMoonBitcoin moonBitcoin)
+        public StartController(IFreeBitcoin freeBitcoin, IRuCaptcha ruCaptcha, IMoonBitcoin moonBitcoin, IBonusBitcoin bonusBitcoin)
         {
             _freeBitcoin = freeBitcoin;
             _ruCaptcha = ruCaptcha;
             _moonBitcoin = moonBitcoin;
+            _bonusBitcoin = bonusBitcoin;
         }
 
         public ActionResult Index() => View(CraneService.GetCranes());
@@ -25,7 +27,7 @@ namespace AutoBot.Controllers
         [HttpGet]
         public PartialViewResult UpdateTimerCrane(Crane crane)
         {
-            crane.ActivityTime = crane.ActivityTime - TimeSpan.FromMinutes(1);
+            crane.ActivityTime -= TimeSpan.FromMinutes(1);
             if (crane.ActivityTime < TimeSpan.FromSeconds(1))
             {
                 crane.ActivityTime = TimeSpan.FromSeconds(0);
@@ -38,17 +40,28 @@ namespace AutoBot.Controllers
         [HttpGet]
         public PartialViewResult GoToCrane(Crane crane)
         {
-            CheckingBid();
+            //CheckingBid();
 
-            switch (crane.TypeCrane)
+            try
             {
-                case TypeCrane.FreeBitcoin:
-                    crane = _freeBitcoin.GoTo(crane).Result;
-                    break;
-                case TypeCrane.MoonBitcoin:
-                    crane = _moonBitcoin.GoTo(crane).Result;
-                    break;
+                switch (crane.TypeCrane)
+                {
+                    case TypeCrane.FreeBitcoin:
+                        crane = _freeBitcoin.GoTo(crane).Result;
+                        break;
+                    case TypeCrane.MoonBitcoin:
+                        crane = _moonBitcoin.GoTo(crane).Result;
+                        break;
+                    case TypeCrane.BonusBitcoin:
+                        crane = _bonusBitcoin.GoTo(crane).Result;
+                        break;
+                }
             }
+            catch (Exception exeption)
+            {
+                crane.StatusCrane = Status.NoWork;
+            }
+            
 
             CraneService.UpdateCrane(crane);
 

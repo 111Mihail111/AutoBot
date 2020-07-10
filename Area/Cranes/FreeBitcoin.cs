@@ -35,12 +35,15 @@ namespace AutoBot.Area.Cranes
             }
 
             string token = GetElementByXPath("//*[@id='free_play_recaptcha']/form/div").GetDataSitekey();
-            string responseOnCaptcha = await _ruCaptchaController.SendCaptcha_v2(token, urlCrane);
+            string responseOnCaptcha = await DecipherCaptcha(token, urlCrane);
 
-            HiddenFieldVisible("g-recaptcha-response");
-            GetElementByXPath("//*[@id='g-recaptcha-response']").SendKeys(responseOnCaptcha);
-            HiddenFieldInVisible("g-recaptcha-response");
-            GetElementById("free_play_form_button").Click(); // Нажать на ROLL
+            if (responseOnCaptcha == ERROR_CAPTCHA_UNSOLVABLE)
+            {
+                return await GoTo(crane);
+            }
+            
+            GetElementById("free_play_form_button").Click();
+            GetElementByXPath("//*[@id='myModal22']/a").Click();
 
             return GetDetailsWithCrane(crane);
         }
@@ -58,7 +61,7 @@ namespace AutoBot.Area.Cranes
             {
                 GetElementByXPath("/html/body/div[1]/div/a[1]").Click(); //Подтверждение о куках сайта
                 await InsertDecodedCaptchaInField();
-                AuthorizationOnSite("signup_form_email", "signup_form_password", "signup_button", LOGIN, PASSWORD);
+                AuthorizationOnSite(SearchMethod.Id, "signup_form_email", "signup_form_password", "signup_button", LOGIN, PASSWORD);
                 Thread.Sleep(2000);
 
                 bool isErrorCapthca = true;
@@ -171,11 +174,11 @@ namespace AutoBot.Area.Cranes
         protected TimeSpan GetTimer()
         {
             string timer = "00:";
-            timer += GetElementByXPath("//*[@id='time_remaining']/span", 15).Text;
+
+            timer += ExecuteScript("return document.getElementById('time_remaining').innerText;");
             timer = timer.Replace("Minutes", ":").Replace("Minute", string.Empty)
                          .Replace("Seconds", string.Empty).Replace("Second", string.Empty)
                          .Replace("\r", string.Empty).Replace("\n", string.Empty);
-            Thread.Sleep(1000);
 
             return TimeSpan.Parse(timer == "00:60:0" ? timer = "00:59:59" : timer);
         }
@@ -198,6 +201,22 @@ namespace AutoBot.Area.Cranes
             crane.BalanceOnCrane = BalanceCrane();
 
             return crane;
+        }
+        /// <summary>
+        /// Расшифровать капчу
+        /// </summary>
+        /// <param name="token">Токен рекапчи</param>
+        /// <param name="urlCrane">Url-адрес крана</param>
+        /// <returns>Расшифрованный токен капчи или ошибку от сервиса RuCaptcha</returns>
+        protected async Task<string> DecipherCaptcha(string token, string urlCrane)
+        {
+            string responseOnCaptcha = await _ruCaptchaController.SendCaptcha_v2(token, urlCrane);
+
+            HiddenFieldVisible("g-recaptcha-response");
+            GetElementByXPath("//*[@id='g-recaptcha-response']").SendKeys(responseOnCaptcha);
+            HiddenFieldInVisible("g-recaptcha-response");
+
+            return responseOnCaptcha;
         }
     }
 }

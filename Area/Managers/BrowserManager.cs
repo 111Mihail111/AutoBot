@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using AutoBot.Enums;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Interactions;
 using System;
@@ -11,11 +12,19 @@ namespace AutoBot.Area.Managers
 {
     public class BrowserManager
     {
-        private static readonly ChromeDriver Browser = Initialization(new ChromeOptions());
-        
+        private static readonly ChromeDriver _browser = Initialization(new ChromeOptions());
+
+        /// <summary>
+        /// Ошибка, капча неразрешима
+        /// </summary>
+        public const string ERROR_CAPTCHA_UNSOLVABLE = "ERROR_CAPTCHA_UNSOLVABLE";
+
+        //"/Project/AutoBot/bin/Debug/netcoreapp2.0" - на работе
+        //"/_VS_Project/Mihail/AutoBot/bin/Debug/netcoreapp2.0" - дома
+
         public static ChromeDriver Initialization(ChromeOptions options)
         {
-            return new ChromeDriver("/Project/AutoBot/bin/Debug/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
+            return new ChromeDriver("/_VS_Project/Mihail/AutoBot/bin/Debug/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
         }
 
         /// <summary>
@@ -24,7 +33,7 @@ namespace AutoBot.Area.Managers
         /// <param name="url">Адрес</param>
         public void GoToUrl(string url)
         {
-            Browser.Navigate().GoToUrl(url);
+            _browser.Navigate().GoToUrl(url);
         }
         /// <summary>
         /// Открыть страницу в новой вкладке
@@ -32,26 +41,42 @@ namespace AutoBot.Area.Managers
         /// <param name="url">Url-адрес страницы</param>
         public void OpenPageInNewTab(string url)
         {
-            Browser.ExecuteScript("window.open();");
+            _browser.ExecuteScript("window.open();");
             SwitchToLastTab();
-            Browser.Navigate().GoToUrl(url);
+            _browser.Navigate().GoToUrl(url);
         }
         /// <summary>
         /// Закрыть вкладку
         /// </summary>
         public void CloseTab()
         {
-            Browser.ExecuteScript("window.close();");
+            _browser.ExecuteScript("window.close();");
         }
-        private void SwitchToLastTab()
+        /// <summary>
+        /// Переключиться на последнюю вкладку
+        /// </summary>
+        public void SwitchToLastTab()
         {
-            var newTabInstance = Browser.WindowHandles[Browser.WindowHandles.Count - 1];
-            Browser.SwitchTo().Window(newTabInstance);
+            var newTabInstance = _browser.WindowHandles[_browser.WindowHandles.Count - 1];
+            _browser.SwitchTo().Window(newTabInstance);
         }
+        /// <summary>
+        /// Переключиться на вкладку
+        /// </summary>
+        /// <param name="indexTab">Индекс вкладки. По умолчанию нулевой</param>
         public void SwitchToTab(int indexTab = 0)
         {
-            Browser.SwitchTo().Window(Browser.WindowHandles[indexTab]);
+            _browser.SwitchTo().Window(_browser.WindowHandles[indexTab]);
         }
+        /// <summary>
+        /// Получить количество вкладок
+        /// </summary>
+        /// <returns>Количество вкладок</returns>
+        public int GetTabsCount()
+        {
+            return _browser.WindowHandles.Count;
+        }
+
 
         /// <summary>
         /// Авторизация на сайте
@@ -61,19 +86,42 @@ namespace AutoBot.Area.Managers
         /// <param name="buttonId">Id кнопки</param>
         /// <param name="login">Логин</param>
         /// <param name="password">Пароль</param>
-        public void AuthorizationOnSite(string loginFieldId, string passwordFieldId, string buttonId, string login, string password)
+        public void AuthorizationOnSite(SearchMethod searchMethod, string loginFieldId, string passwordFieldId, string buttonId, string login, string password)
         {
-            GetElementById(loginFieldId).SendKeys(login);
-            GetElementById(passwordFieldId).SendKeys(password);
-            GetElementById(buttonId).Click();
+            switch (searchMethod)
+            {
+                case SearchMethod.Id:
+                    GetElementById(loginFieldId).SendKeys(login);
+                    GetElementById(passwordFieldId).SendKeys(password);
+                    GetElementById(buttonId).Click();
+                    break;
+                case SearchMethod.XPath:
+                    GetElementByXPath(loginFieldId).SendKeys(login);
+                    GetElementByXPath(passwordFieldId).SendKeys(password);
+                    GetElementByXPath(buttonId).Click();
+                    break;
+            }
         }
         /// <summary>
         /// Установить позицию скрола
         /// </summary>
-        /// <param name="scrollTopPosition">Позиция верхнего скрола</param>
-        public void SetScrollPosition(int scrollVerticalPosition  = 0, int scrollHorizontalPosition = 0)
+        /// <param name="scrollVerticalPosition">Позиция верхнего скрола</param>
+        /// <param name="scrollHorizontalPosition">Позиция нижнего скрола</param>
+        public void SetScrollPosition(int scrollVerticalPosition = 0, int scrollHorizontalPosition = 0)
         {
-            Browser.ExecuteScript($"window.scroll({scrollHorizontalPosition}, {scrollVerticalPosition})");
+            _browser.ExecuteScript($"window.scroll({scrollHorizontalPosition}, {scrollVerticalPosition})");
+        }
+        /// <summary>
+        /// Установить позицию скрола в модальном окне
+        /// </summary>
+        /// <param name="modalId">Идентификатор окна</param>
+        /// <param name="scrollVerticalPosition">Позиция верхнего скрола</param>
+        /// <param name="scrollHorizontalPosition">Позиция нижнего скрола</param>
+        public void SetScrollPositionInWindow(string modalId, int scrollVerticalPosition = 0, int scrollHorizontalPosition = 0)
+        {
+            _browser.ExecuteScript($"let modal = document.getElementById('{modalId}');" +
+                $"modal.scrollTop = {scrollVerticalPosition};" +
+                $"modal.scrollHeight = {scrollHorizontalPosition}");
         }
         /// <summary>
         /// Выполнить скрипт
@@ -81,7 +129,7 @@ namespace AutoBot.Area.Managers
         /// <param name="jsScript">Скрипт</param>
         public string ExecuteScript(string jsScript)
         {
-            return Browser.ExecuteScript(jsScript)?.ToString() ?? string.Empty;
+            return _browser.ExecuteScript(jsScript)?.ToString();
         }
 
         public IWebElement GetElementByXPath(string xPath, int waitingTimeSecond = 5)
@@ -90,7 +138,7 @@ namespace AutoBot.Area.Managers
         }
         public IEnumerable<IWebElement> GetElementsByXPath(string xPath)
         {
-            return Browser.FindElementsByXPath(xPath);
+            return _browser.FindElementsByXPath(xPath);
         }
 
 
@@ -100,7 +148,7 @@ namespace AutoBot.Area.Managers
         }
         public IEnumerable<IWebElement> GetElementsById(string elementId)
         {
-            return Browser.FindElementsById(elementId);
+            return _browser.FindElementsById(elementId);
         }
 
 
@@ -141,7 +189,7 @@ namespace AutoBot.Area.Managers
         /// <returns>Действие</returns>
         public Actions CreateActionToBrowser()
         {
-            return new Actions(Browser);
+            return new Actions(_browser);
         }
 
 
@@ -151,7 +199,7 @@ namespace AutoBot.Area.Managers
         /// <returns>URL</returns>
         public string GetUrlPage()
         {
-            return Browser.Url;
+            return _browser.Url;
         }
         /// <summary>
         /// Получить титул страницы
@@ -159,7 +207,14 @@ namespace AutoBot.Area.Managers
         /// <returns>Титул</returns>
         public string GetTitlePage()
         {
-            return Browser.Title;
+            return _browser.Title;
+        }
+        /// <summary>
+        /// Обновить  страницу
+        /// </summary>
+        public void RefreshPage()
+        {
+            _browser.Navigate().Refresh();
         }
 
 

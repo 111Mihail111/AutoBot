@@ -23,25 +23,37 @@ namespace AutoBot.Area.API
         [HttpPost]
         public async Task<string> SendCaptcha(string image)
         {
-            string status;
-            using (var client = new HttpClient { BaseAddress = _urlRuCaptcha })
+            string status = string.Empty;
+            while (status != "OK")
             {
-                var content = new FormUrlEncodedContent(new[]
+                using (var client = new HttpClient { BaseAddress = _urlRuCaptcha })
                 {
+                    var content = new FormUrlEncodedContent(new[]
+                    {
                     new KeyValuePair<string, string>("key", $"{_APIKey}"),
                     new KeyValuePair<string, string>("body", $"{image}"),
                     new KeyValuePair<string, string>("method", "base64")
                 });
 
-                var result = await client.PostAsync(_urlForPostQuery, content);
-                status = GetStatusRequest(result).Result;
+                    var result = await client.PostAsync(_urlForPostQuery, content);
+                    status = GetStatusRequest(result).Result;
 
-            }
-            var array = status.Split("|");
-            if (array[0] == "OK")
-            {
-                _keyCaptcha = array[1];
-                return await GetResponseOnCaptcha(_keyCaptcha);
+                }
+
+                if (status == "ERROR_NO_SLOT_AVAILABLE")
+                {
+                    _ruCaptcha.GoTo();
+                }
+                else
+                {
+                    var array = status.Split("|");
+                    status = array[0];
+                    if (status == "OK")
+                    {
+                        _keyCaptcha = array[1];
+                        return await GetResponseOnCaptcha(_keyCaptcha);
+                    }
+                }
             }
 
             return string.Empty;
