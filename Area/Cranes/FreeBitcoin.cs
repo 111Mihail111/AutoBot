@@ -5,7 +5,9 @@ using AutoBot.Enums;
 using AutoBot.Extentions;
 using AutoBot.Models;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using System;
+using System.IO;
 using System.Linq;
 using System.Security.Policy;
 using System.Text;
@@ -24,7 +26,9 @@ namespace AutoBot.Area.Cranes
         {
             string urlCrane = crane.URL;
 
+            Initialization(new ChromeOptions());
             GoToUrl(urlCrane);
+
             Thread.Sleep(2000);
             await AuthorizationOnCrane(urlCrane);
             SetScrollPosition(1000);
@@ -59,7 +63,12 @@ namespace AutoBot.Area.Cranes
             bool isAuthorization = CheckPage(urlCrane);
             if (!isAuthorization)
             {
-                GetElementByXPath("/html/body/div[1]/div/a[1]").Click(); //Подтверждение о куках сайта
+                var cookie = GetElementByXPath("/html/body/div[1]/div/a[1]");
+                if (cookie.Displayed)
+                {
+                    cookie.Click();
+                }
+
                 await InsertDecodedCaptchaInField();
                 AuthorizationOnSite(SearchMethod.Id, "signup_form_email", "signup_form_password", "signup_button", LOGIN, PASSWORD);
                 Thread.Sleep(2000);
@@ -99,7 +108,12 @@ namespace AutoBot.Area.Cranes
             OpenPageInNewTab(imageSrc);
 
             string imageByte = ConvertImageToByte();
-            string responseOnCaptcha = await _ruCaptchaController.SendCaptcha(imageByte);
+            string responseOnCaptcha = ERROR_BAD_DUPLICATES;
+
+            while (responseOnCaptcha == ERROR_BAD_DUPLICATES)
+            {
+                responseOnCaptcha = await _ruCaptchaController.SendCaptcha(imageByte);
+            }
 
             GetElementByXPath("//*[@id='botdetect_signup_captcha']/input[2]").SendKeys(responseOnCaptcha);
         }
@@ -199,6 +213,8 @@ namespace AutoBot.Area.Cranes
         {
             crane.ActivityTime = GetTimer();
             crane.BalanceOnCrane = BalanceCrane();
+
+            QuitBrowser();
 
             return crane;
         }

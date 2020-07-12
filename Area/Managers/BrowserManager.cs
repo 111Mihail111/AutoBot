@@ -5,6 +5,7 @@ using OpenQA.Selenium.Interactions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,19 +13,33 @@ namespace AutoBot.Area.Managers
 {
     public class BrowserManager
     {
-        private static readonly ChromeDriver _browser = Initialization(new ChromeOptions());
+        private ChromeDriver _browser;
 
         /// <summary>
         /// Ошибка, капча неразрешима
         /// </summary>
         public const string ERROR_CAPTCHA_UNSOLVABLE = "ERROR_CAPTCHA_UNSOLVABLE";
 
-        //"/Project/AutoBot/bin/Debug/netcoreapp2.0" - на работе
-        //"/_VS_Project/Mihail/AutoBot/bin/Debug/netcoreapp2.0" - дома
+        /// <summary>
+        /// Ошибка, плохие совпадения
+        /// </summary>
+        public const string ERROR_BAD_DUPLICATES = "ERROR_BAD_DUPLICATES";
 
-        public static ChromeDriver Initialization(ChromeOptions options)
+        #region Path for driver
+        //"/Project/AutoBot/bin/Debug/netcoreapp2.0" - на работе
+        //"/_VS_Project/Mihail/AutoBot/BrowserSettings/netcoreapp2.0" - дома
+        #endregion Path for driver
+
+
+        public void Initialization(ChromeOptions options)
         {
-            return new ChromeDriver("/_VS_Project/Mihail/AutoBot/bin/Debug/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
+            options.AddArgument("--user-data-dir=C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profile\\"); //Путь к папке с профилем
+            options.AddArgument("--profile-directory=AutoBot"); //Профиль
+            options.AddArgument("--start-maximized"); //Полностью открывает браузер
+            options.AddAdditionalCapability("useAutomationExtension", false); //Скрывает расширение
+            options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
+
+            _browser = new ChromeDriver("/_VS_Project/Mihail/AutoBot/BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
         }
 
         /// <summary>
@@ -50,7 +65,7 @@ namespace AutoBot.Area.Managers
         /// </summary>
         public void CloseTab()
         {
-            _browser.ExecuteScript("window.close();");
+            _browser.Close();
         }
         /// <summary>
         /// Переключиться на последнюю вкладку
@@ -210,42 +225,18 @@ namespace AutoBot.Area.Managers
             return _browser.Title;
         }
         /// <summary>
-        /// Обновить  страницу
+        /// Обновить страницу
         /// </summary>
         public void RefreshPage()
         {
             _browser.Navigate().Refresh();
         }
-
-
-
-        #region Запуск хрома под другим профилем
-        //РАБОЧИЙ ВАРИАНТ
-        //option.AddArgument("--user-data-dir=C:\\Users\\PolovinkinMV\\AppData\\Local\\Google\\Chrome\\User Data\\");
-        //option.AddArgument("--profile-directory=Profile 4");
-        //option.AddArgument("--start-maximized");
-
-
-        //ChromeOptions option = new ChromeOptions();
-
-        //option.AddArgument("--user-data-dir=C:\\Users\\PolovinkinMV\\AppData\\Local\\Google\\Chrome\\User Data\\");
-        //option.AddArgument("--load-extension=chrome-extension");
-        //option.AddArgument("--profile-directory=Profile 4");
-        //option.AddArgument("--disable-extensions");
-
-        //option.AddArguments("--disable-infobars");
-        //option.AddAdditionalCapability("useAutomationExtension", true);
-        //option.AddArgument("--no-sandbox");
-        //option.AddArgument("--headless");
-        //option.AddArgument("--disable-dev-shm-usage");
-
-        //option.AddArgument("--user-data-dir=C:\\Users\\PolovinkinMV\\AppData\\Local\\Google\\Chrome\\User Data\\");
-        //    option.AddArgument("--profile-directory=Profile 4");
-        //    option.AddArgument("--start-maximized");
-        //    option.AddExtension("C:\\Project\\AutoBot\\WebExtention\\internal.crx");
-
-
-        //    var Browser = new ChromeDriver("/Project/AutoBot/bin/Debug/netcoreapp2.0", option, TimeSpan.FromSeconds(200));
-        #endregion Запуск хрома под другим профилем
+        /// <summary>
+        /// Выйти из браузера
+        /// </summary>
+        public void QuitBrowser()
+        {
+            _browser.Quit();
+        }
     }
 }

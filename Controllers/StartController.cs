@@ -1,9 +1,12 @@
 ﻿using AutoBot.Area.Interface;
+using AutoBot.Area.Managers;
 using AutoBot.Area.Service;
 using AutoBot.Enums;
 using AutoBot.Models;
 using Microsoft.AspNetCore.Mvc;
+using OpenQA.Selenium.Chrome;
 using System;
+using System.Threading.Tasks;
 
 namespace AutoBot.Controllers
 {
@@ -27,7 +30,7 @@ namespace AutoBot.Controllers
         [HttpGet]
         public PartialViewResult UpdateTimerCrane(Crane crane)
         {
-            crane.ActivityTime -= TimeSpan.FromMinutes(1);
+            crane.ActivityTime -= TimeSpan.FromMinutes(5);
             if (crane.ActivityTime < TimeSpan.FromSeconds(1))
             {
                 crane.ActivityTime = TimeSpan.FromSeconds(0);
@@ -40,7 +43,7 @@ namespace AutoBot.Controllers
         [HttpGet]
         public PartialViewResult GoToCrane(Crane crane)
         {
-            //CheckingBid();
+            CheckingBid();
 
             try
             {
@@ -62,7 +65,6 @@ namespace AutoBot.Controllers
                 crane.StatusCrane = Status.NoWork;
             }
             
-
             CraneService.UpdateCrane(crane);
 
             return PartialView("_Cranes", CraneService.GetCranes());

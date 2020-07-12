@@ -3,6 +3,7 @@ using AutoBot.Area.Interface;
 using AutoBot.Area.Managers;
 using AutoBot.Extentions;
 using AutoBot.Models;
+using OpenQA.Selenium.Chrome;
 using System;
 using System.Security.Policy;
 using System.Threading;
@@ -21,6 +22,7 @@ namespace AutoBot.Area.Cranes
         {
             string urlCrane = crane.URL;
 
+            Initialization(new ChromeOptions());
             GoToUrl(urlCrane);
             await Authorization(urlCrane);
             RemovePromotionalBlock();
@@ -124,6 +126,8 @@ namespace AutoBot.Area.Cranes
         {
             crane.BalanceOnCrane = GetElementByXPath("//*[@id='Navigation']/div/span/a").Text;
             crane.ActivityTime = TimeSpan.FromHours(1);
+
+            QuitBrowser();
 
             return crane;
         }

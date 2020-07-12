@@ -5,12 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="BrowserSettings\**" />
     <Compile Remove="WebExtention\**" />
     <Compile Remove="wwwroot\node_modules - Копировать\**" />
+    <Content Remove="BrowserSettings\**" />
     <Content Remove="WebExtention\**" />
     <Content Remove="wwwroot\node_modules - Копировать\**" />
+    <EmbeddedResource Remove="BrowserSettings\**" />
     <EmbeddedResource Remove="WebExtention\**" />
     <EmbeddedResource Remove="wwwroot\node_modules - Копировать\**" />
+    <None Remove="BrowserSettings\**" />
     <None Remove="WebExtention\**" />
     <None Remove="wwwroot\node_modules - Копировать\**" />
   </ItemGroup>

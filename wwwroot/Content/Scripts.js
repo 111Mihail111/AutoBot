@@ -1,6 +1,5 @@
 ﻿setInterval(function () {
     let notes = document.getElementById("Notes");
-    debugger;
     for (var i = 0; i < notes.childElementCount; i++) {
         let timer = notes.children[i].getElementsByTagName("input")[1].value;
         if (timer === "00:00:00") {
@@ -9,14 +8,14 @@
             if (statusCrane === "NoWork") {
                 continue;
             }
-            
+            debugger;
             GoToCrane(GetDataCrane(notes.children[i]));
         }
         else {
             UpdatingTimerCrane(GetDataCrane(notes.children[i]));
         }
     }
-}, 60000)
+}, 10000)
 
 
 function GetDataCrane(row) {
@@ -46,6 +45,10 @@ function UpdatingTimerCrane(crane) {
         url: "/Start/UpdateTimerCrane",
         success: function (data) {
             $('#Notes').html(data);
+
+            if (data.ActivityTime === "00:00:00") {
+                GoToCrane(data);
+            }
         }
     });
 }
