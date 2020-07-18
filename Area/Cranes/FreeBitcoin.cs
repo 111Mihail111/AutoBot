@@ -26,9 +26,8 @@ namespace AutoBot.Area.Cranes
         {
             string urlCrane = crane.URL;
 
-            Initialization(new ChromeOptions());
+            Initialization("C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\FreeBitcoin\\");
             GoToUrl(urlCrane);
-
             Thread.Sleep(2000);
             await AuthorizationOnCrane(urlCrane);
             SetScrollPosition(1000);
@@ -43,6 +42,7 @@ namespace AutoBot.Area.Cranes
 
             if (responseOnCaptcha == ERROR_CAPTCHA_UNSOLVABLE)
             {
+                CloseTab();
                 return await GoTo(crane);
             }
             
@@ -214,7 +214,7 @@ namespace AutoBot.Area.Cranes
             crane.ActivityTime = GetTimer();
             crane.BalanceOnCrane = BalanceCrane();
 
-            QuitBrowser();
+            CloseTab();
 
             return crane;
         }

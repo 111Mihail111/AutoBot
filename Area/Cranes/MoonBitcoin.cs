@@ -15,37 +15,58 @@ namespace AutoBot.Area.Cranes
     {
         private RuCaptchaController _ruCaptchaController = new RuCaptchaController(); //TODO: Обернуть интерфейсом и прокинуть через DI
         const string LOGIN = "polowinckin.mixail@yandex.ru"; //TODO: Настройки вынести отдельно на страницу
-        
-
+        const string BROWSER_PROFILE_CRANE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\MoonBitcoin\\";
 
         public async Task<Crane> GoTo(Crane crane)
         {
             string urlCrane = crane.URL;
 
-            Initialization(new ChromeOptions());
+            Initialization(BROWSER_PROFILE_CRANE);
             GoToUrl(urlCrane);
             await Authorization(urlCrane);
-            RemovePromotionalBlock();
 
             if (IsButtonEnabled())
             {
                 return GetDetailsWithCrane(crane);
             }
-            
-            GetElementByXPath("//*[@id='Faucet']/div[2]/button").Click();
+
+            OpenModalForCollectingCurrency(urlCrane);
 
             string token = GetElementById("ClaimForm").GetDataFvAddonsRecaptcha2Sitekey();
             string response = await DecipherCaptcha(token, urlCrane);
-
             if (response == ERROR_CAPTCHA_UNSOLVABLE)
             {
+                CloseTab();
                 return await GoTo(crane);
             }
-                        
+
             GetElementByXPath("//*[@id='ClaimModal']/div/div/div[3]/button[1]").Click();
             GetElementByXPath("//*[@id='FaucetClaimModal']/div/div/div[3]/button").Click();
 
             return GetDetailsWithCrane(crane);
+        }
+
+        /// <summary>
+        /// Открыть модальное окно для сбора криптовалюты
+        /// </summary>
+        /// <param name="urlCrane">URL-адрес крана</param>
+        private void OpenModalForCollectingCurrency(string urlCrane)
+        {
+            int countTabs = 2;
+            while (countTabs == 2)
+            {
+                RemovePromotionalBlock();
+                GetElementByXPath("//*[@id='Faucet']/div[2]/button").Click();
+
+                if (GetTabsCount() < countTabs)
+                {
+                    break;
+                }
+
+                CloseTab();
+                SwitchToTab();
+                GoToUrl(urlCrane);
+            }
         }
 
         /// <summary>
@@ -64,7 +85,7 @@ namespace AutoBot.Area.Cranes
             while (response == ERROR_CAPTCHA_UNSOLVABLE)
             {
                 SetScrollPosition(300);
-                GetElementByXPath("//*[@id='PageContent_UnauthorisedButtons']/button").Click(); 
+                GetElementByXPath("//*[@id='PageContent_UnauthorisedButtons']/button").Click();
                 Thread.Sleep(1200);
                 GetElementById("SignInEmailInput").SendKeys(LOGIN);
 
@@ -125,9 +146,9 @@ namespace AutoBot.Area.Cranes
         protected Crane GetDetailsWithCrane(Crane crane)
         {
             crane.BalanceOnCrane = GetElementByXPath("//*[@id='Navigation']/div/span/a").Text;
-            crane.ActivityTime = TimeSpan.FromHours(1);
+            crane.ActivityTime = TimeSpan.FromMinutes(10);
 
-            QuitBrowser();
+            CloseTab();
 
             return crane;
         }
@@ -148,7 +169,7 @@ namespace AutoBot.Area.Cranes
         protected async Task<string> DecipherCaptcha(string token, string urlCrane)
         {
             string responseOnCaptcha = await _ruCaptchaController.SendCaptcha_v2(token, urlCrane);
-            
+
             HiddenFieldVisible("g-recaptcha-response");
             GetElementByXPath("//*[@id='g-recaptcha-response']").SendKeys(responseOnCaptcha);
             HiddenFieldInVisible("g-recaptcha-response");

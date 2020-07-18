@@ -19,7 +19,9 @@ namespace AutoBot.Area
         public void GoTo()
         {
             string url = "https://rucaptcha.com/setting";
-            OpenPageInNewTab(url);
+
+            Initialization("C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\RuCaptcha\\");
+            GoToUrl(url);
 
             if (!IsAuthorazition())
             {
@@ -28,10 +30,9 @@ namespace AutoBot.Area
                 AuthorizationOnSite(SearchMethod.Id, "email", "password", "btn_register", LOGIN, PASSWORD);
                 GoToUrl(url);
             }
-            
+
             ToChangeBet();
             CloseTab();
-            SwitchToTab();
         }
 
         /// <summary>

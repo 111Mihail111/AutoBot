@@ -1,36 +1,32 @@
 ﻿using AutoBot.Area.Interface;
-using AutoBot.Area.Managers;
 using AutoBot.Area.Service;
 using AutoBot.Enums;
 using AutoBot.Models;
 using Microsoft.AspNetCore.Mvc;
-using OpenQA.Selenium.Chrome;
 using System;
-using System.Threading.Tasks;
 
 namespace AutoBot.Controllers
 {
     public class StartController : Controller
     {
         private IFreeBitcoin _freeBitcoin;
-        private IRuCaptcha _ruCaptcha;
         private IMoonBitcoin _moonBitcoin;
         private IBonusBitcoin _bonusBitcoin;
 
-        public StartController(IFreeBitcoin freeBitcoin, IRuCaptcha ruCaptcha, IMoonBitcoin moonBitcoin, IBonusBitcoin bonusBitcoin)
+        public StartController(IFreeBitcoin freeBitcoin, IMoonBitcoin moonBitcoin, IBonusBitcoin bonusBitcoin)
         {
             _freeBitcoin = freeBitcoin;
-            _ruCaptcha = ruCaptcha;
             _moonBitcoin = moonBitcoin;
             _bonusBitcoin = bonusBitcoin;
         }
 
         public ActionResult Index() => View(CraneService.GetCranes());
 
+
         [HttpGet]
         public PartialViewResult UpdateTimerCrane(Crane crane)
         {
-            crane.ActivityTime -= TimeSpan.FromMinutes(5);
+            crane.ActivityTime -= TimeSpan.FromMinutes(6);
             if (crane.ActivityTime < TimeSpan.FromSeconds(1))
             {
                 crane.ActivityTime = TimeSpan.FromSeconds(0);
@@ -43,8 +39,6 @@ namespace AutoBot.Controllers
         [HttpGet]
         public PartialViewResult GoToCrane(Crane crane)
         {
-            CheckingBid();
-
             try
             {
                 switch (crane.TypeCrane)
@@ -59,20 +53,20 @@ namespace AutoBot.Controllers
                         crane = _bonusBitcoin.GoTo(crane).Result;
                         break;
                 }
+
+                CraneService.UpdateCrane(crane);
             }
             catch (Exception exeption)
             {
-                crane.StatusCrane = Status.NoWork;
+                if (crane != null)
+                {
+                    crane.StatusCrane = Status.NoWork;
+                    CraneService.UpdateCrane(crane);
+                }
             }
-            
-            CraneService.UpdateCrane(crane);
 
             return PartialView("_Cranes", CraneService.GetCranes());
         }
 
-        protected void CheckingBid()
-        {
-            _ruCaptcha.GoTo();
-        }
     }
 }

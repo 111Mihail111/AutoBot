@@ -1,4 +1,5 @@
 ﻿setInterval(function () {
+    debugger;
     let notes = document.getElementById("Notes");
     for (var i = 0; i < notes.childElementCount; i++) {
         let timer = notes.children[i].getElementsByTagName("input")[1].value;
@@ -8,14 +9,14 @@
             if (statusCrane === "NoWork") {
                 continue;
             }
-            debugger;
+
             GoToCrane(GetDataCrane(notes.children[i]));
         }
         else {
             UpdatingTimerCrane(GetDataCrane(notes.children[i]));
         }
     }
-}, 10000)
+}, 360000)
 
 
 function GetDataCrane(row) {
@@ -45,10 +46,10 @@ function UpdatingTimerCrane(crane) {
         url: "/Start/UpdateTimerCrane",
         success: function (data) {
             $('#Notes').html(data);
+            debugger;
 
-            if (data.ActivityTime === "00:00:00") {
-                GoToCrane(data);
-            }
+            //TODO:Отладить метод
+            CheckTimers(crane);
         }
     });
 }
@@ -70,4 +71,20 @@ function GoToCrane(crane) {
             $('#Notes').html(data);
         }
     });
+}
+
+
+function CheckTimers(crane) {
+    var row = document.getElementById("Notes");
+
+    var list = [];
+    for (var i = 0; i < row.childElementCount; i++) {
+        list[i] = GetDataCrane(row.children[i]);
+    }
+
+    for (var i = 0; i < list.length; i++) {
+        if (crane.URL === list[i].URL) {
+            GoToCrane(list[i]);
+        }
+    }
 }

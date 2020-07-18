@@ -31,9 +31,10 @@ namespace AutoBot.Area.Managers
         #endregion Path for driver
 
 
-        public void Initialization(ChromeOptions options)
+        public void Initialization(string pathToProfile)
         {
-            options.AddArgument("--user-data-dir=C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profile\\"); //Путь к папке с профилем
+            ChromeOptions options = new ChromeOptions();
+            options.AddArgument($"--user-data-dir={pathToProfile}"); //Путь к папке с профилем
             options.AddArgument("--profile-directory=AutoBot"); //Профиль
             options.AddArgument("--start-maximized"); //Полностью открывает браузер
             options.AddAdditionalCapability("useAutomationExtension", false); //Скрывает расширение
