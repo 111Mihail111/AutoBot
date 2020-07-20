@@ -16,7 +16,7 @@
             UpdatingTimerCrane(GetDataCrane(notes.children[i]));
         }
     }
-}, 360000)
+}, 420000)
 
 
 function GetDataCrane(row) {
@@ -76,15 +76,16 @@ function GoToCrane(crane) {
 
 function CheckTimers(crane) {
     var row = document.getElementById("Notes");
-
     var list = [];
+
     for (var i = 0; i < row.childElementCount; i++) {
         list[i] = GetDataCrane(row.children[i]);
     }
 
     for (var i = 0; i < list.length; i++) {
-        if (crane.URL === list[i].URL) {
-            GoToCrane(list[i]);
+        var element = list[i];
+        if (crane.URL === element.URL && element.ActivityTime === "00:00:00") {
+            GoToCrane(element);
         }
     }
 }

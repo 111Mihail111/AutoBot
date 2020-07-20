@@ -26,7 +26,7 @@ namespace AutoBot.Controllers
         [HttpGet]
         public PartialViewResult UpdateTimerCrane(Crane crane)
         {
-            crane.ActivityTime -= TimeSpan.FromMinutes(6);
+            crane.ActivityTime -= TimeSpan.FromMinutes(7);
             if (crane.ActivityTime < TimeSpan.FromSeconds(1))
             {
                 crane.ActivityTime = TimeSpan.FromSeconds(0);

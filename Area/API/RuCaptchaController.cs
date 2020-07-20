@@ -116,6 +116,7 @@ namespace AutoBot.Area.API
             var array = status.Split("|");
             if (array[0] == "OK")
             {
+                _keyCaptcha = array[1];
                 Thread.Sleep(15000);
                 return await GetResponseOnCaptcha(array[1]);
             }
