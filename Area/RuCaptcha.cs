@@ -2,8 +2,6 @@
 using AutoBot.Area.Managers;
 using AutoBot.Enums;
 using AutoBot.Extentions;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Interactions;
 using System;
 using System.Linq;
 using System.Threading;

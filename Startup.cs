@@ -1,4 +1,5 @@
 using AutoBot.Area;
+using AutoBot.Area.API;
 using AutoBot.Area.Cranes;
 using AutoBot.Area.Interface;
 using Microsoft.AspNetCore.Builder;
@@ -18,6 +19,8 @@ namespace AutoBot
             services.AddScoped<IRuCaptcha, RuCaptcha>();
             services.AddScoped<IMoonBitcoin, MoonBitcoin>();
             services.AddScoped<IBonusBitcoin, BonusBitcoin>();
+            services.AddScoped<IMoonDogecoin, MoonDogecoin>();
+            services.AddScoped<IRuCaptchaController, RuCaptchaController>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

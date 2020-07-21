@@ -17,5 +17,9 @@
         /// http://bonusbitcoin.co/faucet
         /// </summary>
         BonusBitcoin = 2,
+        /// <summary>
+        /// https://moondoge.co.in/faucet
+        /// </summary>
+        MoonDogecoin = 3,
     }
 }

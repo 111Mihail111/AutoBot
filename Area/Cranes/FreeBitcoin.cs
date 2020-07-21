@@ -1,16 +1,10 @@
-﻿using AutoBot.Area.API;
-using AutoBot.Area.Interface;
+﻿using AutoBot.Area.Interface;
 using AutoBot.Area.Managers;
 using AutoBot.Enums;
 using AutoBot.Extentions;
 using AutoBot.Models;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
 using System;
-using System.IO;
 using System.Linq;
-using System.Security.Policy;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,11 +12,17 @@ namespace AutoBot.Area.Cranes
 {
     public class FreeBitcoin : BrowserManager, IFreeBitcoin
     {
-        private RuCaptchaController _ruCaptchaController = new RuCaptchaController(); //TODO: Обернуть интерфейсом и прокинуть через DI
+        private IRuCaptchaController _ruCaptchaController;
         const string LOGIN = "polowinckin.mixail@yandex.ru"; //TODO: Настройки вынести отдельно на страницу
         const string PASSWORD = "xHkKv78SvV2o7rSX";  //TODO: Настройки вынести отдельно на страницу
 
-        public async Task<Crane> GoTo(Crane crane)
+        public FreeBitcoin(IRuCaptchaController ruCaptchaController)
+        {
+            _ruCaptchaController = ruCaptchaController;
+        }
+
+        ///<inheritdoc/>
+        public async Task<Crane> Start(Crane crane)
         {
             string urlCrane = crane.URL;
 
@@ -43,7 +43,7 @@ namespace AutoBot.Area.Cranes
             if (responseOnCaptcha == ERROR_CAPTCHA_UNSOLVABLE)
             {
                 CloseTab();
-                return await GoTo(crane);
+                return await Start(crane);
             }
             
             GetElementById("free_play_form_button").Click();
@@ -51,8 +51,6 @@ namespace AutoBot.Area.Cranes
 
             return GetDetailsWithCrane(crane);
         }
-
-
         /// <summary>
         /// Авторизоваться на кране
         /// </summary>
@@ -79,11 +77,11 @@ namespace AutoBot.Area.Cranes
                     isErrorCapthca = GetElementByXPath("//*[@id='reward_point_redeem_result_container_div']").Displayed;
                     if (!isErrorCapthca)
                     {
-                        _ruCaptchaController.SendReportOnCaptcha(_ruCaptchaController.GetKeyCaptcha(), "reportgood");
+                        _ruCaptchaController.SendReport(_ruCaptchaController.GetCaptchaQueryId(), "reportgood");
                         break;
                     }
 
-                    _ruCaptchaController.SendReportOnCaptcha(_ruCaptchaController.GetKeyCaptcha(), "reportbad");
+                    _ruCaptchaController.SendReport(_ruCaptchaController.GetCaptchaQueryId(), "reportbad");
                     await InsertDecodedCaptchaInField();
                     GetElementById("signup_button").Click();
                 }
@@ -112,7 +110,7 @@ namespace AutoBot.Area.Cranes
 
             while (responseOnCaptcha == ERROR_BAD_DUPLICATES)
             {
-                responseOnCaptcha = await _ruCaptchaController.SendCaptcha(imageByte);
+                responseOnCaptcha = await _ruCaptchaController.SendCaptchaImage(imageByte);
             }
 
             GetElementByXPath("//*[@id='botdetect_signup_captcha']/input[2]").SendKeys(responseOnCaptcha);
@@ -226,7 +224,7 @@ namespace AutoBot.Area.Cranes
         /// <returns>Расшифрованный токен капчи или ошибку от сервиса RuCaptcha</returns>
         protected async Task<string> DecipherCaptcha(string token, string urlCrane)
         {
-            string responseOnCaptcha = await _ruCaptchaController.SendCaptcha_v2(token, urlCrane);
+            string responseOnCaptcha = await _ruCaptchaController.SendRecaptcha_v2(token, urlCrane);
 
             HiddenFieldVisible("g-recaptcha-response");
             GetElementByXPath("//*[@id='g-recaptcha-response']").SendKeys(responseOnCaptcha);

@@ -16,9 +16,9 @@
             UpdatingTimerCrane(GetDataCrane(notes.children[i]));
         }
     }
-}, 420000)
+}, 600000)
 
-
+/*Получить данные крана*/
 function GetDataCrane(row) {
     return {
         URL: row.getElementsByTagName("input")[0].value,
@@ -30,7 +30,7 @@ function GetDataCrane(row) {
     }
 }
 
-
+/*Обновить таймер крана*/
 function UpdatingTimerCrane(crane) {
     $.ajax({
         type: "GET",
@@ -46,15 +46,12 @@ function UpdatingTimerCrane(crane) {
         url: "/Start/UpdateTimerCrane",
         success: function (data) {
             $('#Notes').html(data);
-            debugger;
-
-            //TODO:Отладить метод
             CheckTimers(crane);
         }
     });
 }
 
-
+/*Перейти на кран*/
 function GoToCrane(crane) {
     $.ajax({
         type: "GET",
@@ -73,7 +70,7 @@ function GoToCrane(crane) {
     });
 }
 
-
+/*Проверка таймеров*/
 function CheckTimers(crane) {
     var row = document.getElementById("Notes");
     var list = [];
@@ -87,5 +84,12 @@ function CheckTimers(crane) {
         if (crane.URL === element.URL && element.ActivityTime === "00:00:00") {
             GoToCrane(element);
         }
+    }
+}
+
+window.onload = function () {
+    let notes = document.getElementById("Notes");
+    for (var i = 0; i < notes.childElementCount; i++) {
+        GoToCrane(GetDataCrane(notes.children[i]));
     }
 }

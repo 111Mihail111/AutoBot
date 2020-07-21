@@ -1,11 +1,8 @@
-﻿using AutoBot.Area.API;
-using AutoBot.Area.Interface;
+﻿using AutoBot.Area.Interface;
 using AutoBot.Area.Managers;
-using AutoBot.Enums;
 using AutoBot.Extentions;
 using AutoBot.Models;
 using System;
-using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,11 +10,17 @@ namespace AutoBot.Area.Cranes
 {
     public class BonusBitcoin : BrowserManager, IBonusBitcoin
     {
-        private RuCaptchaController _ruCaptchaController = new RuCaptchaController(); //TODO: Обернуть интерфейсом и прокинуть через DI
+        private IRuCaptchaController _ruCaptchaController;
         const string LOGIN = "desiptikon.bot@yandex.ru"; //TODO: Настройки вынести отдельно на страницу
         const string PASSWORD = "123q_Q*W(*E&*R^*Z$*X!*C?*V";  //TODO: Настройки вынести отдельно на страницу
 
-        public async Task<Crane> GoTo(Crane crane)
+        public BonusBitcoin(IRuCaptchaController ruCaptchaController)
+        {
+            _ruCaptchaController = ruCaptchaController;
+        }
+
+        ///<inheritdoc/>
+        public async Task<Crane> Start(Crane crane)
         {
             string urlCrane = crane.URL;
 
@@ -36,7 +39,7 @@ namespace AutoBot.Area.Cranes
 
             if (response == ERROR_CAPTCHA_UNSOLVABLE)
             {
-                return await GoTo(crane);
+                return await Start(crane);
             }
 
             GetElementByXPath("//*[@id='FaucetForm']/button[2]").Click();
@@ -156,7 +159,7 @@ namespace AutoBot.Area.Cranes
         /// <returns>Расшифрованный токен капчи или ошибку от сервиса RuCaptcha</returns>
         protected async Task<string> DecipherCaptcha(string elementId, string token, string urlCrane)
         {
-            string responseOnCaptcha = await _ruCaptchaController.SendCaptcha_v2(token, urlCrane);
+            string responseOnCaptcha = await _ruCaptchaController.SendRecaptcha_v2(token, urlCrane);
 
             HiddenFieldVisible(elementId);
             GetElementByXPath(elementId).SendKeys(responseOnCaptcha);

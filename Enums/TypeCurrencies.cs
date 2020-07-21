@@ -9,5 +9,9 @@
         /// Биткоин
         /// </summary>
         Bitcoin = 0,
+        /// <summary>
+        /// Доджкоин
+        /// </summary>
+        Dogecoin = 1,
     }
 }

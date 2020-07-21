@@ -4,6 +4,7 @@ using AutoBot.Enums;
 using AutoBot.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Threading.Tasks;
 
 namespace AutoBot.Controllers
 {
@@ -12,12 +13,15 @@ namespace AutoBot.Controllers
         private IFreeBitcoin _freeBitcoin;
         private IMoonBitcoin _moonBitcoin;
         private IBonusBitcoin _bonusBitcoin;
+        private IMoonDogecoin _moonDogecoin;
 
-        public StartController(IFreeBitcoin freeBitcoin, IMoonBitcoin moonBitcoin, IBonusBitcoin bonusBitcoin)
+        public StartController(IFreeBitcoin freeBitcoin, IMoonBitcoin moonBitcoin, IBonusBitcoin bonusBitcoin, 
+            IMoonDogecoin moonDogecoin)
         {
             _freeBitcoin = freeBitcoin;
             _moonBitcoin = moonBitcoin;
             _bonusBitcoin = bonusBitcoin;
+            _moonDogecoin = moonDogecoin;
         }
 
         public ActionResult Index() => View(CraneService.GetCranes());
@@ -26,7 +30,7 @@ namespace AutoBot.Controllers
         [HttpGet]
         public PartialViewResult UpdateTimerCrane(Crane crane)
         {
-            crane.ActivityTime -= TimeSpan.FromMinutes(7);
+            crane.ActivityTime -= TimeSpan.FromMinutes(10);
             if (crane.ActivityTime < TimeSpan.FromSeconds(1))
             {
                 crane.ActivityTime = TimeSpan.FromSeconds(0);
@@ -37,20 +41,23 @@ namespace AutoBot.Controllers
         }
 
         [HttpGet]
-        public PartialViewResult GoToCrane(Crane crane)
+        public async Task<PartialViewResult> GoToCrane(Crane crane)
         {
             try
             {
                 switch (crane.TypeCrane)
                 {
                     case TypeCrane.FreeBitcoin:
-                        crane = _freeBitcoin.GoTo(crane).Result;
+                        crane = _freeBitcoin.Start(crane).Result;
                         break;
                     case TypeCrane.MoonBitcoin:
-                        crane = _moonBitcoin.GoTo(crane).Result;
+                        crane = _moonBitcoin.Start(crane).Result;
                         break;
                     case TypeCrane.BonusBitcoin:
-                        crane = _bonusBitcoin.GoTo(crane).Result;
+                        crane = _bonusBitcoin.Start(crane).Result;
+                        break;
+                    case TypeCrane.MoonDogecoin:
+                        crane = await _moonDogecoin.Start(crane);
                         break;
                 }
 

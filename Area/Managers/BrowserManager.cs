@@ -1,13 +1,10 @@
 ﻿using AutoBot.Enums;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Interactions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AutoBot.Area.Managers
 {
@@ -19,11 +16,14 @@ namespace AutoBot.Area.Managers
         /// Ошибка, капча неразрешима
         /// </summary>
         public const string ERROR_CAPTCHA_UNSOLVABLE = "ERROR_CAPTCHA_UNSOLVABLE";
-
         /// <summary>
         /// Ошибка, плохие совпадения
         /// </summary>
         public const string ERROR_BAD_DUPLICATES = "ERROR_BAD_DUPLICATES";
+        /// <summary>
+        /// Ошибка, нулевой остаток (на расшифровку капчи)
+        /// </summary>
+        public const string ERROR_ZERO_BALANCE = "ERROR_ZERO_BALANCE";
 
         #region Path for driver
         //"/Project/AutoBot/bin/Debug/netcoreapp2.0" - на работе
@@ -194,18 +194,7 @@ namespace AutoBot.Area.Managers
                 waitingTimeSecond--;
             }
 
-            //TODO: ОБЕРНУТЬ В TRY CATCH И ОЖИДАТЬ ОШИБКУ ЗДЕСЬ, если элемент не найден
             return null;
-        }
-
-
-        /// <summary>
-        /// Создать действие в браузере
-        /// </summary>
-        /// <returns>Действие</returns>
-        public Actions CreateActionToBrowser()
-        {
-            return new Actions(_browser);
         }
 
 

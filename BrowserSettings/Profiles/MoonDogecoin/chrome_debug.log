@@ -1,0 +1,3 @@
+[15172:11216:0721/153454.196:WARNING:discovery_network_list_win.cc(196)] Failed to open Wlan client handle: 1062
+[15172:6060:0721/153458.128:ERROR:device_event_log_impl.cc(208)] [15:34:58.129] Bluetooth: bluetooth_adapter_winrt.cc:1060 Getting Default Adapter failed.
+[15172:6060:0721/153502.249:WARNING:CONSOLE(0)] "HTML Imports is deprecated and will be removed in M80, around February 2020. Please use ES modules instead. See https://www.chromestatus.com/features/5144752345317376 and https://developers.google.com/web/updates/2019/07/web-components-time-to-upgrade for more details.", source:  (0)
