@@ -13,6 +13,8 @@ namespace AutoBot.Area.Cranes
         private IRuCaptchaController _ruCaptchaController;
         const string LOGIN = "desiptikon.bot@yandex.ru"; //TODO: Настройки вынести отдельно на страницу
         const string PASSWORD = "123q_Q*W(*E&*R^*Z$*X!*C?*V";  //TODO: Настройки вынести отдельно на страницу
+        const string BROWSER_PROFILE_CRANE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\BonusBitcoin\\";
+        private string _errorZeroBalance;
 
         public BonusBitcoin(IRuCaptchaController ruCaptchaController)
         {
@@ -24,6 +26,7 @@ namespace AutoBot.Area.Cranes
         {
             string urlCrane = crane.URL;
 
+            Initialization(BROWSER_PROFILE_CRANE);
             GoToUrl(urlCrane);
             await Authorization(urlCrane);
 
@@ -34,16 +37,18 @@ namespace AutoBot.Area.Cranes
 
             SetScrollPosition(1200);
 
-            string token = GetElementById("FaucetForm").GetDataFvAddonsRecaptcha2Sitekey();
-            string response = await DecipherCaptcha("g-recaptcha-response", token, urlCrane);
-
-            if (response == ERROR_CAPTCHA_UNSOLVABLE)
-            {
-                return await Start(crane);
-            }
-
+            await DecipherCaptcha("g-recaptcha-response", urlCrane, "FaucetForm");
             GetElementByXPath("//*[@id='FaucetForm']/button[2]").Click();
-            GetElementByXPath("//*[@id='FaucetClaimModal']/div/div/div[3]/button").Click();
+
+            if (GetTabsCount() > 2)
+            {
+                CloseTab();
+                SwitchToTab();
+            }
+            else
+            {
+                GetElementByXPath("//*[@id='FaucetClaimModal']/div/div/div[3]/button").Click();
+            }
 
             return GetDetailsWithCrane(crane);
         }
@@ -60,27 +65,35 @@ namespace AutoBot.Area.Cranes
                 return;
             }
 
-            GetElementByXPath("/html/body/div[1]/div/a[1]").Click();
-
-            string response = ERROR_CAPTCHA_UNSOLVABLE;
-            while (response == ERROR_CAPTCHA_UNSOLVABLE)
+            var cookie = GetElementByXPath("/html/body/div[1]/div/a[1]");
+            if (cookie != null && cookie.Displayed)
             {
-                GetElementById("PageContent_SignInButton").Click();
-                Thread.Sleep(1000);
-                SetScrollPositionInWindow("SignInModal", 300);
+                cookie.Click();
+            }
 
-                string token = GetElementById("SignInForm").GetDataFvAddonsRecaptcha2Sitekey();
-                response = await DecipherCaptcha("g-recaptcha-response-1", token, urlCrane);
+            GetElementById("PageContent_SignInButton").Click();
+            Thread.Sleep(1000);
+            SetScrollPositionInWindow("SignInModal", 300);
+            await DecipherCaptcha("g-recaptcha-response-1", urlCrane, "SignInForm");
 
-                if (response == ERROR_CAPTCHA_UNSOLVABLE)
-                {
-                    RefreshPage();
-                    continue;
-                }
+            var emailInput = GetElementByXPath("//*[@id='SignInEmailInput']");
+            if (string.IsNullOrEmpty(emailInput.GetValue()))
+            {
+                emailInput.SendKeys(LOGIN);
+            }
 
-                GetElementByXPath("//*[@id='SignInEmailInput']").SendKeys(LOGIN);
-                GetElementByXPath("//*[@id='SignInPasswordInput']").SendKeys(PASSWORD);
-                ExecuteScript("document.querySelector('#SignInModal>div>div>div.modal-footer>button.btn.btn-primary').click()");
+            var passwordInput = GetElementByXPath("//*[@id='SignInPasswordInput']");
+            if (string.IsNullOrEmpty(passwordInput.GetValue()))
+            {
+                passwordInput.SendKeys(PASSWORD);
+            }
+
+            ExecuteScript("document.querySelector('#SignInModal>div>div>div.modal-footer>button.btn.btn-primary').click()");
+
+            if (!IsCaptchaValid())
+            {
+                RefreshPage();
+                await Authorization(urlCrane);
             }
         }
         /// <summary>
@@ -140,6 +153,7 @@ namespace AutoBot.Area.Cranes
         {
             crane.ActivityTime = GetTimer();
             crane.BalanceOnCrane = GetBalanceOnCrane();
+            CloseTab();
 
             return crane;
         }
@@ -157,15 +171,45 @@ namespace AutoBot.Area.Cranes
         /// <param name="token">Токен рекапчи</param>
         /// <param name="urlCrane">Url-адрес крана</param>
         /// <returns>Расшифрованный токен капчи или ошибку от сервиса RuCaptcha</returns>
-        protected async Task<string> DecipherCaptcha(string elementId, string token, string urlCrane)
+        protected async Task DecipherCaptcha(string textAreaId, string urlCrane, string elementWithToken)
         {
-            string responseOnCaptcha = await _ruCaptchaController.SendRecaptcha_v2(token, urlCrane);
+            string token = GetElementById(elementWithToken).GetDataFvAddonsRecaptcha2Sitekey();
+            string responseOnCaptcha = ERROR_CAPTCHA_UNSOLVABLE;
 
-            HiddenFieldVisible(elementId);
-            GetElementByXPath(elementId).SendKeys(responseOnCaptcha);
-            HiddenFieldInVisible(elementId);
-            
-            return responseOnCaptcha;
+            while (responseOnCaptcha == ERROR_CAPTCHA_UNSOLVABLE || responseOnCaptcha == ERROR_BAD_DUPLICATES)
+            {
+                responseOnCaptcha = await _ruCaptchaController.SendRecaptcha_v2(token, urlCrane);
+            }
+
+            if (responseOnCaptcha == ERROR_ZERO_BALANCE)
+            {
+                _errorZeroBalance = responseOnCaptcha;
+                return;
+            }
+
+            HiddenFieldVisible(textAreaId);
+            GetElementByXPath(textAreaId).SendKeys(responseOnCaptcha);
+            HiddenFieldInVisible(textAreaId);
+        }
+        /// <summary>
+        /// Валидна ли капча
+        /// </summary>
+        /// <returns>True если валидна, иначе false</returns>
+        protected bool IsCaptchaValid()
+        {
+            if (!GetElementById("MessageModal").Displayed)
+            {
+                _ruCaptchaController.SendReport(_ruCaptchaController.GetCaptchaQueryId(), "reportgood");
+                return true;
+            }
+
+            string errorCaptcha = GetElementByXPath("//*[@id='MessageModal']/div/div/div[2]").GetInnerText();
+            if (errorCaptcha.Contains("The captcha is not valid"))
+            {
+                _ruCaptchaController.SendReport(_ruCaptchaController.GetCaptchaQueryId(), "reportbad");
+            }
+
+            return false;
         }
     }
 }

@@ -95,7 +95,7 @@ namespace AutoBot.Area.Cranes
             string signInClick = "document.querySelector('#SignInModal>div>div>div.modal-footer>button').click();";
             ExecuteScript(signInClick);
 
-            int tabs = GetTabsCount();
+            int tabs = GetTabsCount(); //TODO: зачем нам переменная tabs? Избавиться.
             while (tabs > 1)
             {
                 SwitchToLastTab();

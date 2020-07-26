@@ -20,17 +20,25 @@ namespace AutoBot.Area
 
             Initialization("C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\RuCaptcha\\");
             GoToUrl(url);
-
-            if (!IsAuthorazition())
-            {
-                GetElementByXPath("/html/body/div[1]/div[1]/div/div/div/div[2]/div/ul/li[2]/a").Click();
-                Thread.Sleep(2000);
-                AuthorizationOnSite(SearchMethod.Id, "email", "password", "btn_register", LOGIN, PASSWORD);
-                GoToUrl(url);
-            }
+            Authorazition(url);
 
             ToChangeBet();
             CloseTab();
+        }
+
+        protected void Authorazition(string url)
+        {
+            if (!IsAuthorazition())
+            {
+                return;
+            }
+
+            //TODO: В будущем может понадобиться расшифровка капчи
+
+            GetElementByXPath("/html/body/div[1]/div[1]/div/div/div/div[2]/div/ul/li[2]/a").Click();
+            Thread.Sleep(1000);
+            AuthorizationOnSite(SearchMethod.Id, "email", "password", "btn_register", LOGIN, PASSWORD);
+            GoToUrl(url);
         }
 
         /// <summary>
@@ -44,8 +52,12 @@ namespace AutoBot.Area
             }
 
             ExecuteScript($"document.getElementById('price').value = {GetCurrentRate()};");
-            SetScrollPosition(900);
-            GetElementByXPath("/html/body/div[1]/div[2]/div[2]/div/div[1]/div/form/div/div[30]/input").Click();
+
+            //TODO:Протестить
+            //SetScrollPosition(900);
+
+            string buttonSave = "/html/body/div[1]/div[3]/div/div/div/div/div[1]/div/form/div/div[13]/input";
+            GetElementByXPath(buttonSave).Click();
         }
         /// <summary>
         /// Получить текущую ставку за простые капчи
@@ -53,8 +65,10 @@ namespace AutoBot.Area
         /// <returns>Ставка</returns>
         protected int GetCurrentRate()
         {
-            var webElement = GetElementByXPath("/html/body/div[1]/div[2]/div[2]/div/div[1]/div/form/div/div[12]/span").Text;
-            return Convert.ToInt32(webElement);
+            string xPath = "/html/body/div[1]/div[3]/div/div/div/div/div[1]/div/form/div/div[6]/div[2]";
+            string currentRate = GetElementByXPath(xPath).GetInnerText().Replace(" руб / за каждую 1000 капч", string.Empty);
+
+            return Convert.ToInt32(currentRate);
         }
         /// <summary>
         /// Получить мою ставку за простые капчи
@@ -62,9 +76,11 @@ namespace AutoBot.Area
         /// <returns>Ставка</returns>
         protected int GetMyCurrentRate()
         {
-            var webElement = GetElementById("price2").GetValue().Split(".").First();
-            return Convert.ToInt32(webElement);
+            string myCurrent = GetElementById("price").GetValue().Split(".").First();
+
+            return Convert.ToInt32(myCurrent);
         }
+
         /// <summary>
         /// Проверка авторизации
         /// </summary>
@@ -72,7 +88,7 @@ namespace AutoBot.Area
         /// <returns>Если true - авторизация есть, иначе false</returns>
         protected bool IsAuthorazition()
         {
-            return GetTitlePage() == "401 Unauthorized" ? false : true;
+            return GetTitlePage() == "401 Unauthorized";
         }
     }
 }
