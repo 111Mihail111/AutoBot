@@ -13,5 +13,9 @@
         /// Доджкоин
         /// </summary>
         Dogecoin = 1,
+        /// <summary>
+        /// Лайткоин
+        /// </summary>
+        LiteCoin = 2,
     }
 }

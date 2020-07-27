@@ -40,14 +40,10 @@ namespace AutoBot.Area.Cranes
             await DecipherCaptcha("g-recaptcha-response", urlCrane, "FaucetForm");
             GetElementByXPath("//*[@id='FaucetForm']/button[2]").Click();
 
-            if (GetTabsCount() > 2)
+            if (GetTabsCount() > 1)
             {
                 CloseTab();
                 SwitchToTab();
-            }
-            else
-            {
-                GetElementByXPath("//*[@id='FaucetClaimModal']/div/div/div[3]/button").Click();
             }
 
             return GetDetailsWithCrane(crane);
@@ -65,6 +61,7 @@ namespace AutoBot.Area.Cranes
                 return;
             }
 
+            //TODO:Заменить на асинхронность
             var cookie = GetElementByXPath("/html/body/div[1]/div/a[1]");
             if (cookie != null && cookie.Displayed)
             {
@@ -76,12 +73,14 @@ namespace AutoBot.Area.Cranes
             SetScrollPositionInWindow("SignInModal", 300);
             await DecipherCaptcha("g-recaptcha-response-1", urlCrane, "SignInForm");
 
+            //TODO:Заменить на асинхронность
             var emailInput = GetElementByXPath("//*[@id='SignInEmailInput']");
             if (string.IsNullOrEmpty(emailInput.GetValue()))
             {
                 emailInput.SendKeys(LOGIN);
             }
 
+            //TODO:Заменить на асинхронность
             var passwordInput = GetElementByXPath("//*[@id='SignInPasswordInput']");
             if (string.IsNullOrEmpty(passwordInput.GetValue()))
             {

@@ -1,6 +1,5 @@
 ﻿using AutoBot.Area.Interface;
 using AutoBot.Area.Managers;
-using AutoBot.Enums;
 using AutoBot.Extentions;
 using AutoBot.Models;
 using System;
@@ -47,6 +46,7 @@ namespace AutoBot.Area.Cranes
                 return await Start(crane);
             }
 
+            //TODO:Возможно лишний, отладить
             GetElementByXPath("//*[@id='myModal22']/a").Click();
 
             return GetDetailsWithCrane(crane);
@@ -63,20 +63,40 @@ namespace AutoBot.Area.Cranes
                 return;
             }
 
-            var noThanks = GetElementByXPath("//*[@id='push_notification_modal']/div[1]/div[2]/div/div[1]");
-            if (noThanks.Displayed)
-            {
-                noThanks.Click();
-            }
+            ExecuteScript("document.querySelector('#push_notification_modal').remove();" +
+                "document.querySelector('body > div.reveal-modal-bg').remove();");
 
-            var cookie = GetElementByXPath("/html/body/div[1]/div/a[1]");
-            if (cookie.Displayed)
+            var cookie = GetElementByXPath("/html/body/div[1]/div/a[1]", 2);
+            if (cookie != null && cookie.Displayed)
             {
                 cookie.Click();
             }
 
+            //TODO:Это костыль, переписать
+            var loginButton = GetElementByXPath("//*[@id='login_button']", 2);
+            if (loginButton.Displayed)
+            {
+                loginButton.Click();
+                return;
+            }
+
             await InsertDecodedCaptchaInField();
-            AuthorizationOnSite(SearchMethod.Id, "signup_form_email", "signup_form_password", "signup_button", LOGIN, PASSWORD);
+
+            //TODO:Заменить на асинхронность
+            var emailInput = GetElementById("signup_form_email");
+            if (emailInput != null && string.IsNullOrEmpty(emailInput.GetValue()))
+            {
+                emailInput.SendKeys(LOGIN);
+            }
+
+            //TODO:Заменить на асинхронность
+            var passwordInput = GetElementById("signup_form_password");
+            if (passwordInput != null && string.IsNullOrEmpty(passwordInput.GetValue()))
+            {
+                passwordInput.SendKeys(PASSWORD);
+            }
+
+            GetElementById("signup_button").Click();
             Thread.Sleep(2000);
 
             bool isErrorCapthca = true;
@@ -97,8 +117,9 @@ namespace AutoBot.Area.Cranes
             GoToUrl(urlCrane);
             Thread.Sleep(2000);
 
+            //TODO:Заменить на асинхронный скрипт
             var advertisingWindow = GetElementByXPath("//*[@id='push_notification_modal']/div[1]/div[2]/div/div[1]");
-            if (advertisingWindow.Displayed)
+            if (advertisingWindow != null && advertisingWindow.Displayed)
             {
                 advertisingWindow.Click();
             }

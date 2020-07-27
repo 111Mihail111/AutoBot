@@ -16,7 +16,7 @@
             UpdatingTimerCrane(GetDataCrane(notes.children[i]));
         }
     }
-}, 10000)
+}, 600000)
 
 /*Получить данные крана*/
 function GetDataCrane(row) {

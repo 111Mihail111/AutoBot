@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace AutoBot.Area.Managers
 {
@@ -165,6 +166,10 @@ namespace AutoBot.Area.Managers
         public IEnumerable<IWebElement> GetElementsById(string elementId)
         {
             return _browser.FindElementsById(elementId);
+        }
+        public async Task<IWebElement> GetAsyncElementById(string elementId, int waitingTimeSecond = 5)
+        {
+            return ExpectationElement(elementId, waitingTimeSecond);
         }
 
 
