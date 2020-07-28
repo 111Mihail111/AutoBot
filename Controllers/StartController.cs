@@ -15,15 +15,17 @@ namespace AutoBot.Controllers
         private IBonusBitcoin _bonusBitcoin;
         private IMoonDogecoin _moonDogecoin;
         private IMoonLitecoin _moonLitecoin;
+        private IMoonDash _moonDash;
 
         public StartController(IFreeBitcoin freeBitcoin, IMoonBitcoin moonBitcoin, IBonusBitcoin bonusBitcoin, 
-            IMoonDogecoin moonDogecoin, IMoonLitecoin moonLitecoin)
+            IMoonDogecoin moonDogecoin, IMoonLitecoin moonLitecoin, IMoonDash moonDash)
         {
             _freeBitcoin = freeBitcoin;
             _moonBitcoin = moonBitcoin;
             _bonusBitcoin = bonusBitcoin;
             _moonDogecoin = moonDogecoin;
             _moonLitecoin = moonLitecoin;
+            _moonDash = moonDash;
         }
 
         public ActionResult Index() => View(CraneService.GetCranes());
@@ -63,6 +65,9 @@ namespace AutoBot.Controllers
                         break;
                     case TypeCrane.MoonLitecoin:
                         crane = _moonLitecoin.Start(crane).Result;
+                        break;
+                    case TypeCrane.MoonDash:
+                        crane = _moonDash.Start(crane).Result;
                         break;
                 }
 

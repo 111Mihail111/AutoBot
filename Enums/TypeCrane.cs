@@ -24,6 +24,10 @@
         /// <summary>
         /// https://moonliteco.in/faucet
         /// </summary>
-        MoonLitecoin = 4
+        MoonLitecoin = 4,
+        /// <summary>
+        /// https://moondash.co.in/faucet
+        /// </summary>
+        MoonDash = 5,
     }
 }

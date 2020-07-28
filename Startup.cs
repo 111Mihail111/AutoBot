@@ -22,6 +22,7 @@ namespace AutoBot
             services.AddScoped<IMoonDogecoin, MoonDogecoin>();
             services.AddScoped<IRuCaptchaController, RuCaptchaController>();
             services.AddScoped<IMoonLitecoin, MoonLitecoin>();
+            services.AddScoped<IMoonDash, MoonDash>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

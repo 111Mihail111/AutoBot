@@ -17,5 +17,9 @@
         /// Лайткоин
         /// </summary>
         LiteCoin = 2,
+        /// <summary>
+        /// Дэшь
+        /// </summary>
+        Dash = 3,
     }
 }

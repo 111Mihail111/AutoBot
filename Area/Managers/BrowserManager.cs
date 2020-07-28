@@ -167,6 +167,7 @@ namespace AutoBot.Area.Managers
         {
             return _browser.FindElementsById(elementId);
         }
+        //TODO: Довести до ума асинхронные методы
         public async Task<IWebElement> GetAsyncElementById(string elementId, int waitingTimeSecond = 5)
         {
             return ExpectationElement(elementId, waitingTimeSecond);

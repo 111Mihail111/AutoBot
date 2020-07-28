@@ -17,8 +17,10 @@ namespace AutoBot.Area.Service
             //    StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.Dogecoin, TypeCrane = TypeCrane.MoonDogecoin},
             //new Crane { URL = "http://bonusbitcoin.co/faucet", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
             //    StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.Bitcoin, TypeCrane = TypeCrane.BonusBitcoin },
-            new Crane { URL = "https://moonliteco.in/faucet", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
-                StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.LiteCoin, TypeCrane = TypeCrane.MoonLitecoin, },
+            //new Crane { URL = "https://moonliteco.in/faucet", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
+            //    StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.LiteCoin, TypeCrane = TypeCrane.MoonLitecoin, },
+            new Crane { URL = "https://moondash.co.in/faucet", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
+                StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.Dash, TypeCrane = TypeCrane.MoonDash, }
         };
 
         /// <summary>

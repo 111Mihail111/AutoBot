@@ -15,6 +15,11 @@ namespace AutoBot.Area.Cranes
         const string BROWSER_PROFILE_CRANE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\MoonLitecoin\\";
         private string _errorZeroBalance;
 
+        public MoonLitecoin(IRuCaptchaController ruCaptchaController)
+        {
+            _ruCaptchaController = ruCaptchaController;
+        }
+
         ///<inheritdoc/>
         public async Task<Crane> Start(Crane crane)
         {
@@ -29,8 +34,9 @@ namespace AutoBot.Area.Cranes
                 return GetDetailsWithCrane(crane);
             }
 
-            GetElementByXPath("//*[@id='Faucet']/div[2]/button").Click();
+            OpenModalForCollectingCurrency(urlCrane);
             await DecipherCaptcha(urlCrane, "ClaimForm");
+            GetElementByXPath("//*[@id='ClaimModal']/div/div/div[3]/button[1]").Click();
 
             if (!IsCaptchaValid())
             {
@@ -74,7 +80,35 @@ namespace AutoBot.Area.Cranes
                 await Authorization(urlCrane);
             }
         }
+        /// <summary>
+        /// Открыть модальное окно для сбора криптовалюты
+        /// </summary>
+        /// <param name="urlCrane">URL-адрес крана</param>
+        private void OpenModalForCollectingCurrency(string urlCrane)
+        {
+            int countTabs = 2;
+            while (countTabs == 2)
+            {
+                RemovePromotionalBlock();
+                GetElementByXPath("//*[@id='Faucet']/div[2]/button").Click();
 
+                if (GetTabsCount() < countTabs)
+                {
+                    break;
+                }
+
+                CloseTab();
+                SwitchToTab();
+                GoToUrl(urlCrane);
+            }
+        }
+        /// <summary>
+        /// Удалить рекламный блок
+        /// </summary>
+        protected void RemovePromotionalBlock()
+        {
+            ExecuteScript("document.getElementById('slideIn').remove();");
+        }
         /// <summary>
         /// Заблокированна ли кнопка (снятия валюты)
         /// </summary>
