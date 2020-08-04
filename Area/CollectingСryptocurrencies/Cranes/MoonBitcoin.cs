@@ -1,4 +1,4 @@
-﻿using AutoBot.Area.Interface;
+﻿using AutoBot.Area.CollectingСryptocurrencies.Interface;
 using AutoBot.Area.Managers;
 using AutoBot.Extentions;
 using AutoBot.Models;
@@ -6,7 +6,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AutoBot.Area.Cranes
+namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
 {
     public class MoonBitcoin : BrowserManager, IMoonBitcoin
     {
@@ -57,6 +57,7 @@ namespace AutoBot.Area.Cranes
             {
                 RemovePromotionalBlock();
                 GetElementByXPath("//*[@id='Faucet']/div[2]/button").Click();
+                Thread.Sleep(1000);
 
                 if (GetTabsCount() < countTabs)
                 {

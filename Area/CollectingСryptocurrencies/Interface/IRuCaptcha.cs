@@ -1,4 +1,4 @@
-﻿namespace AutoBot.Area.Interface
+﻿namespace AutoBot.Area.CollectingСryptocurrencies.Interface
 {
     public interface IRuCaptcha
     {

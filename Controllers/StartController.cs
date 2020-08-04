@@ -1,5 +1,5 @@
-﻿using AutoBot.Area.Interface;
-using AutoBot.Area.Service;
+﻿using AutoBot.Area.CollectingСryptocurrencies.Interface;
+using AutoBot.Area.Services;
 using AutoBot.Enums;
 using AutoBot.Models;
 using Microsoft.AspNetCore.Mvc;

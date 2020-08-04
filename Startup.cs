@@ -1,7 +1,7 @@
-using AutoBot.Area;
 using AutoBot.Area.API;
-using AutoBot.Area.Cranes;
-using AutoBot.Area.Interface;
+using AutoBot.Area.Collecting—ryptocurrencies;
+using AutoBot.Area.Collecting—ryptocurrencies.Cranes;
+using AutoBot.Area.Collecting—ryptocurrencies.Interface;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,9 +1,9 @@
 ﻿using AutoBot.Models;
 using System.Threading.Tasks;
 
-namespace AutoBot.Area.Interface
+namespace AutoBot.Area.CollectingСryptocurrencies.Interface
 {
-    public interface IMoonDogecoin
+    public interface IMoonBitcoin
     {
         /// <summary>
         /// Начать

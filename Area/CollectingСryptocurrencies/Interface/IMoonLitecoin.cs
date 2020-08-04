@@ -1,9 +1,9 @@
 ﻿using AutoBot.Models;
 using System.Threading.Tasks;
 
-namespace AutoBot.Area.Interface
+namespace AutoBot.Area.CollectingСryptocurrencies.Interface
 {
-    public interface IMoonDash
+    public interface IMoonLitecoin
     {
         /// <summary>
         /// Начать

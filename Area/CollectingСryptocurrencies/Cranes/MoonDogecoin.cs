@@ -1,4 +1,4 @@
-﻿using AutoBot.Area.Interface;
+﻿using AutoBot.Area.CollectingСryptocurrencies.Interface;
 using AutoBot.Area.Managers;
 using AutoBot.Extentions;
 using AutoBot.Models;
@@ -6,16 +6,16 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AutoBot.Area.Cranes
+namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
 {
-    public class MoonLitecoin : BrowserManager, IMoonLitecoin
+    public class MoonDogecoin : BrowserManager, IMoonDogecoin
     {
         private IRuCaptchaController _ruCaptchaController;
         const string LOGIN = "polowinckin.mixail@yandex.ru"; //TODO: Настройки вынести отдельно на страницу
-        const string BROWSER_PROFILE_CRANE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\MoonLitecoin\\";
+        const string BROWSER_PROFILE_CRANE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\MoonDogecoin\\";
         private string _errorZeroBalance;
 
-        public MoonLitecoin(IRuCaptchaController ruCaptchaController)
+        public MoonDogecoin(IRuCaptchaController ruCaptchaController)
         {
             _ruCaptchaController = ruCaptchaController;
         }
@@ -46,7 +46,6 @@ namespace AutoBot.Area.Cranes
 
             return GetDetailsWithCrane(crane);
         }
-
         /// <summary>
         /// Авторизация
         /// </summary>
@@ -63,7 +62,7 @@ namespace AutoBot.Area.Cranes
             GetElementByXPath("//*[@id='PageContent_UnauthorisedButtons']/button").Click();
             Thread.Sleep(600);
 
-            var signInEmailInput = GetAsyncElementById("SignInEmailInput").Result;
+            var signInEmailInput = GetElementById("SignInEmailInput");
             if (string.IsNullOrEmpty(signInEmailInput.GetValue()))
             {
                 signInEmailInput.SendKeys(LOGIN);
@@ -74,6 +73,16 @@ namespace AutoBot.Area.Cranes
             string signInClick = "document.querySelector('#SignInModal>div>div>div.modal-footer>button').click();";
             ExecuteScript(signInClick);
 
+            int tabs = GetTabsCount();
+            while (tabs > 1)
+            {
+                SwitchToLastTab();
+                CloseTab();
+                SwitchToLastTab();
+                ExecuteScript(signInClick);
+                tabs = GetTabsCount();
+            }
+
             if (!IsCaptchaValid())
             {
                 RefreshPage();
@@ -81,26 +90,26 @@ namespace AutoBot.Area.Cranes
             }
         }
         /// <summary>
-        /// Открыть модальное окно для сбора криптовалюты
+        /// Получить детали с крана.
         /// </summary>
-        /// <param name="urlCrane">URL-адрес крана</param>
-        private void OpenModalForCollectingCurrency(string urlCrane)
+        /// <param name="crane">Модель крана</param>
+        /// <returns>Обновленная модель крана</returns>
+        protected Crane GetDetailsWithCrane(Crane crane)
         {
-            int countTabs = 2;
-            while (countTabs == 2)
-            {
-                RemovePromotionalBlock();
-                GetElementByXPath("//*[@id='Faucet']/div[2]/button").Click();
+            crane.BalanceOnCrane = GetElementByXPath("//*[@id='Navigation']/div/span/a").Text;
+            crane.ActivityTime = TimeSpan.FromMinutes(10);
 
-                if (GetTabsCount() < countTabs)
-                {
-                    break;
-                }
+            CloseTab();
 
-                CloseTab();
-                SwitchToTab();
-                GoToUrl(urlCrane);
-            }
+            return crane;
+        }
+        /// <summary>
+        /// Заблокированна ли кнопка (снятия валюты)
+        /// </summary>
+        /// <returns></returns>
+        protected bool IsButtonEnabled()
+        {
+            return GetElementByXPath("//*[@id='Faucet']/div[2]/button").Enabled == false;
         }
         /// <summary>
         /// Удалить рекламный блок
@@ -110,12 +119,34 @@ namespace AutoBot.Area.Cranes
             ExecuteScript("document.getElementById('slideIn').remove();");
         }
         /// <summary>
-        /// Заблокированна ли кнопка (снятия валюты)
+        /// Открыть модальное окно для сбора криптовалюты
         /// </summary>
-        /// <returns></returns>
-        protected bool IsButtonEnabled()
+        /// <param name="urlCrane">URL-адрес крана</param>
+        private void OpenModalForCollectingCurrency(string urlCrane)
         {
-            return GetElementByXPath("//*[@id='Faucet']/div[2]/button").Enabled == false;
+            string url = string.Empty;
+            while (url != urlCrane)
+            {
+                RemovePromotionalBlock();
+                GetElementByXPath("//*[@id='Faucet']/div[2]/button").Click();
+                Thread.Sleep(1000);
+
+                if (GetTabsCount() > 1)
+                {
+                    CloseTab();
+                    SwitchToTab();
+                    GoToUrl(urlCrane);
+                    continue;
+                }
+
+                url = GetUrlPage();
+                if (url == urlCrane)
+                {
+                    break;
+                }
+
+                GoToUrl(urlCrane);
+            }
         }
         /// <summary>
         /// Валидна ли капча
@@ -182,20 +213,6 @@ namespace AutoBot.Area.Cranes
             ExecuteScript($"var element = document.getElementById('{elementId}');" +
                 "element.style.position = '';" +
                 "element.style.display = 'none';");
-        }
-        /// <summary>
-        /// Получить детали с крана.
-        /// </summary>
-        /// <param name="crane">Модель крана</param>
-        /// <returns>Обновленная модель крана</returns>
-        protected Crane GetDetailsWithCrane(Crane crane)
-        {
-            crane.BalanceOnCrane = GetElementByXPath("//*[@id='Navigation']/div/span/a").Text;
-            crane.ActivityTime = TimeSpan.FromMinutes(10);
-
-            CloseTab();
-
-            return crane;
         }
     }
 }

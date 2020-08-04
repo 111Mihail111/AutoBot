@@ -1,4 +1,4 @@
-﻿using AutoBot.Area.Interface;
+﻿using AutoBot.Area.CollectingСryptocurrencies.Interface;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;

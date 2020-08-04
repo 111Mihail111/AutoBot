@@ -1,4 +1,4 @@
-﻿using AutoBot.Area.Interface;
+﻿using AutoBot.Area.CollectingСryptocurrencies.Interface;
 using AutoBot.Area.Managers;
 using AutoBot.Enums;
 using AutoBot.Extentions;
@@ -6,7 +6,7 @@ using System;
 using System.Linq;
 using System.Threading;
 
-namespace AutoBot.Area
+namespace AutoBot.Area.CollectingСryptocurrencies
 {
     public class RuCaptcha : BrowserManager, IRuCaptcha
     {

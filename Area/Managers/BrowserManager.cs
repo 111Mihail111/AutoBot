@@ -144,9 +144,19 @@ namespace AutoBot.Area.Managers
         /// Выполнить скрипт
         /// </summary>
         /// <param name="jsScript">Скрипт</param>
+        /// <returns>Возвращаемое значение скрипта</returns>
         public string ExecuteScript(string jsScript)
         {
             return _browser.ExecuteScript(jsScript)?.ToString();
+        }
+        /// <summary>
+        /// Асинхронно выполнить скрипт
+        /// </summary>
+        /// <param name="jsScript">Скрипт</param>
+        /// <returns>Возвращаемое значение js кода</returns>
+        public async Task<string> ExecuteScriptAsync(string jsScript)
+        {
+            return await Task.Run(() => ExecuteScript(jsScript)?.ToString());
         }
 
         public IWebElement GetElementByXPath(string xPath, int waitingTimeSecond = 5)
@@ -156,6 +166,10 @@ namespace AutoBot.Area.Managers
         public IEnumerable<IWebElement> GetElementsByXPath(string xPath)
         {
             return _browser.FindElementsByXPath(xPath);
+        }
+        protected async Task<IWebElement> GetAsyncElementByXPath(string xPath, int waitingTimeSecond = 5)
+        {
+            return await Task.Run(() => ExpectationElement(xPath, waitingTimeSecond));
         }
 
 
@@ -167,10 +181,9 @@ namespace AutoBot.Area.Managers
         {
             return _browser.FindElementsById(elementId);
         }
-        //TODO: Довести до ума асинхронные методы
         public async Task<IWebElement> GetAsyncElementById(string elementId, int waitingTimeSecond = 5)
         {
-            return ExpectationElement(elementId, waitingTimeSecond);
+            return await Task.Run(() => ExpectationElement(elementId, waitingTimeSecond));
         }
 
 

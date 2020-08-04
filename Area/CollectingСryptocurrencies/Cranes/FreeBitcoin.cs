@@ -1,4 +1,4 @@
-﻿using AutoBot.Area.Interface;
+﻿using AutoBot.Area.CollectingСryptocurrencies.Interface;
 using AutoBot.Area.Managers;
 using AutoBot.Extentions;
 using AutoBot.Models;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AutoBot.Area.Cranes
+namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
 {
     public class FreeBitcoin : BrowserManager, IFreeBitcoin
     {
@@ -36,18 +36,15 @@ namespace AutoBot.Area.Cranes
                 return GetDetailsWithCrane(crane);
             }
 
-            SetScrollPosition(1000);
+            RemoveModalPromotional();
             await DecipherCaptcha(urlCrane, "//*[@id='free_play_recaptcha']/form/div");
             GetElementById("free_play_form_button").Click();
 
             if (!IsCaptchaValid())
             {
-                CloseTab();
+                QuitBrowser();
                 return await Start(crane);
             }
-
-            //TODO:Возможно лишний, отладить
-            GetElementByXPath("//*[@id='myModal22']/a").Click();
 
             return GetDetailsWithCrane(crane);
         }
@@ -63,16 +60,9 @@ namespace AutoBot.Area.Cranes
                 return;
             }
 
-            ExecuteScript("document.querySelector('#push_notification_modal').remove();" +
-                "document.querySelector('body > div.reveal-modal-bg').remove();");
+            RemoveModalPromotional();
+            ConsentToCookies();
 
-            var cookie = GetElementByXPath("/html/body/div[1]/div/a[1]", 2);
-            if (cookie != null && cookie.Displayed)
-            {
-                cookie.Click();
-            }
-
-            //TODO:Это костыль, переписать
             var loginButton = GetElementByXPath("//*[@id='login_button']", 2);
             if (loginButton.Displayed)
             {
@@ -80,22 +70,8 @@ namespace AutoBot.Area.Cranes
                 return;
             }
 
+            InsertLoginAndPassword();
             await InsertDecodedCaptchaInField();
-
-            //TODO:Заменить на асинхронность
-            var emailInput = GetElementById("signup_form_email");
-            if (emailInput != null && string.IsNullOrEmpty(emailInput.GetValue()))
-            {
-                emailInput.SendKeys(LOGIN);
-            }
-
-            //TODO:Заменить на асинхронность
-            var passwordInput = GetElementById("signup_form_password");
-            if (passwordInput != null && string.IsNullOrEmpty(passwordInput.GetValue()))
-            {
-                passwordInput.SendKeys(PASSWORD);
-            }
-
             GetElementById("signup_button").Click();
             Thread.Sleep(2000);
 
@@ -115,14 +91,6 @@ namespace AutoBot.Area.Cranes
             }
 
             GoToUrl(urlCrane);
-            Thread.Sleep(2000);
-
-            //TODO:Заменить на асинхронный скрипт
-            var advertisingWindow = GetElementByXPath("//*[@id='push_notification_modal']/div[1]/div[2]/div/div[1]");
-            if (advertisingWindow != null && advertisingWindow.Displayed)
-            {
-                advertisingWindow.Click();
-            }
         }
         /// <summary>
         /// Вставить расшифрованную капчу в поле
@@ -171,27 +139,18 @@ namespace AutoBot.Area.Cranes
         protected string ConvertImageToByte()
         {
             string result = ExecuteScript(
-            "var c = document.createElement(\"canvas\");" +
-            "var ctx = c.getContext(\"2d\");" +
-            "var img = document.querySelector(\"body > img\");" +
-            "c.height = img.height;" +
-            "c.width = img.width;" +
-            "ctx.drawImage(img, 0, 0);" +
-            "return c.toDataURL(\"image/jpeg\");").Replace("data:image/jpeg;base64,", string.Empty);
+                "var c = document.createElement(\"canvas\");" +
+                "var ctx = c.getContext(\"2d\");" +
+                "var img = document.querySelector(\"body > img\");" +
+                "c.height = img.height;" +
+                "c.width = img.width;" +
+                "ctx.drawImage(img, 0, 0);" +
+                "return c.toDataURL(\"image/jpeg\");").Replace("data:image/jpeg;base64,", string.Empty);
 
             CloseTab();
             SwitchToTab();
 
             return result;
-        }
-        /// <summary>
-        /// Проверка страницы
-        /// </summary>
-        /// <param name="url">Страница</param>
-        /// <returns>True если открыта нужная страница, иначе - false</returns>
-        protected bool CheckPage(string url)
-        {
-            return GetUrlPage() == url ? true : false;
         }
         /// <summary>
         /// Существует ли таймер
@@ -240,7 +199,7 @@ namespace AutoBot.Area.Cranes
             crane.ActivityTime = GetTimer();
             crane.BalanceOnCrane = BalanceCrane();
 
-            CloseTab();
+            QuitBrowser();
 
             return crane;
         }
@@ -290,6 +249,42 @@ namespace AutoBot.Area.Cranes
             }
 
             return false;
+        }
+        /// <summary>
+        /// Ввести логин и пароль в поля
+        /// </summary>
+        protected async void InsertLoginAndPassword()
+        {
+            var emailInput = await Task.Run(() => GetAsyncElementById("signup_form_email"));
+            if (emailInput != null && string.IsNullOrEmpty(emailInput.GetValue()))
+            {
+                emailInput.SendKeys(LOGIN);
+            }
+
+            var passwordInput = await Task.Run(() => GetAsyncElementById("signup_form_password"));
+            if (passwordInput != null && string.IsNullOrEmpty(passwordInput.GetValue()))
+            {
+                passwordInput.SendKeys(PASSWORD);
+            }
+        }
+        /// <summary>
+        /// Удаление рекламного окна
+        /// </summary>
+        protected async void RemoveModalPromotional()
+        {
+            await ExecuteScriptAsync("document.querySelector('#push_notification_modal').remove();" +
+                "document.querySelector('body > div.reveal-modal-bg').remove();");
+        }
+        /// <summary>
+        /// Согласие на куки
+        /// </summary>
+        protected async void ConsentToCookies()
+        {
+            var cookie = await GetAsyncElementByXPath("/html/body/div[1]/div/a[1]", 2);
+            if (cookie != null && cookie.Displayed)
+            {
+                cookie.Click();
+            }
         }
     }
 }
