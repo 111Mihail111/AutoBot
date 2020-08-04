@@ -40,7 +40,7 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
 
             if (!IsCaptchaValid())
             {
-                CloseTab();
+                QuitBrowser();
                 return await Start(crane);
             }
 
@@ -83,7 +83,7 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
 
             SetScrollPosition(300);
             GetElementByXPath("//*[@id='PageContent_UnauthorisedButtons']/button").Click();
-            Thread.Sleep(1200);
+            Thread.Sleep(600);
 
             var signInEmailInput = GetElementById("SignInEmailInput");
             if (string.IsNullOrEmpty(signInEmailInput.GetValue()))
@@ -96,14 +96,12 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
             string signInClick = "document.querySelector('#SignInModal>div>div>div.modal-footer>button').click();";
             ExecuteScript(signInClick);
 
-            int tabs = GetTabsCount(); //TODO: зачем нам переменная tabs? Избавиться.
-            while (tabs > 1)
+            while (GetTabsCount() > 1)
             {
                 SwitchToLastTab();
                 CloseTab();
                 SwitchToLastTab();
                 ExecuteScript(signInClick);
-                tabs = GetTabsCount();
             }
 
             if (!IsCaptchaValid())
@@ -149,7 +147,7 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
             crane.BalanceOnCrane = GetElementByXPath("//*[@id='Navigation']/div/span/a").Text;
             crane.ActivityTime = TimeSpan.FromMinutes(10);
 
-            CloseTab();
+            QuitBrowser();
 
             return crane;
         }

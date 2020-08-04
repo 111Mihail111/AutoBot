@@ -16,6 +16,7 @@ namespace AutoBot.Controllers
         private IMoonDogecoin _moonDogecoin;
         private IMoonLitecoin _moonLitecoin;
         private IMoonDash _moonDash;
+        private IRuCaptcha _ruCaptcha;
 
         public StartController(IFreeBitcoin freeBitcoin, IMoonBitcoin moonBitcoin, IBonusBitcoin bonusBitcoin, 
             IMoonDogecoin moonDogecoin, IMoonLitecoin moonLitecoin, IMoonDash moonDash)

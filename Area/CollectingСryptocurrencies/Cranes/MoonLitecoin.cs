@@ -40,7 +40,7 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
 
             if (!IsCaptchaValid())
             {
-                CloseTab();
+                QuitBrowser();
                 return await Start(crane);
             }
 
@@ -194,7 +194,7 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
             crane.BalanceOnCrane = GetElementByXPath("//*[@id='Navigation']/div/span/a").Text;
             crane.ActivityTime = TimeSpan.FromMinutes(10);
 
-            CloseTab();
+            QuitBrowser();
 
             return crane;
         }

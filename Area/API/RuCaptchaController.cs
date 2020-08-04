@@ -25,6 +25,10 @@ namespace AutoBot.Area.API
             _ruCaptcha = ruCaptcha;
         }
 
+        public RuCaptchaController()
+        {
+        }
+
         ///<inheritdoc/>
         [HttpPost]
         public async Task<string> SendCaptchaImage(string byteImage)
@@ -48,7 +52,7 @@ namespace AutoBot.Area.API
 
                 if (status == "ERROR_NO_SLOT_AVAILABLE")
                 {
-                    _ruCaptcha.GoTo();
+                    await _ruCaptcha.GoTo();
                 }
                 else
                 {
@@ -131,7 +135,7 @@ namespace AutoBot.Area.API
                     status = await GetStatusRequest(result);
                     if (status == "ERROR_NO_SLOT_AVAILABLE")
                     {
-                        _ruCaptcha.GoTo();
+                        await _ruCaptcha.GoTo();
                     }
                 }
 

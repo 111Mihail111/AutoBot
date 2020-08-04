@@ -35,10 +35,14 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
                 return GetDetailsWithCrane(crane);
             }
 
-            SetScrollPosition(1200);
-
             await DecipherCaptcha("g-recaptcha-response", urlCrane, "FaucetForm");
             GetElementByXPath("//*[@id='FaucetForm']/button[2]").Click();
+
+            if (!IsCaptchaValid())
+            {
+                QuitBrowser();
+                return await Start(crane);
+            }
 
             if (GetTabsCount() > 1)
             {
@@ -61,32 +65,13 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
                 return;
             }
 
-            //TODO:Заменить на асинхронность
-            var cookie = GetElementByXPath("/html/body/div[1]/div/a[1]");
-            if (cookie != null && cookie.Displayed)
-            {
-                cookie.Click();
-            }
-
+            ConsentToCookies();
             GetElementById("PageContent_SignInButton").Click();
             Thread.Sleep(1000);
+
+            InsertLoginAndPassword();
             SetScrollPositionInWindow("SignInModal", 300);
             await DecipherCaptcha("g-recaptcha-response-1", urlCrane, "SignInForm");
-
-            //TODO:Заменить на асинхронность
-            var emailInput = GetElementByXPath("//*[@id='SignInEmailInput']");
-            if (string.IsNullOrEmpty(emailInput.GetValue()))
-            {
-                emailInput.SendKeys(LOGIN);
-            }
-
-            //TODO:Заменить на асинхронность
-            var passwordInput = GetElementByXPath("//*[@id='SignInPasswordInput']");
-            if (string.IsNullOrEmpty(passwordInput.GetValue()))
-            {
-                passwordInput.SendKeys(PASSWORD);
-            }
-
             ExecuteScript("document.querySelector('#SignInModal>div>div>div.modal-footer>button.btn.btn-primary').click()");
 
             if (!IsCaptchaValid())
@@ -116,15 +101,6 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
                 "element.style.display = 'none';");
         }
         /// <summary>
-        /// Проверка авторизации
-        /// </summary>
-        /// <param name="urlCrane">URL адрес крана</param>
-        /// <returns></returns>
-        protected bool CheckAuthorization(string urlCrane)
-        {
-            return urlCrane != GetUrlPage();
-        }
-        /// <summary>
         /// Получить баланс с крана
         /// </summary>
         /// <returns>Баланс</returns>
@@ -152,7 +128,8 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
         {
             crane.ActivityTime = GetTimer();
             crane.BalanceOnCrane = GetBalanceOnCrane();
-            CloseTab();
+            
+            QuitBrowser();
 
             return crane;
         }
@@ -209,6 +186,34 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
             }
 
             return false;
+        }
+        /// <summary>
+        /// Согласие на куки
+        /// </summary>
+        protected async void ConsentToCookies()
+        {
+            var cookie = await GetAsyncElementByXPath("/html/body/div[1]/div/a[1]");
+            if (cookie != null && cookie.Displayed)
+            {
+                cookie.Click();
+            }
+        }
+        /// <summary>
+        /// Ввести логин и пароль в поля
+        /// </summary>
+        protected async void InsertLoginAndPassword()
+        {
+            var emailInput = await Task.Run(() => GetAsyncElementByXPath("//*[@id='SignInEmailInput']"));
+            if (emailInput != null && string.IsNullOrEmpty(emailInput.GetValue()))
+            {
+                emailInput.SendKeys(LOGIN);
+            }
+
+            var passwordInput = await Task.Run(() => GetAsyncElementByXPath("//*[@id='SignInPasswordInput']"));
+            if (passwordInput != null && string.IsNullOrEmpty(passwordInput.GetValue()))
+            {
+                passwordInput.SendKeys(PASSWORD);
+            }
         }
     }
 }

@@ -280,7 +280,7 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
         /// </summary>
         protected async void ConsentToCookies()
         {
-            var cookie = await GetAsyncElementByXPath("/html/body/div[1]/div/a[1]", 2);
+            var cookie = await GetAsyncElementByXPath("/html/body/div[1]/div/a[1]");
             if (cookie != null && cookie.Displayed)
             {
                 cookie.Click();
