@@ -2,6 +2,8 @@ using AutoBot.Area.API;
 using AutoBot.Area.Collecting—ryptocurrencies;
 using AutoBot.Area.Collecting—ryptocurrencies.Cranes;
 using AutoBot.Area.Collecting—ryptocurrencies.Interface;
+using AutoBot.Area.PerformanceTasks.Interface;
+using AutoBot.Area.PerformanceTasks.InternetServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +25,7 @@ namespace AutoBot
             services.AddScoped<IRuCaptchaController, RuCaptchaController>();
             services.AddScoped<IMoonLitecoin, MoonLitecoin>();
             services.AddScoped<IMoonDash, MoonDash>();
+            services.AddScoped<IV_Like, V_Like>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

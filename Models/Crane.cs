@@ -1,4 +1,4 @@
-﻿using AutoBot.Enums;
+﻿using AutoBot.Area.Enums;
 using System;
 
 namespace AutoBot.Models

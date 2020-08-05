@@ -1,5 +1,4 @@
-﻿using AutoBot.Enums;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System;
 using System.Collections.Generic;
@@ -94,31 +93,6 @@ namespace AutoBot.Area.Managers
             return _browser.WindowHandles.Count;
         }
 
-
-        /// <summary>
-        /// Авторизация на сайте
-        /// </summary>
-        /// <param name="loginFieldId">Id поля логина</param>
-        /// <param name="passwordFieldId">Id поля пароля</param>
-        /// <param name="buttonId">Id кнопки</param>
-        /// <param name="login">Логин</param>
-        /// <param name="password">Пароль</param>
-        public void AuthorizationOnSite(SearchMethod searchMethod, string loginFieldId, string passwordFieldId, string buttonId, string login, string password)
-        {
-            switch (searchMethod)
-            {
-                case SearchMethod.Id:
-                    GetElementById(loginFieldId).SendKeys(login);
-                    GetElementById(passwordFieldId).SendKeys(password);
-                    GetElementById(buttonId).Click();
-                    break;
-                case SearchMethod.XPath:
-                    GetElementByXPath(loginFieldId).SendKeys(login);
-                    GetElementByXPath(passwordFieldId).SendKeys(password);
-                    GetElementByXPath(buttonId).Click();
-                    break;
-            }
-        }
         /// <summary>
         /// Установить позицию скрола
         /// </summary>

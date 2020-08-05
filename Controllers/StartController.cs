@@ -1,6 +1,7 @@
 ﻿using AutoBot.Area.CollectingСryptocurrencies.Interface;
+using AutoBot.Area.Enums;
+using AutoBot.Area.PerformanceTasks.Interface;
 using AutoBot.Area.Services;
-using AutoBot.Enums;
 using AutoBot.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -16,10 +17,10 @@ namespace AutoBot.Controllers
         private IMoonDogecoin _moonDogecoin;
         private IMoonLitecoin _moonLitecoin;
         private IMoonDash _moonDash;
-        private IRuCaptcha _ruCaptcha;
+        private IV_Like _v_Like;
 
         public StartController(IFreeBitcoin freeBitcoin, IMoonBitcoin moonBitcoin, IBonusBitcoin bonusBitcoin, 
-            IMoonDogecoin moonDogecoin, IMoonLitecoin moonLitecoin, IMoonDash moonDash)
+            IMoonDogecoin moonDogecoin, IMoonLitecoin moonLitecoin, IMoonDash moonDash, IV_Like v_Like)
         {
             _freeBitcoin = freeBitcoin;
             _moonBitcoin = moonBitcoin;
@@ -27,9 +28,10 @@ namespace AutoBot.Controllers
             _moonDogecoin = moonDogecoin;
             _moonLitecoin = moonLitecoin;
             _moonDash = moonDash;
+            _v_Like = v_Like;
         }
 
-        public ActionResult Index() => View(CraneService.GetCranes());
+        public ActionResult Index() => View(WebService.GetAllData());
 
 
         [HttpGet]
@@ -41,8 +43,8 @@ namespace AutoBot.Controllers
                 crane.ActivityTime = TimeSpan.FromSeconds(0);
             }
 
-            CraneService.UpdateCrane(crane);
-            return PartialView("_Cranes", CraneService.GetCranes());
+            WebService.UpdateCrane(crane);
+            return PartialView("_Cranes", WebService.GetCranes());
         }
 
         [HttpGet]
@@ -72,19 +74,33 @@ namespace AutoBot.Controllers
                         break;
                 }
 
-                CraneService.UpdateCrane(crane);
+                WebService.UpdateCrane(crane);
             }
             catch (Exception exeption)
             {
                 if (crane != null)
                 {
                     crane.StatusCrane = Status.NoWork;
-                    CraneService.UpdateCrane(crane);
+                    WebService.UpdateCrane(crane);
                 }
             }
 
-            return PartialView("_Cranes", CraneService.GetCranes());
+            return PartialView("_Cranes", WebService.GetCranes());
         }
 
+        [HttpGet]
+        public PartialViewResult GoToInternetService(InternetService internetService)
+        {
+            switch (internetService.TypeService)
+            {
+                case TypeService.V_Like:
+                    internetService = _v_Like.GoTo(internetService);
+                    break;
+            }
+
+            WebService.UpdateInternetService(internetService);
+
+            return PartialView("_InternetService", WebService.GetInternetServices());
+        }
     }
 }

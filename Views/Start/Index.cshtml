@@ -1,4 +1,4 @@
-﻿@model List<AutoBot.Models.Crane>
+﻿@model AutoBot.ViewModels.WebsitesVM
 
 @{
     Layout = null;
@@ -19,53 +19,12 @@
     <div class="container-fluid">
         <div class="col-12">
 
-            <div class="row">
-                <div class="col-12">
-                    <h1 class="text-center">Список всех кранов</h1>
-                </div>
+            <div id="Cranes">
+                @{await Html.RenderPartialAsync("_Cranes", Model.Cranes);}
             </div>
 
-            <div class="row mt-4 mb-1 text-center">
-
-                <div class="col-2" style="background-color: rgb(138,198,66); border: 2px solid white;">
-                    <div class="mt-2 mb-2">
-                        <span class="text-light" style="font-size: 20px">URL</span>
-                    </div>
-                </div>
-
-                <div class="col-2" style="background-color: rgb(138,198,66); border: 2px solid white;">
-                    <div class="mt-2 mb-2">
-                        <span class="text-light" style="font-size: 20px">Время до активации</span>
-                    </div>
-                </div>
-
-                <div class="col-2" style="background-color: rgb(138,198,66); border: 2px solid white;">
-                    <div class="mt-2 mb-2">
-                        <span class="text-light" style="font-size: 20px">Статус крана</span>
-                    </div>
-                </div>
-
-                <div class="col-2" style="background-color: rgb(138,198,66); border: 2px solid white;">
-                    <div class="mt-2 mb-2">
-                        <span class="text-light" style="font-size: 20px">Баланс на кране</span>
-                    </div>
-                </div>
-
-                <div class="col-2" style="background-color: rgb(138,198,66); border: 2px solid white;">
-                    <div class="mt-2 mb-2">
-                        <span class="text-light" style="font-size: 20px">Тип валюты</span>
-                    </div>
-                </div>
-
-                <div class="col-2" style="background-color: rgb(138,198,66); border: 2px solid white;">
-                    <div class="mt-2 mb-2">
-                        <span class="text-light" style="font-size: 20px">Тип крана</span>
-                    </div>
-                </div>
-            </div>
-
-            <div id="Notes">
-                @{await Html.RenderPartialAsync("_Cranes", Model);}
+            <div class="mt-5" id="InternetService">
+                @{await Html.RenderPartialAsync("_InternetService", Model.InternetServices);}
             </div>
 
         </div>

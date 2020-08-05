@@ -1,6 +1,6 @@
 ﻿setInterval(function () {
     debugger;
-    let notes = document.getElementById("Notes");
+    let notes = document.getElementById("Cranes");
     for (var i = 0; i < notes.childElementCount; i++) {
         let timer = notes.children[i].getElementsByTagName("input")[1].value;
         if (timer === "00:00:00") {
@@ -45,7 +45,7 @@ function UpdatingTimerCrane(crane) {
         contentType: "application/json; charset=utf-8",
         url: "/Start/UpdateTimerCrane",
         success: function (data) {
-            $('#Notes').html(data);
+            $('#Cranes').html(data);
             CheckTimers(crane);
         }
     });
@@ -65,14 +65,14 @@ function GoToCrane(crane) {
         },
         url: "/Start/GoToCrane",
         success: function (data) {
-            $('#Notes').html(data);
+            $('#Cranes').html(data);
         }
     });
 }
 
 /*Проверка таймеров*/
 function CheckTimers(crane) {
-    var row = document.getElementById("Notes");
+    var row = document.getElementById("Cranes");
     var list = [];
 
     for (var i = 0; i < row.childElementCount; i++) {
@@ -87,9 +87,44 @@ function CheckTimers(crane) {
     }
 }
 
-window.onload = function () {
-    let notes = document.getElementById("Notes");
-    for (var i = 0; i < notes.childElementCount; i++) {
-        GoToCrane(GetDataCrane(notes.children[i]));
+//window.onload = function () {
+//    let notes = document.getElementById("Cranes");
+//    for (var i = 0; i < notes.childElementCount; i++) {
+//        GoToCrane(GetDataCrane(notes.children[i]));
+//    }
+//}
+
+function GoToService(internetService) {
+    $.ajax({
+        type: "GET",
+        data: {
+            'URL': internetService.URL,
+            'ActivityTime': internetService.ActivityTime,
+            'StatusService': internetService.StatusService,
+            'BalanceOnService': internetService.BalanceOnService,
+            'TypeService': internetService.TypeService,
+        },
+        url: "/Start/GoToInternetService",
+        success: function (data) {
+            $('#InternetService').html(data);
+        }
+    });
+}
+
+function GetDataService(row) {
+    return {
+        URL: row.getElementsByTagName("input")[0].value,
+        ActivityTime: row.getElementsByTagName("input")[1].value,
+        StatusService: row.getElementsByTagName("input")[2].value,
+        BalanceOnService: row.getElementsByTagName("input")[3].value,
+        TypeService: row.getElementsByTagName("input")[4].value,
     }
 }
+
+//window.onload = function () {
+//    debugger;
+//    let notes = document.getElementById("InternetService");
+//    for (var i = 2; i < notes.childElementCount; i++) {
+//        GoToService(GetDataService(notes.children[i]));
+//    }
+//}

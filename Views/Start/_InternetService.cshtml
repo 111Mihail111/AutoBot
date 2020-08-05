@@ -1,0 +1,74 @@
+﻿@model IEnumerable<AutoBot.Models.InternetService>
+
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center">Список интернет-сервисов</h1>
+        </div>
+    </div>
+
+    <div class="row mt-4 mb-1 text-center">
+
+        <div class="col-4" style="background-color: rgb(138,198,66); border: 2px solid white;">
+            <div class="mt-2 mb-2">
+                <span class="text-light" style="font-size: 20px">URL</span>
+            </div>
+        </div>
+
+        <div class="col-2" style="background-color: rgb(138,198,66); border: 2px solid white;">
+            <div class="mt-2 mb-2">
+                <span class="text-light" style="font-size: 20px">Время до активации</span>
+            </div>
+        </div>
+
+        <div class="col-2" style="background-color: rgb(138,198,66); border: 2px solid white;">
+            <div class="mt-2 mb-2">
+                <span class="text-light" style="font-size: 20px">Статус сервиса</span>
+            </div>
+        </div>
+
+        <div class="col-2" style="background-color: rgb(138,198,66); border: 2px solid white;">
+            <div class="mt-2 mb-2">
+                <span class="text-light" style="font-size: 20px">Баланс на сервисе</span>
+            </div>
+        </div>
+
+        <div class="col-2" style="background-color: rgb(138,198,66); border: 2px solid white;">
+            <div class="mt-2 mb-2">
+                <span class="text-light" style="font-size: 20px">Тип сервиса</span>
+            </div>
+        </div>
+    </div>
+
+@foreach (var item in Model)
+{
+    <div id="Row" class="row mb-2">
+
+        <div class="row-cols-12" style="display: none">
+            <div><input id="URL" value="@item.URL" /></div>
+            <div><input id="ActivityTime" value="@item.ActivityTime.ToString(@"hh\:mm\:ss")" /></div>
+            <div><input id="StatusCrane" value="@item.StatusService" /></div>
+            <div><input id="BalanceOnCrane" value="@item.BalanceOnService" /></div>
+            <div><input id="TypeCrane" value="@item.TypeService" /></div>
+        </div>
+
+        <div class="col-4 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
+            <div class="mt-2 mb-2"><span>@item.URL</span></div>
+        </div>
+
+        <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
+            <div class="mt-2 mb-2"><span>@item.ActivityTime.ToString(@"hh\:mm\:ss")</span></div>
+        </div>
+
+        <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
+            <div class="mt-2 mb-2"><span>@item.StatusService</span></div>
+        </div>
+
+        <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
+            <div class="mt-2 mb-2"><span>@item.BalanceOnService</span></div>
+        </div>
+
+        <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
+            <div class="mt-2 mb-2"><span>@item.TypeService</span></div>
+        </div>
+    </div>
+}
