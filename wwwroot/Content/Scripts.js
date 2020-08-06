@@ -121,10 +121,10 @@ function GetDataService(row) {
     }
 }
 
-//window.onload = function () {
-//    debugger;
-//    let notes = document.getElementById("InternetService");
-//    for (var i = 2; i < notes.childElementCount; i++) {
-//        GoToService(GetDataService(notes.children[i]));
-//    }
-//}
+window.onload = function () {
+    debugger;
+    let notes = document.getElementById("InternetService");
+    for (var i = 2; i < notes.childElementCount; i++) {
+        GoToService(GetDataService(notes.children[i]));
+    }
+}

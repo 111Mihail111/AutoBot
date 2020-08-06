@@ -40,7 +40,7 @@ namespace AutoBot.Area.Managers
             options.AddAdditionalCapability("useAutomationExtension", false); //Скрывает расширение
             options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
 
-            _browser = new ChromeDriver("/_VS_Project/Mihail/AutoBot/BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
+            _browser = new ChromeDriver("/Project/AutoBot/bin/Debug/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
         }
 
         /// <summary>
@@ -91,6 +91,14 @@ namespace AutoBot.Area.Managers
         public int GetTabsCount()
         {
             return _browser.WindowHandles.Count;
+        }
+
+        /// <summary>
+        /// ОК - в алерт окне
+        /// </summary>
+        public void AlertAccept()
+        {
+            _browser.SwitchTo().Alert().Accept();
         }
 
         /// <summary>
@@ -161,6 +169,25 @@ namespace AutoBot.Area.Managers
         }
 
 
+        public IWebElement GetElementByClassName(string className, int waitingTimeSecond = 5)
+        {
+            return ExpectationElement(className, waitingTimeSecond);
+        }
+        public IEnumerable<IWebElement> GetElementsByClassName(string className)
+        {
+            //TODO:Найти код ошибки и воткнуть в кэч. Он не может адекватно искать из-за символом xPath
+            try
+            {
+                return _browser.FindElementsByClassName(className);
+            } 
+            catch
+            {
+                return new List<IWebElement>();
+            }
+            
+        }
+
+
         /// <summary>
         /// Ожидание элемента на странице
         /// </summary>
@@ -181,6 +208,12 @@ namespace AutoBot.Area.Managers
                 if (webElementXPath.Any())
                 {
                     return webElementXPath.First();
+                }
+
+                var webElementClassName = GetElementsByClassName(attributeElement);
+                if (webElementClassName.Any())
+                {
+                    return webElementClassName.First();
                 }
 
                 Thread.Sleep(1000);

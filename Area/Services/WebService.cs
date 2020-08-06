@@ -77,7 +77,7 @@ namespace AutoBot.Area.Services
         /// <param name="internetService">Модель интернет сервиса</param>
         public static void UpdateInternetService(InternetService internetService)
         {
-            int index = _cranes.FindIndex(fi => fi.URL == internetService.URL);
+            int index = _services.FindIndex(fi => fi.URL == internetService.URL);
             _services[index] = internetService;
         }
     }
