@@ -1,22 +1,34 @@
 ﻿setInterval(function () {
-    debugger;
-    let notes = document.getElementById("Cranes");
-    for (var i = 0; i < notes.childElementCount; i++) {
+    //CheckSites("Cranes");
+    CheckSites("InternetService");
+}, 300000)
+
+/**
+ * Проверка сайтов
+ * @param {any} site Id контейнера
+ */
+function CheckSites(site) {
+    let notes = document.getElementById(site);
+    for (var i = 2; i < notes.childElementCount; i++) {
         let timer = notes.children[i].getElementsByTagName("input")[1].value;
         if (timer === "00:00:00") {
 
             let statusCrane = notes.children[i].getElementsByTagName("input")[2].value;
-            if (statusCrane === "NoWork") {
+            if (statusCrane === "NoWork" || statusCrane === "InWork") {
                 continue;
             }
 
-            GoToCrane(GetDataCrane(notes.children[i]));
+            notes.children[i].getElementsByTagName("input")[2].value = "InWork";
+            let crane = GetDataCrane(notes.children[i]);
+
+            UpdatingStatusCrane(crane.URL, crane.StatusCrane);
+            GoToCrane(crane);
         }
         else {
             UpdatingTimerCrane(GetDataCrane(notes.children[i]));
         }
     }
-}, 600000)
+}
 
 /*Получить данные крана*/
 function GetDataCrane(row) {
@@ -47,6 +59,22 @@ function UpdatingTimerCrane(crane) {
         success: function (data) {
             $('#Cranes').html(data);
             CheckTimers(crane);
+        }
+    });
+}
+
+/*Обновить статус крана*/
+function UpdatingStatusCrane(url, status) {
+    $.ajax({
+        type: "GET",
+        data: {
+            url: url,
+            statusCrane: status,
+        },
+        contentType: "application/json; charset=utf-8",
+        url: "/Start/UpdateStatusCrane/",
+        success: function (data) {
+            $('#Cranes').html(data);
         }
     });
 }

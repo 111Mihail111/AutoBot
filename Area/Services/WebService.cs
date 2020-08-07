@@ -71,6 +71,18 @@ namespace AutoBot.Area.Services
             int index = _cranes.FindIndex(fi => fi.URL == crane.URL);
             _cranes[index] = crane;
         }
+
+        /// <summary>
+        /// Обновить статус крана
+        /// </summary>
+        /// <param name="url">Url-адрес крана</param>
+        /// <param name="status">Статус крана</param>
+        public static void UpdateStatusCrane(string url, Status status)
+        {
+            int index = _cranes.FindIndex(fi => fi.URL == url);
+            _cranes[index].StatusCrane = status;
+        }
+
         /// <summary>
         /// Обновить интернет-сервис
         /// </summary>

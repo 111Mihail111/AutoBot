@@ -188,6 +188,15 @@ namespace AutoBot.Area.Managers
         }
 
 
+        public IEnumerable<IWebElement> GetElementsByTagName(string tagName)
+        {
+            return _browser.FindElementsByTagName(tagName);
+        }
+        public IWebElement GetElementByTagName(string tagName, int waitingTimeSecond = 5)
+        {
+            return ExpectationElement(tagName, waitingTimeSecond);
+        }
+
         /// <summary>
         /// Ожидание элемента на странице
         /// </summary>
@@ -214,6 +223,12 @@ namespace AutoBot.Area.Managers
                 if (webElementClassName.Any())
                 {
                     return webElementClassName.First();
+                }
+
+                var webElementTagName = GetElementsByTagName(attributeElement);
+                if (webElementTagName.Any())
+                {
+                    return webElementTagName.First();
                 }
 
                 Thread.Sleep(1000);

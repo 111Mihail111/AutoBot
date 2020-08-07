@@ -37,13 +37,20 @@ namespace AutoBot.Controllers
         [HttpGet]
         public PartialViewResult UpdateTimerCrane(Crane crane)
         {
-            crane.ActivityTime -= TimeSpan.FromMinutes(10);
+            crane.ActivityTime -= TimeSpan.FromMinutes(5);
             if (crane.ActivityTime < TimeSpan.FromSeconds(1))
             {
                 crane.ActivityTime = TimeSpan.FromSeconds(0);
             }
 
             WebService.UpdateCrane(crane);
+            return PartialView("_Cranes", WebService.GetCranes());
+        }
+
+        [HttpGet]
+        public PartialViewResult UpdateStatusCrane(string url, Status statusCrane)
+        {
+            WebService.UpdateStatusCrane(url, statusCrane);
             return PartialView("_Cranes", WebService.GetCranes());
         }
 

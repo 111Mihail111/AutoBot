@@ -1,4 +1,5 @@
 ﻿using AutoBot.Area.CollectingСryptocurrencies.Interface;
+using AutoBot.Area.Enums;
 using AutoBot.Area.Managers;
 using AutoBot.Extentions;
 using AutoBot.Models;
@@ -193,6 +194,7 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
         {
             crane.BalanceOnCrane = GetElementByXPath("//*[@id='Navigation']/div/span/a").Text;
             crane.ActivityTime = TimeSpan.FromMinutes(10);
+            crane.StatusCrane = Status.Work;
 
             QuitBrowser();
 

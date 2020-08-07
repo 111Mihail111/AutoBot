@@ -1,4 +1,5 @@
 ﻿using AutoBot.Area.CollectingСryptocurrencies.Interface;
+using AutoBot.Area.Enums;
 using AutoBot.Area.Managers;
 using AutoBot.Extentions;
 using AutoBot.Models;
@@ -11,7 +12,7 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
     public class MoonDash : BrowserManager, IMoonDash
     {
         private IRuCaptchaController _ruCaptchaController;
-        const string LOGIN = "polowinckin.mixail@yandex.ru"; //TODO: Настройки вынести отдельно на страницу
+        const string LOGIN = "desiptikon.bot@yandex.ru"; //TODO: Настройки вынести отдельно на страницу
         const string BROWSER_PROFILE_CRANE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\MoonDash\\";
         private string _errorZeroBalance;
 
@@ -191,6 +192,7 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
         {
             crane.BalanceOnCrane = GetElementByXPath("//*[@id='Navigation']/div/span/a").Text;
             crane.ActivityTime = TimeSpan.FromMinutes(10);
+            crane.StatusCrane = Status.Work;
 
             QuitBrowser();
 

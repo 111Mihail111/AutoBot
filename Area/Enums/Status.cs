@@ -13,5 +13,9 @@
         /// Не рабочий
         /// </summary>
         NoWork = 1,
+        /// <summary>
+        /// В работе
+        /// </summary>
+        InWork = 2,
     }
 }
