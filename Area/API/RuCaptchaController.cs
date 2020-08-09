@@ -17,7 +17,7 @@ namespace AutoBot.Area.API
         private readonly Uri _urlRuCaptcha = new Uri("http://rucaptcha.com");
         private readonly string _urlForPostQuery = "/in.php";
         private readonly string _urlForGetQuery = "/res.php";
-        private readonly string _APIKey = "bdeac7db70fa1dfbabc955a4826f7775";
+        private readonly string _APIKey = "bdeac7db70fa1dfbabc955a4826f7775"; //TODO: реализовать авто смену ключа при нулевом балансе
         private string _captchaId;
 
         public RuCaptchaController(IRuCaptcha ruCaptcha)
@@ -40,10 +40,10 @@ namespace AutoBot.Area.API
                 {
                     var content = new FormUrlEncodedContent(new[]
                     {
-                    new KeyValuePair<string, string>("key", $"{_APIKey}"),
-                    new KeyValuePair<string, string>("body", $"{byteImage}"),
-                    new KeyValuePair<string, string>("method", "base64")
-                });
+                        new KeyValuePair<string, string>("key", $"{_APIKey}"),
+                        new KeyValuePair<string, string>("body", $"{byteImage}"),
+                        new KeyValuePair<string, string>("method", "base64")
+                    });
 
                     var result = await client.PostAsync(_urlForPostQuery, content);
                     status = GetStatusRequest(result).Result;
@@ -153,6 +153,6 @@ namespace AutoBot.Area.API
         {
             var bytes = await responseMessage.Content.ReadAsByteArrayAsync();
             return Encoding.GetEncoding("utf-8").GetString(bytes, 0, bytes.Length).ToString();
-        }                
+        }
     }
 }

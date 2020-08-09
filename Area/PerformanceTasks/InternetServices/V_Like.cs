@@ -1,6 +1,7 @@
 ﻿using AutoBot.Area.Enums;
 using AutoBot.Area.Managers;
 using AutoBot.Area.PerformanceTasks.Interface;
+using AutoBot.Area.Services;
 using AutoBot.Extentions;
 using AutoBot.Models;
 using System;
@@ -12,14 +13,29 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
     public class V_Like : BrowserManager, IV_Like
     {
         const string BROWSER_PROFILE_CRANE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\PerformanceTasks\\V_Like\\";
-        const string LOGIN = "89524349046"; //TODO: Настройки вынести отдельно на страницу
-        const string PASSWORD = "123qwerzxcv";  //TODO: Настройки вынести отдельно на страницу
-        const string LOGIN_INSTAGRAM = "fedosinalexei@yandex.ru"; //TODO: Настройки вынести отдельно на страницу
-        const string PASSWORD_INSTAGRAM = "123q_Q*W(*E&*R^*Z$*X!*C?*V";  //TODO: Настройки вынести отдельно на страницу
+        private string _loginVK;
+        private string _passwordVK;
+        private string _loginInstagram;
+        private string _passwordInstagram;
+
+        protected void Init()
+        {
+            var accounts = AccountService.GetAccount(TypeService.V_Like);
+
+            var accountVK = accounts.First();
+            _loginVK = accountVK.Login;
+            _passwordVK = accountVK.Password;
+
+            var accountInstagram = accounts.Last();
+            _loginInstagram = accountInstagram.Login;
+            _passwordInstagram = accountInstagram.Password;
+
+            Initialization(BROWSER_PROFILE_CRANE);
+        }
 
         public InternetService GoTo(InternetService service)
         {
-            Initialization(BROWSER_PROFILE_CRANE);
+            Init();
             GoToUrl(service.URL);
             AuthorizationOnService();
             BeginCollecting();
@@ -213,16 +229,16 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         }
         protected void AuthorizationInInstagram()
         {
-            GetElementByXPath("//*[@id='loginForm']/div[1]/div[1]/div/label/input").SendKeys(LOGIN_INSTAGRAM);
-            GetElementByXPath("//*[@id='loginForm']/div[1]/div[2]/div/label/input").SendKeys(PASSWORD_INSTAGRAM);
+            GetElementByXPath("//*[@id='loginForm']/div[1]/div[1]/div/label/input").SendKeys(_loginInstagram);
+            GetElementByXPath("//*[@id='loginForm']/div[1]/div[2]/div/label/input").SendKeys(_passwordInstagram);
             GetElementByXPath("//*[@id='loginForm']/div[1]/div[3]/button/div").Click();
             GetElementByXPath("//*[@id='react-root']/section/main/div/div/div/section/div/button").Click();
         }
 
         protected void InsertLoginAndPassword() //TODO:Метод будет асинхронным
         {
-            GetElementByXPath("//*[@id='login_submit']/div/div/input[6]").SendKeys(LOGIN); //TODO:Создать 2 новых метода. Второй асинхронный
-            GetElementByXPath("//*[@id='login_submit']/div/div/input[7]").SendKeys(PASSWORD); //TODO:Создать 2 новых метода. Второй асинхронный
+            GetElementByXPath("//*[@id='login_submit']/div/div/input[6]").SendKeys(_loginVK); //TODO:Создать 2 новых метода. Второй асинхронный
+            GetElementByXPath("//*[@id='login_submit']/div/div/input[7]").SendKeys(_passwordVK); //TODO:Создать 2 новых метода. Второй асинхронный
             GetElementById("install_allow").Click();
         }
 

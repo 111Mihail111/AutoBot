@@ -1,4 +1,4 @@
-﻿@model AutoBot.ViewModels.WebsitesVM
+﻿@model AutoBot.ViewModels.WebSitesVM
 
 @{
     Layout = null;
@@ -26,7 +26,21 @@
             <div class="mt-5" id="InternetService">
                 @{await Html.RenderPartialAsync("_InternetService", Model.InternetServices);}
             </div>
-
+                        
+            <form class="row" style="margin-top:300px" asp-action="SaveAccounts" asp-controller="Start" method="post" enctype="multipart/form-data">
+                <div class="col-4">
+                    <div class="input-group mb-1">
+                        <div class="input-group-prepend">
+                            <button class="btn btn-outline-secondary" type="submit" id="inputGroupFileAddon03">Сохранить</button>
+                        </div>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" name="fileAccounts" id="inputGroupFile03" aria-describedby="inputGroupFileAddon03">
+                            <label class="custom-file-label" for="inputGroupFile03">Загрузите файл</label>
+                        </div>
+                    </div>
+                    <h6>@ViewBag.Message</h6>
+                </div>
+            </form>
         </div>
     </div>
 

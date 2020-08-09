@@ -1,7 +1,7 @@
 ﻿setInterval(function () {
     //CheckSites("Cranes");
-    CheckSites("InternetService");
-}, 300000)
+    //CheckSites("InternetService");
+}, 10000)
 
 /**
  * Проверка сайтов
@@ -149,10 +149,10 @@ function GetDataService(row) {
     }
 }
 
-window.onload = function () {
-    debugger;
-    let notes = document.getElementById("InternetService");
-    for (var i = 2; i < notes.childElementCount; i++) {
-        GoToService(GetDataService(notes.children[i]));
-    }
-}
+//window.onload = function () {
+//    debugger;
+//    let notes = document.getElementById("InternetService");
+//    for (var i = 2; i < notes.childElementCount; i++) {
+//        GoToService(GetDataService(notes.children[i]));
+//    }
+//}

@@ -1,6 +1,7 @@
 ﻿using AutoBot.Area.CollectingСryptocurrencies.Interface;
 using AutoBot.Area.Enums;
 using AutoBot.Area.Managers;
+using AutoBot.Area.Services;
 using AutoBot.Extentions;
 using AutoBot.Models;
 using System;
@@ -13,23 +14,50 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
     public class FreeBitcoin : BrowserManager, IFreeBitcoin
     {
         private IRuCaptchaController _ruCaptchaController;
-        const string LOGIN = "polowinckin.mixail@yandex.ru"; //TODO: Настройки вынести отдельно на страницу
-        const string PASSWORD = "xHkKv78SvV2o7rSX";  //TODO: Настройки вынести отдельно на страницу
+        private string _login;
+        private string _password;
         private string _errorZeroBalance;
+        const string BROWSER_PROFILE_CRANE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\FreeBitcoin\\";
 
         public FreeBitcoin(IRuCaptchaController ruCaptchaController)
         {
             _ruCaptchaController = ruCaptchaController;
         }
 
+        protected void Init()
+        {
+            var account = AccountService.GetAccount(TypeCrane.FreeBitcoin).First();
+            _login = account.Login;
+            _password = account.Password;
+
+            Initialization(BROWSER_PROFILE_CRANE);
+        }
+
         ///<inheritdoc/>
         public async Task<Crane> Start(Crane crane)
         {
-            string urlCrane = crane.URL;
+            Init();
 
-            Initialization("C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\FreeBitcoin\\");
+            string urlCrane = crane.URL;
             GoToUrl(urlCrane);
             Thread.Sleep(1000);
+
+            GetElementByXPath("/html/body/div[1]/div/nav/section/ul/li[4]/a").Click();
+            while (true)
+            {
+                GetElementById("double_your_btc_bet_lo_button").Click();
+
+                if (GetElementById("double_your_btc_bet_win").GetInnerText() == string.Empty)
+                {
+                    GetElementById("double_your_btc_2x").Click();
+                    continue;
+                }
+
+                GetElementById("double_your_btc_min").Click();
+            }
+
+
+
             await AuthorizationOnCrane(urlCrane);
             
             if (IsTimerExist())
@@ -260,13 +288,13 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
             var emailInput = await Task.Run(() => GetAsyncElementById("signup_form_email"));
             if (emailInput != null && string.IsNullOrEmpty(emailInput.GetValue()))
             {
-                emailInput.SendKeys(LOGIN);
+                emailInput.SendKeys(_login);
             }
 
             var passwordInput = await Task.Run(() => GetAsyncElementById("signup_form_password"));
             if (passwordInput != null && string.IsNullOrEmpty(passwordInput.GetValue()))
             {
-                passwordInput.SendKeys(PASSWORD);
+                passwordInput.SendKeys(_password);
             }
         }
         /// <summary>

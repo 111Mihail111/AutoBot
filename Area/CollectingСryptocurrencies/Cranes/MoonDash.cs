@@ -1,9 +1,11 @@
 ﻿using AutoBot.Area.CollectingСryptocurrencies.Interface;
 using AutoBot.Area.Enums;
 using AutoBot.Area.Managers;
+using AutoBot.Area.Services;
 using AutoBot.Extentions;
 using AutoBot.Models;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,7 +14,7 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
     public class MoonDash : BrowserManager, IMoonDash
     {
         private IRuCaptchaController _ruCaptchaController;
-        const string LOGIN = "desiptikon.bot@yandex.ru"; //TODO: Настройки вынести отдельно на страницу
+        private string _login;
         const string BROWSER_PROFILE_CRANE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\MoonDash\\";
         private string _errorZeroBalance;
 
@@ -21,11 +23,18 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
             _ruCaptchaController = ruCaptchaController;
         }
 
-        public async Task<Crane> Start(Crane crane)
+        protected void Init()
         {
-            string urlCrane = crane.URL;
+            _login = AccountService.GetAccount(TypeCrane.MoonDash).First().Login;
 
             Initialization(BROWSER_PROFILE_CRANE);
+        }
+
+        public async Task<Crane> Start(Crane crane)
+        {
+            Init();
+
+            string urlCrane = crane.URL;
             GoToUrl(urlCrane);
             await Authorization(urlCrane);
 
@@ -65,7 +74,7 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
             var signInEmailInput = GetAsyncElementById("SignInEmailInput").Result;
             if (string.IsNullOrEmpty(signInEmailInput.GetValue()))
             {
-                signInEmailInput.SendKeys(LOGIN);
+                signInEmailInput.SendKeys(_login);
             }
 
             await DecipherCaptcha(urlCrane, "SignInForm");

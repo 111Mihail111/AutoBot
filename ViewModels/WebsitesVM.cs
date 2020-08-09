@@ -6,7 +6,7 @@ namespace AutoBot.ViewModels
     /// <summary>
     /// Вэб-сайт VM
     /// </summary>
-    public class WebsitesVM
+    public class WebSitesVM
     {
         /// <summary>
         /// Лист интернет-сервисов

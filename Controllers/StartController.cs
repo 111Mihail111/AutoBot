@@ -1,8 +1,10 @@
 ﻿using AutoBot.Area.CollectingСryptocurrencies.Interface;
 using AutoBot.Area.Enums;
+using AutoBot.Area.Managers;
 using AutoBot.Area.PerformanceTasks.Interface;
 using AutoBot.Area.Services;
 using AutoBot.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -108,6 +110,23 @@ namespace AutoBot.Controllers
             WebService.UpdateInternetService(internetService);
 
             return PartialView("_InternetService", WebService.GetInternetServices());
+        }
+
+        [HttpPost]
+        public ActionResult SaveAccounts(IFormFile fileAccounts)
+        {
+            var data = WebService.GetAllData();
+            if (fileAccounts == null)
+            {
+                ViewBag.Message = "Вы не загрузили файл!";
+                return View("Index", data);
+            }
+
+            AccountManager accountManager = new AccountManager();  //TODO:Прокинуть через DI
+            accountManager.SaveAccounts(fileAccounts);
+
+            ViewBag.Message = "Все сохранено!";
+            return View("Index", data);
         }
     }
 }

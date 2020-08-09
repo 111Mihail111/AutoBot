@@ -16,24 +16,24 @@ namespace AutoBot.Area.Services
         {
             new Crane { URL = "https://freebitco.in/", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
                 StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.Bitcoin, TypeCrane = TypeCrane.FreeBitcoin },
-            new Crane { URL = "https://moonbit.co.in/faucet", ActivityTime = TimeSpan.FromMinutes(0), BalanceOnCrane = "0",
-                StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.Bitcoin, TypeCrane = TypeCrane.MoonBitcoin },
-            new Crane { URL = "https://moondoge.co.in/faucet", ActivityTime = TimeSpan.FromMinutes(0), BalanceOnCrane = "0",
-                StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.Dogecoin, TypeCrane = TypeCrane.MoonDogecoin},
-            new Crane { URL = "http://bonusbitcoin.co/faucet", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
-                StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.Bitcoin, TypeCrane = TypeCrane.BonusBitcoin },
-            new Crane { URL = "https://moonliteco.in/faucet", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
-                StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.LiteCoin, TypeCrane = TypeCrane.MoonLitecoin, },
-            new Crane { URL = "https://moondash.co.in/faucet", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
-                StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.Dash, TypeCrane = TypeCrane.MoonDash, }
+            //new Crane { URL = "https://moonbit.co.in/faucet", ActivityTime = TimeSpan.FromMinutes(0), BalanceOnCrane = "0",
+            //    StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.Bitcoin, TypeCrane = TypeCrane.MoonBitcoin },
+            //new Crane { URL = "https://moondoge.co.in/faucet", ActivityTime = TimeSpan.FromMinutes(0), BalanceOnCrane = "0",
+            //    StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.Dogecoin, TypeCrane = TypeCrane.MoonDogecoin},
+            //new Crane { URL = "http://bonusbitcoin.co/faucet", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
+            //    StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.Bitcoin, TypeCrane = TypeCrane.BonusBitcoin },
+            //new Crane { URL = "https://moonliteco.in/faucet", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
+            //    StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.LiteCoin, TypeCrane = TypeCrane.MoonLitecoin, },
+            //new Crane { URL = "https://moondash.co.in/faucet", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
+            //    StatusCrane = Status.Work, TypeCurrencies = TypeCurrencies.Dash, TypeCrane = TypeCrane.MoonDash, }
         };
         /// <summary>
         /// Интернет-сервисы
         /// </summary>
         public static List<InternetService> _services = new List<InternetService>
         {
-            new InternetService { URL = "https://v-like.ru/", ActivityTime = TimeSpan.FromHours(0), BalanceOnService = "0",
-                StatusService = Status.Work, TypeService = TypeService.V_Like },
+            //new InternetService { URL = "https://v-like.ru/", ActivityTime = TimeSpan.FromHours(0), BalanceOnService = "0",
+            //    StatusService = Status.Work, TypeService = TypeService.V_Like },
         };
 
         /// <summary>
@@ -56,9 +56,9 @@ namespace AutoBot.Area.Services
         /// Получить все данные
         /// </summary>
         /// <returns></returns>
-        public static WebsitesVM GetAllData()
+        public static WebSitesVM GetAllData()
         {
-            return new WebsitesVM { Cranes = GetCranes().ToList(), InternetServices = GetInternetServices().ToList() };
+            return new WebSitesVM { Cranes = GetCranes().ToList(), InternetServices = GetInternetServices().ToList() };
         }
 
 

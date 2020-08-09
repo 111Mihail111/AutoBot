@@ -40,7 +40,7 @@ namespace AutoBot.Area.Managers
             options.AddAdditionalCapability("useAutomationExtension", false); //Скрывает расширение
             options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
 
-            _browser = new ChromeDriver("/Project/AutoBot/bin/Debug/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
+            _browser = new ChromeDriver("/_VS_Project/Mihail/AutoBot/BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
         }
 
         /// <summary>

@@ -1,6 +1,8 @@
 ﻿using AutoBot.Area.API;
 using AutoBot.Area.CollectingСryptocurrencies.Interface;
+using AutoBot.Area.Enums;
 using AutoBot.Area.Managers;
+using AutoBot.Area.Services;
 using AutoBot.Extentions;
 using System;
 using System.Linq;
@@ -11,19 +13,28 @@ namespace AutoBot.Area.CollectingСryptocurrencies
 {
     public class RuCaptcha : BrowserManager, IRuCaptcha
     {
-        private RuCaptchaController _ruCaptchaController = new RuCaptchaController(); //TODO:Сделать через ко
-        protected const string LOGIN = "polowinckin.mixail@yandex.ru"; //TODO: Настройки вынести отдельно на страницу
-        protected const string PASSWORD = "U394gbUGKUn3";  //TODO: Настройки вынести отдельно на страницу
+        private RuCaptchaController _ruCaptchaController = new RuCaptchaController(); //TODO:Сделать через DI
+        private string _login;
+        private string _password;
         const string BROWSER_PROFILE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\RuCaptcha\\";
         private string _errorZeroBalance;
 
 
+        protected void Init()
+        {
+            var accounts = AccountService.GetAccount(Etc.RuCaptcha).First();
+            _login = accounts.Login;
+            _password = accounts.Password;
+
+            Initialization(BROWSER_PROFILE);
+        }
+
         ///<inheritdoc/>
         public async Task GoTo()
         {
-            string url = "https://rucaptcha.com/setting";
+            Init();
 
-            Initialization(BROWSER_PROFILE);
+            string url = "https://rucaptcha.com/setting";
             GoToUrl(url);
             await Authorazition(url);
 
@@ -187,13 +198,13 @@ namespace AutoBot.Area.CollectingСryptocurrencies
             var emailInput = await Task.Run(() => GetAsyncElementById("password"));
             if (emailInput != null && string.IsNullOrEmpty(emailInput.GetValue()))
             {
-                emailInput.SendKeys(PASSWORD);
+                emailInput.SendKeys(_password);
             }
 
             var passwordInput = Task.Run(() => GetAsyncElementById("email")).Result;
             if (passwordInput != null && string.IsNullOrEmpty(passwordInput.GetValue()))
             {
-                passwordInput.SendKeys(LOGIN);
+                passwordInput.SendKeys(_login);
             }
         }
     }

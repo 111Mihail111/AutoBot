@@ -1,9 +1,11 @@
 ﻿using AutoBot.Area.CollectingСryptocurrencies.Interface;
 using AutoBot.Area.Enums;
 using AutoBot.Area.Managers;
+using AutoBot.Area.Services;
 using AutoBot.Extentions;
 using AutoBot.Models;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,8 +14,8 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
     public class BonusBitcoin : BrowserManager, IBonusBitcoin
     {
         private IRuCaptchaController _ruCaptchaController;
-        const string LOGIN = "desiptikon.bot@yandex.ru"; //TODO: Настройки вынести отдельно на страницу
-        const string PASSWORD = "123q_Q*W(*E&*R^*Z$*X!*C?*V";  //TODO: Настройки вынести отдельно на страницу
+        private string _login;
+        private string _password;
         const string BROWSER_PROFILE_CRANE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\BonusBitcoin\\";
         private string _errorZeroBalance;
 
@@ -22,12 +24,21 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
             _ruCaptchaController = ruCaptchaController;
         }
 
+        protected void Init()
+        {
+            var account = AccountService.GetAccount(TypeCrane.BonusBitcoin).First();
+            _login = account.Login;
+            _password = account.Password;
+
+            Initialization(BROWSER_PROFILE_CRANE);
+        }
+
         ///<inheritdoc/>
         public async Task<Crane> Start(Crane crane)
         {
-            string urlCrane = crane.URL;
+            Init();
 
-            Initialization(BROWSER_PROFILE_CRANE);
+            string urlCrane = crane.URL;
             GoToUrl(urlCrane);
             await Authorization(urlCrane);
 
@@ -208,13 +219,13 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
             var emailInput = await Task.Run(() => GetAsyncElementByXPath("//*[@id='SignInEmailInput']"));
             if (emailInput != null && string.IsNullOrEmpty(emailInput.GetValue()))
             {
-                emailInput.SendKeys(LOGIN);
+                emailInput.SendKeys(_login);
             }
 
             var passwordInput = await Task.Run(() => GetAsyncElementByXPath("//*[@id='SignInPasswordInput']"));
             if (passwordInput != null && string.IsNullOrEmpty(passwordInput.GetValue()))
             {
-                passwordInput.SendKeys(PASSWORD);
+                passwordInput.SendKeys(_password);
             }
         }
     }
