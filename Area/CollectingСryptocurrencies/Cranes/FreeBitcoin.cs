@@ -42,22 +42,6 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
             GoToUrl(urlCrane);
             Thread.Sleep(1000);
 
-            GetElementByXPath("/html/body/div[1]/div/nav/section/ul/li[4]/a").Click();
-            while (true)
-            {
-                GetElementById("double_your_btc_bet_lo_button").Click();
-
-                if (GetElementById("double_your_btc_bet_win").GetInnerText() == string.Empty)
-                {
-                    GetElementById("double_your_btc_2x").Click();
-                    continue;
-                }
-
-                GetElementById("double_your_btc_min").Click();
-            }
-
-
-
             await AuthorizationOnCrane(urlCrane);
             
             if (IsTimerExist())
