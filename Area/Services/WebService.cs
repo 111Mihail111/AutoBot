@@ -32,8 +32,8 @@ namespace AutoBot.Area.Services
         /// </summary>
         public static List<InternetService> _services = new List<InternetService>
         {
-            //new InternetService { URL = "https://v-like.ru/", ActivityTime = TimeSpan.FromHours(0), BalanceOnService = "0",
-            //    StatusService = Status.Work, TypeService = TypeService.V_Like },
+            new InternetService { URL = "https://v-like.ru/", ActivityTime = TimeSpan.FromHours(0), BalanceOnService = "0",
+                StatusService = Status.Work, TypeService = TypeService.V_Like },
         };
 
         /// <summary>
@@ -81,6 +81,17 @@ namespace AutoBot.Area.Services
         {
             int index = _cranes.FindIndex(fi => fi.URL == url);
             _cranes[index].StatusCrane = status;
+        }
+
+        /// <summary>
+        /// Обновить статус сервиса
+        /// </summary>
+        /// <param name="url">Url-адрес сервиса</param>
+        /// <param name="status">Статус сервиса</param>
+        public static void UpdateStatusService(string url, Status status)
+        {
+            int index = _services.FindIndex(fi => fi.URL == url);
+            _services[index].StatusService = status;
         }
 
         /// <summary>

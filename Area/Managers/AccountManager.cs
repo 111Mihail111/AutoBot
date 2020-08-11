@@ -37,13 +37,22 @@ namespace AutoBot.Area.Managers
                 for (int i = 0; i < array.Length; i++)
                 {
                     array[i].Replace("||", string.Empty);
-                    if (array.Length == 2)  //TODO:2 записи есть не только у API
-                    {
-                        accounts.Add(new Account { TypeWebSite = array[0], ApiKey = array[0] });
-                    }
                 }
-
-                accounts.Add(new Account { TypeWebSite = array[0], Login = array[1], Password = array[2] });
+                switch (array.Length)
+                {
+                    case 2:
+                        if (array.Length == 2 && array[0] == "RuCaptcha")
+                        {
+                            accounts.Add(new Account { TypeWebSite = array[0], ApiKey = array[1] });
+                            continue;
+                        }
+                        accounts.Add(new Account { TypeWebSite = array[0], Login = array[1] });
+                        break;
+                    default:
+                        accounts.Add(new Account { TypeWebSite = array[0], Login = array[1], Password = array[2] });
+                        break;
+                }
+                
             }
 
             return accounts;

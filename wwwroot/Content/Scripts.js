@@ -1,13 +1,13 @@
 ﻿setInterval(function () {
-    //CheckSites("Cranes");
-    //CheckSites("InternetService");
-}, 10000)
+    //CheckSites("Cranes", true);
+    CheckSites("InternetService", false);
+}, 60000)
 
 /**
  * Проверка сайтов
  * @param {any} site Id контейнера
  */
-function CheckSites(site) {
+function CheckSites(site, isCrane) {
     let notes = document.getElementById(site);
     for (var i = 2; i < notes.childElementCount; i++) {
         let timer = notes.children[i].getElementsByTagName("input")[1].value;
@@ -19,10 +19,18 @@ function CheckSites(site) {
             }
 
             notes.children[i].getElementsByTagName("input")[2].value = "InWork";
-            let crane = GetDataCrane(notes.children[i]);
 
-            UpdatingStatusCrane(crane.URL, crane.StatusCrane);
-            GoToCrane(crane);
+            var data;
+            if (isCrane) {
+                data = GetDataCrane(notes.children[i]);
+                UpdatingStatusCrane(data.URL, data.StatusCrane);
+                GoToCrane(data);
+            }
+            else {
+                data = GetDataService(notes.children[i]);
+                UpdatingStatusService(data.URL, data.StatusCrane);
+                GoToService(data);
+            }
         }
         else {
             UpdatingTimerCrane(GetDataCrane(notes.children[i]));
@@ -79,6 +87,21 @@ function UpdatingStatusCrane(url, status) {
     });
 }
 
+function UpdatingStatusService(url, status) {
+    $.ajax({
+        type: "GET",
+        data: {
+            url: url,
+            statusService: status,
+        },
+        contentType: "application/json; charset=utf-8",
+        url: "/Start/UpdateStatusService/",
+        success: function (data) {
+            $('#InternetService').html(data);
+        }
+    });
+}
+
 /*Перейти на кран*/
 function GoToCrane(crane) {
     $.ajax({
@@ -114,13 +137,6 @@ function CheckTimers(crane) {
         }
     }
 }
-
-//window.onload = function () {
-//    let notes = document.getElementById("Cranes");
-//    for (var i = 0; i < notes.childElementCount; i++) {
-//        GoToCrane(GetDataCrane(notes.children[i]));
-//    }
-//}
 
 function GoToService(internetService) {
     $.ajax({

@@ -49,8 +49,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         private void BeginCollecting()
         {
             JoinInCommunityVK();
-            //WorkWithLikesVK();
-            //AddToFriendsVK();
+            WorkWithLikesVK();
+            AddToFriendsVK();
             //SubscriptionsInInstagram();
             //WorkWithLikeInstagram();
         }
@@ -124,7 +124,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     AlertAccept();
                     continue;
                 }
-                
+
+                LinkEmailVK();
+
                 if (title == "Поставить Лайк + Рассказать друзьям")
                 {
                     LikeIt();
@@ -141,6 +143,18 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 GetElementByXPath("//*[@id='buttons']/a[2]").Click();
                 Thread.Sleep(1000);
                 perfomanse = GetElementByClassName("groups").GetInnerText();
+            }
+        }
+
+        /// <summary>
+        /// Привязка Email к аккаунту Vk
+        /// </summary>
+        protected void LinkEmailVK()
+        {
+            if (GetElementById("stl_left").Displayed)
+            {
+                ExecuteScript("document.querySelector('#box_layer_bg').remove();");
+                ExecuteScript("document.querySelector('#box_layer_wrap').remove()");
             }
         }
         /// <summary>
@@ -308,7 +322,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <returns>Модель интернет-сервиса</returns>
         protected InternetService GetDetailsWithService(InternetService internetService)
         {
-            internetService.ActivityTime = TimeSpan.FromMinutes(10);
+            internetService.ActivityTime = TimeSpan.FromMinutes(1);
             internetService.BalanceOnService = GetElementByClassName("balance").GetInnerText();
             internetService.StatusService = Status.Work;
 

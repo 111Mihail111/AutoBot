@@ -57,6 +57,13 @@ namespace AutoBot.Controllers
         }
 
         [HttpGet]
+        public PartialViewResult UpdateStatusService(string url, Status statusService)
+        {
+            WebService.UpdateStatusService(url, statusService);
+            return PartialView("_InternetService", WebService.GetInternetServices());
+        }
+
+        [HttpGet]
         public async Task<PartialViewResult> GoToCrane(Crane crane)
         {
             try
