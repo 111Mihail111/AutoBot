@@ -50,6 +50,20 @@ namespace AutoBot.Controllers
         }
 
         [HttpGet]
+        public PartialViewResult UpdateTimerService(InternetService service)
+        {
+            service.ActivityTime -= TimeSpan.FromMinutes(1);
+            if (service.ActivityTime < TimeSpan.FromSeconds(1))
+            {
+                service.ActivityTime = TimeSpan.FromSeconds(0);
+            }
+
+            WebService.UpdateInternetService(service);
+            return PartialView("_InternetService", WebService.GetInternetServices());
+        }
+
+
+        [HttpGet]
         public PartialViewResult UpdateStatusCrane(string url, Status statusCrane)
         {
             WebService.UpdateStatusCrane(url, statusCrane);

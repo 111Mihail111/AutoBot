@@ -28,12 +28,16 @@ function CheckSites(site, isCrane) {
             }
             else {
                 data = GetDataService(notes.children[i]);
-                UpdatingStatusService(data.URL, data.StatusCrane);
+                UpdatingStatusService(data.URL, data.StatusService);
                 GoToService(data);
             }
         }
         else {
-            UpdatingTimerCrane(GetDataCrane(notes.children[i]));
+            if (isCrane) {
+                UpdatingTimerCrane(GetDataCrane(notes.children[i]));
+                return;
+            }
+            UpdatingTimerService(GetDataService(notes.children[i]));
         }
     }
 }
@@ -47,6 +51,16 @@ function GetDataCrane(row) {
         BalanceOnCrane: row.getElementsByTagName("input")[3].value,
         TypeCurrencies: row.getElementsByTagName("input")[4].value,
         TypeCrane: row.getElementsByTagName("input")[5].value,
+    }
+}
+/*Получить данные сервиса*/
+function GetDataService(row) {
+    return {
+        URL: row.getElementsByTagName("input")[0].value,
+        ActivityTime: row.getElementsByTagName("input")[1].value,
+        StatusService: row.getElementsByTagName("input")[2].value,
+        BalanceOnService: row.getElementsByTagName("input")[3].value,
+        TypeService: row.getElementsByTagName("input")[4].value,
     }
 }
 
@@ -70,6 +84,25 @@ function UpdatingTimerCrane(crane) {
         }
     });
 }
+/*Обновить таймер сервиса*/
+function UpdatingTimerService(internetService) {
+    $.ajax({
+        type: "GET",
+        data: {
+            'URL': internetService.URL,
+            'ActivityTime': internetService.ActivityTime,
+            'StatusService': internetService.StatusService,
+            'BalanceOnService': internetService.BalanceOnService,
+            'TypeService': internetService.TypeService,
+        },
+        contentType: "application/json; charset=utf-8",
+        url: "/Start/UpdateTimerService",
+        success: function (data) {
+            $('#InternetService').html(data);
+            CheckTimers(internetService);
+        }
+    });
+}
 
 /*Обновить статус крана*/
 function UpdatingStatusCrane(url, status) {
@@ -86,7 +119,7 @@ function UpdatingStatusCrane(url, status) {
         }
     });
 }
-
+/*Обновить статус сервиса*/
 function UpdatingStatusService(url, status) {
     $.ajax({
         type: "GET",
@@ -120,6 +153,23 @@ function GoToCrane(crane) {
         }
     });
 }
+/*Перейти на сервис*/
+function GoToService(internetService) {
+    $.ajax({
+        type: "GET",
+        data: {
+            'URL': internetService.URL,
+            'ActivityTime': internetService.ActivityTime,
+            'StatusService': internetService.StatusService,
+            'BalanceOnService': internetService.BalanceOnService,
+            'TypeService': internetService.TypeService,
+        },
+        url: "/Start/GoToInternetService",
+        success: function (data) {
+            $('#InternetService').html(data);
+        }
+    });
+}
 
 /*Проверка таймеров*/
 function CheckTimers(crane) {
@@ -138,37 +188,19 @@ function CheckTimers(crane) {
     }
 }
 
-function GoToService(internetService) {
-    $.ajax({
-        type: "GET",
-        data: {
-            'URL': internetService.URL,
-            'ActivityTime': internetService.ActivityTime,
-            'StatusService': internetService.StatusService,
-            'BalanceOnService': internetService.BalanceOnService,
-            'TypeService': internetService.TypeService,
-        },
-        url: "/Start/GoToInternetService",
-        success: function (data) {
-            $('#InternetService').html(data);
-        }
-    });
-}
+/*Проверка таймеров*/
+function CheckTimers(crane) {
+    var row = document.getElementById("InternetService");
+    var list = [];
 
-function GetDataService(row) {
-    return {
-        URL: row.getElementsByTagName("input")[0].value,
-        ActivityTime: row.getElementsByTagName("input")[1].value,
-        StatusService: row.getElementsByTagName("input")[2].value,
-        BalanceOnService: row.getElementsByTagName("input")[3].value,
-        TypeService: row.getElementsByTagName("input")[4].value,
+    for (var i = 0; i < row.childElementCount; i++) {
+        list[i] = GetDataCrane(row.children[i]);
+    }
+
+    for (var i = 0; i < list.length; i++) {
+        var element = list[i];
+        if (crane.URL === element.URL && element.ActivityTime === "00:00:00") {
+            GoToService(element);
+        }
     }
 }
-
-//window.onload = function () {
-//    debugger;
-//    let notes = document.getElementById("InternetService");
-//    for (var i = 2; i < notes.childElementCount; i++) {
-//        GoToService(GetDataService(notes.children[i]));
-//    }
-//}

@@ -100,6 +100,15 @@ namespace AutoBot.Area.Managers
         {
             _browser.SwitchTo().Alert().Accept();
         }
+        /// <summary>
+        /// Получить текст из алерт окна
+        /// </summary>
+        /// <returns></returns>
+        public string GetTextFromAlert()
+        {
+            return _browser.SwitchTo().Alert().Text;
+        }
+
 
         /// <summary>
         /// Установить позицию скрола
