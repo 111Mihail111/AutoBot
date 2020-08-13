@@ -106,7 +106,15 @@ namespace AutoBot.Area.Managers
         /// <returns></returns>
         public string GetTextFromAlert()
         {
-            return _browser.SwitchTo().Alert().Text;
+            try
+            {
+                return _browser.SwitchTo().Alert().Text;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+            
         }
 
 

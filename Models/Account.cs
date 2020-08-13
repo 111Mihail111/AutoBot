@@ -1,4 +1,6 @@
-﻿namespace AutoBot.Models
+﻿using AutoBot.Area.Enums;
+
+namespace AutoBot.Models
 {
     /// <summary>
     /// Аккаунт
@@ -21,5 +23,9 @@
         /// API ключ
         /// </summary>
         public string ApiKey { get; set; }
+        /// <summary>
+        /// Тип аккаунта
+        /// </summary>
+        public AccountType AccountType { get; set; }
     }
 }

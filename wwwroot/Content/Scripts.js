@@ -1,7 +1,7 @@
 ﻿setInterval(function () {
     //CheckSites("Cranes", true);
     CheckSites("InternetService", false);
-}, 60000)
+}, 300000)
 
 /**
  * Проверка сайтов

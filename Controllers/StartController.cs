@@ -19,10 +19,10 @@ namespace AutoBot.Controllers
         private IMoonDogecoin _moonDogecoin;
         private IMoonLitecoin _moonLitecoin;
         private IMoonDash _moonDash;
-        private IV_Like _v_Like;
+        private IVLike _v_Like;
 
         public StartController(IFreeBitcoin freeBitcoin, IMoonBitcoin moonBitcoin, IBonusBitcoin bonusBitcoin, 
-            IMoonDogecoin moonDogecoin, IMoonLitecoin moonLitecoin, IMoonDash moonDash, IV_Like v_Like)
+            IMoonDogecoin moonDogecoin, IMoonLitecoin moonLitecoin, IMoonDash moonDash, IVLike v_Like)
         {
             _freeBitcoin = freeBitcoin;
             _moonBitcoin = moonBitcoin;
@@ -123,7 +123,7 @@ namespace AutoBot.Controllers
         {
             switch (internetService.TypeService)
             {
-                case TypeService.V_Like:
+                case TypeService.VLike:
                     internetService = _v_Like.GoTo(internetService);
                     break;
             }

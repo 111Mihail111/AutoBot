@@ -8,6 +8,10 @@
         /// <summary>
         /// https://v-like.ru/
         /// </summary>
-        V_Like = 0,
+        VLike = 0,
+        /// <summary>
+        /// https://vktarget.ru/
+        /// </summary>
+        VkTarget = 1,
     }
 }

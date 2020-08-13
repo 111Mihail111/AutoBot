@@ -33,7 +33,9 @@ namespace AutoBot.Area.Services
         public static List<InternetService> _services = new List<InternetService>
         {
             new InternetService { URL = "https://v-like.ru/", ActivityTime = TimeSpan.FromHours(0), BalanceOnService = "0",
-                StatusService = Status.Work, TypeService = TypeService.V_Like },
+                StatusService = Status.Work, TypeService = TypeService.VLike },
+            //new InternetService { URL="https://vktarget.ru/list/", ActivityTime = TimeSpan.FromHours(0), BalanceOnService = "0",
+            //    StatusService = Status.Work, TypeService = TypeService.VkTarget },
         };
 
         /// <summary>

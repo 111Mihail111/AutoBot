@@ -12,7 +12,7 @@ using System.Threading;
 
 namespace AutoBot.Area.PerformanceTasks.InternetServices
 {
-    public class V_Like : BrowserManager, IV_Like
+    public class VLike : BrowserManager, IVLike
     {
         const string BROWSER_PROFILE_CRANE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\PerformanceTasks\\V_Like\\";
         private string _loginVK;
@@ -22,13 +22,13 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
         protected void Init()
         {
-            var accounts = AccountService.GetAccount(TypeService.V_Like);
+            var accounts = AccountService.GetAccount(TypeService.VLike);
 
             var accountVK = accounts.First();
             _loginVK = accountVK.Login;
             _passwordVK = accountVK.Password;
 
-            var accountInstagram = accounts.Last();
+            var accountInstagram = accounts.Where(w => w.AccountType == AccountType.Instagram).First();
             _loginInstagram = accountInstagram.Login;
             _passwordInstagram = accountInstagram.Password;
 
@@ -139,7 +139,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 if (title == "Поставить Лайк + Рассказать друзьям")
                 {
                     LikeIt();
-                    MakeRepost(); //TODO:Пока не отлажен
+                    MakeRepost();
                 }
                 else
                 {
@@ -152,24 +152,17 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 Thread.Sleep(5000);
                 GetElementByXPath("//*[@id='buttons']/a[2]").Click();
 
-                try
+                if (GetTextFromAlert() == "К сожалению, уже было поставлено нужное количество лайков к данном объекту. Обновите список заданий.")
                 {
-                    if (GetTextFromAlert() == "К сожалению, уже было поставлено нужное количество лайков к данном объекту. Обновите список заданий.")
-                    {
-                        OpenPageInNewTab(url);
-                        SwitchToLastTab();
-                        LikeIt();
-                        CloseTab();
-                        SwitchToTab();
-                        GetElementByXPath("//*[@id='buttons']/a[1]").Click();
-                        GetElementByXPath("//*[@id='vk2']/a").Click();
-                    }
+                    OpenPageInNewTab(url);
+                    SwitchToLastTab();
+                    LikeIt();
+                    CloseTab();
+                    SwitchToTab();
+                    GetElementByXPath("//*[@id='buttons']/a[1]").Click();
+                    GetElementByXPath("//*[@id='vk2']/a").Click();
                 }
-                catch (Exception)
-                {
-                    //Alerta не было
-                }
-                
+
                 Thread.Sleep(1000);
                 perfomanse = GetElementByClassName("groups").GetInnerText();
             }
@@ -299,14 +292,17 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     continue;
                 }
 
-                var loginForm = GetElementById("loginForm");
+                var likeButton = GetElementByXPath("//*[@id='react-root']/section/main/div/div[1]/article/div[3]/section[1]/span[1]/button");
+                likeButton.Click();
+
+                var loginForm = GetElementById("loginForm"); //TODO: 
                 if (loginForm != null && loginForm.Displayed)
                 {
                     AuthorizationInInstagram();
                     GetElementByTagName("button").Click();
+                    likeButton.Click();
                 }
-                
-                GetElementByXPath("//*[@id='react-root']/section/main/div/div[1]/article/div[3]/section[1]/span[1]/button").Click();
+
                 CloseTab();
                 SwitchToTab();
                 Thread.Sleep(1000);
@@ -393,8 +389,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected void MakeRepost()
         {
             var post = GetUrlPage().Replace("https://vk.com/wall", "post");
-            SetScrollPosition(10000);
-            GetElementByXPath($"//*[@id='{post}']/div/div[2]/div/div[2]/div/div[1]/a[3]/div[1]").Click(); ////*[@id='post579804101_451']/div/div[2]/div/div[2]/div/div[1]/a[2]/div[1]
+            SetScrollPosition(10000);            
+            GetElementByXPath($"//*[@id='{post}']/div/div[2]/div/div[2]/div/div[1]/a[3]/div[1]")?.Click(); //Переделать Иногда под постом 3 кнопки (лайк, коммент и репост)
+            GetElementByXPath($"//*[@id='{post}']/div/div[2]/div/div[2]/div/div[1]/a[2]/div[1]")?.Click(); //Переделать на норм код, чтобы понимать когда у нас 2 кнопи, а когда три
             GetElementById("like_share_my").Click();
             GetElementById("like_share_send").Click();
         }

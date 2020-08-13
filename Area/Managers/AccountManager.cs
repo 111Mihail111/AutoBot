@@ -1,6 +1,9 @@
-﻿using AutoBot.Area.Services;
+﻿using AutoBot.Area.Enums;
+using AutoBot.Area.Services;
+using AutoBot.Extentions;
 using AutoBot.Models;
 using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -40,16 +43,16 @@ namespace AutoBot.Area.Managers
                 }
                 switch (array.Length)
                 {
-                    case 2:
-                        if (array.Length == 2 && array[0] == "RuCaptcha")
+                    case 3:
+                        if (array[0] == "RuCaptcha")
                         {
                             accounts.Add(new Account { TypeWebSite = array[0], ApiKey = array[1] });
                             continue;
                         }
-                        accounts.Add(new Account { TypeWebSite = array[0], Login = array[1] });
+                        accounts.Add(new Account { TypeWebSite = array[0], Login = array[1], AccountType = array[3].ConvertStringToEnum<AccountType>() });
                         break;
                     default:
-                        accounts.Add(new Account { TypeWebSite = array[0], Login = array[1], Password = array[2] });
+                        accounts.Add(new Account { TypeWebSite = array[0], Login = array[1], Password = array[2], AccountType = array[3].ConvertStringToEnum<AccountType>() });
                         break;
                 }
                 
