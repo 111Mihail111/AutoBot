@@ -43,13 +43,14 @@ namespace AutoBot.Area.Managers
                 }
                 switch (array.Length)
                 {
+                    case 2:
                     case 3:
-                        if (array[0] == "RuCaptcha")
+                        if (array.Length == 2 && array[0] == "RuCaptcha")
                         {
                             accounts.Add(new Account { TypeWebSite = array[0], ApiKey = array[1] });
                             continue;
                         }
-                        accounts.Add(new Account { TypeWebSite = array[0], Login = array[1], AccountType = array[3].ConvertStringToEnum<AccountType>() });
+                        accounts.Add(new Account { TypeWebSite = array[0], Login = array[1], AccountType = array[2].ConvertStringToEnum<AccountType>() });
                         break;
                     default:
                         accounts.Add(new Account { TypeWebSite = array[0], Login = array[1], Password = array[2], AccountType = array[3].ConvertStringToEnum<AccountType>() });

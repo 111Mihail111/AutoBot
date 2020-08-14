@@ -389,9 +389,19 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected void MakeRepost()
         {
             var post = GetUrlPage().Replace("https://vk.com/wall", "post");
-            SetScrollPosition(10000);            
-            GetElementByXPath($"//*[@id='{post}']/div/div[2]/div/div[2]/div/div[1]/a[3]/div[1]")?.Click(); //Переделать Иногда под постом 3 кнопки (лайк, коммент и репост)
-            GetElementByXPath($"//*[@id='{post}']/div/div[2]/div/div[2]/div/div[1]/a[2]/div[1]")?.Click(); //Переделать на норм код, чтобы понимать когда у нас 2 кнопи, а когда три
+            SetScrollPosition(10000);
+
+            string script = $"return document.querySelector('#{post}>div>div.post_content>div>div.like_wrap._like_wall-197684583_14').getElementsByTagName('a').length;";
+            ExecuteScript(script);
+            if (Convert.ToInt32(ExecuteScript(script)) == 3)
+            {
+                GetElementByXPath($"//*[@id='{post}']/div/div[2]/div/div[2]/div/div[1]/a[3]/div[1]").Click();
+            }
+            else
+            {
+                GetElementByXPath($"//*[@id='{post}']/div/div[2]/div/div[2]/div/div[1]/a[2]/div[1]")?.Click();
+            }
+            
             GetElementById("like_share_my").Click();
             GetElementById("like_share_send").Click();
         }
