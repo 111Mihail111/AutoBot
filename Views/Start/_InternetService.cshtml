@@ -59,8 +59,14 @@
             <div class="mt-2 mb-2"><span>@item.ActivityTime.ToString(@"hh\:mm\:ss")</span></div>
         </div>
 
-        <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
-            <div class="mt-2 mb-2"><span>@item.StatusService</span></div>
+        <div class="col-2">
+            <div class="row">
+                @Html.DropDownList("StatusService", new SelectList(new string[] { "Work", "NoWork" }, item.StatusService), new {
+                   @class = "form-control",
+                   @style = "background-color: rgb(222,243,202); border: 2px solid white; height: 44px; text-align-last: center;",
+                   @onchange = "ChangeStatus(this)"
+                })
+            </div>
         </div>
 
         <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">

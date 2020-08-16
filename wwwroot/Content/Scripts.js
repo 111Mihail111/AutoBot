@@ -1,11 +1,12 @@
 ﻿setInterval(function () {
-    //CheckSites("Cranes", true);
-    CheckSites("InternetService", false);
-}, 300000)
+    CheckSites("Cranes", true);
+    //CheckSites("InternetService", false);
+}, 60000)
 
 /**
  * Проверка сайтов
  * @param {any} site Id контейнера
+ * @param {any} isCrane Является ли краном
  */
 function CheckSites(site, isCrane) {
     let notes = document.getElementById(site);
@@ -40,6 +41,15 @@ function CheckSites(site, isCrane) {
             UpdatingTimerService(GetDataService(notes.children[i]));
         }
     }
+}
+
+/**
+ * Смена статус
+ * @param {any} select DropDownlList-контрол
+ */
+function ChangeStatus(select) {
+    var row = select.parentElement.parentElement.parentElement;
+    row.children[0].children[2].children[0].value = select.value;
 }
 
 /*Получить данные крана*/
