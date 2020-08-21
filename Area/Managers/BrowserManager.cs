@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using AutoBot.Area.Enums;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System;
 using System.Collections.Generic;
@@ -166,6 +167,28 @@ namespace AutoBot.Area.Managers
         {
             return _browser.FindElementsByXPath(xPath);
         }
+        public IWebElement GetElementByXPath(string xPath, SearchMethod searchMethod, string tagName, int waitingTimeSecond = 5)
+        {
+            var webElement = ExpectationElement(xPath, waitingTimeSecond);
+            switch (searchMethod)
+            {
+                case SearchMethod.Tag:
+                    return webElement.FindElement(By.TagName(tagName));
+                default:
+                    return null;
+            }
+        }
+        public IEnumerable<IWebElement> GetElementsByXPath(string xPath, SearchMethod searchMethod, string tagName, int waitingTimeSecond = 5)
+        {
+            var webElement = ExpectationElement(xPath, waitingTimeSecond);
+            switch (searchMethod)
+            {
+                case SearchMethod.Tag:
+                    return webElement.FindElements(By.TagName(tagName));
+                default:
+                    return null;
+            }
+        }
         protected async Task<IWebElement> GetAsyncElementByXPath(string xPath, int waitingTimeSecond = 5)
         {
             return await Task.Run(() => ExpectationElement(xPath, waitingTimeSecond));
@@ -205,14 +228,16 @@ namespace AutoBot.Area.Managers
         }
 
 
-        public IEnumerable<IWebElement> GetElementsByTagName(string tagName)
-        {
-            return _browser.FindElementsByTagName(tagName);
-        }
         public IWebElement GetElementByTagName(string tagName, int waitingTimeSecond = 5)
         {
             return ExpectationElement(tagName, waitingTimeSecond);
         }
+        public IEnumerable<IWebElement> GetElementsByTagName(string tagName)
+        {
+            return _browser.FindElementsByTagName(tagName);
+        }
+
+        
 
         /// <summary>
         /// Ожидание элемента на странице

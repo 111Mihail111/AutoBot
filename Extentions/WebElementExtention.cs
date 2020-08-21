@@ -53,5 +53,15 @@ namespace AutoBot.Extentions
         {
             return webElement.GetAttribute("innerText");
         }
+
+        /// <summary>
+        /// Получить содержимое title атрибута
+        /// </summary>
+        /// <param name="webElement"></param>
+        /// <returns></returns>
+        public static string GetTitle(this IWebElement webElement)
+        {
+            return webElement.GetAttribute("title");
+        }
     }
 }

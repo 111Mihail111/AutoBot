@@ -1,7 +1,7 @@
 ﻿setInterval(function () {
-    CheckSites("Cranes", true);
-    //CheckSites("InternetService", false);
-}, 60000)
+    //CheckSites("Cranes", true);
+    CheckSites("InternetService", false);
+}, 120000)
 
 /**
  * Проверка сайтов
@@ -90,7 +90,7 @@ function UpdatingTimerCrane(crane) {
         url: "/Start/UpdateTimerCrane",
         success: function (data) {
             $('#Cranes').html(data);
-            CheckTimers(crane);
+            CheckTimersCrane(crane);
         }
     });
 }
@@ -109,7 +109,8 @@ function UpdatingTimerService(internetService) {
         url: "/Start/UpdateTimerService",
         success: function (data) {
             $('#InternetService').html(data);
-            CheckTimers(internetService);
+            debugger;
+            CheckTimersInternetService(internetService);
         }
     });
 }
@@ -177,40 +178,41 @@ function GoToService(internetService) {
         url: "/Start/GoToInternetService",
         success: function (data) {
             $('#InternetService').html(data);
+            debugger;
         }
     });
 }
 
 /*Проверка таймеров*/
-function CheckTimers(crane) {
+function CheckTimersCrane(crane) {
     var row = document.getElementById("Cranes");
     var list = [];
 
-    for (var i = 0; i < row.childElementCount; i++) {
-        list[i] = GetDataCrane(row.children[i]);
+    for (var i = 2; i < row.childElementCount; i++) {
+        list[i - 2] = GetDataCrane(row.children[i]);
     }
 
     for (var i = 0; i < list.length; i++) {
         var element = list[i];
         if (crane.URL === element.URL && element.ActivityTime === "00:00:00") {
-            GoToCrane(element);
+            CheckSites("Cranes", true);
         }
     }
 }
 
 /*Проверка таймеров*/
-function CheckTimers(crane) {
+function CheckTimersInternetService(internetService) {
     var row = document.getElementById("InternetService");
     var list = [];
 
-    for (var i = 0; i < row.childElementCount; i++) {
-        list[i] = GetDataCrane(row.children[i]);
+    for (var i = 2; i < row.childElementCount; i++) {
+        list[i - 2] = GetDataService(row.children[i]);
     }
 
     for (var i = 0; i < list.length; i++) {
         var element = list[i];
-        if (crane.URL === element.URL && element.ActivityTime === "00:00:00") {
-            GoToService(element);
+        if (internetService.URL === element.URL && element.ActivityTime === "00:00:00") {
+            CheckSites("InternetService", false);
         }
     }
 }

@@ -52,59 +52,101 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         {
             JoinInCommunityVK();
             WorkWithLikesVK();
-            AddToFriendsVK();
+            //AddToFriendsVK();
             SubscriptionsInInstagram();
             WorkWithLikeInstagram();
         }
+
 
         /// <summary>
         /// Вступить в сообщество ВК
         /// </summary>
         protected void JoinInCommunityVK()
         {
-            GetElementByXPath("//*[@id='vk1']/a").Click(); //Вступление в ВК
+            GetElementByXPath("//*[@id='vk1']/a").Click();
 
             var message = GetElementByXPath("//*[@id='content']/div[3]/div/p[1]/b");
             while (message == null)
             {
                 GetElementByXPath("//*[@id='content']/div[3]/div[1]/div[3]/a").Click();
-
-                if (GetTabsCount() > 1)
-                {
-                    SwitchToLastTab();
-                    CloseTab();
-                    SwitchToTab();
-                }
-
-                GetElementByXPath("//*[@id='content']/p[4]/a").Click();
                 SwitchToLastTab();
+                RemoveWindowMessage();
 
-                BeautifulAddressForVK();
-                LinkEmailVK();
-
-                if (GetTitlePage() == "Частная группа")
+                if (IsPrivateGroup())
                 {
-                    CloseTab();
-                    SwitchToTab();
-                    GetElementByXPath("//*[@id='buttons']/a[1]").Click();
-                    Thread.Sleep(1000);
-                    GetElementByXPath("//*[@id='content']/div[3]/div[1]/a[1]").Click();
+                    SkipTask();
+                    message = GetElementByXPath("//*[@id='content']/div[3]/div/p[1]/b");
                     continue;
                 }
 
-                GetElementById("join_button")?.Click();
-                GetElementById("public_subscribe")?.Click();
-
-                Thread.Sleep(1000);
-
+                JoinGroup();
                 CloseTab();
                 SwitchToTab();
                 GetElementByXPath("//*[@id='buttons']/a[2]").Click();
+                DelayPayments();
 
                 message = GetElementByXPath("//*[@id='content']/div[3]/div/p[1]/b");
             }
-
         }
+        /// <summary>
+        /// Вступить в группу
+        /// </summary>
+        public void JoinGroup()
+        {
+            var joinButton = GetElementById("join_button");
+            if (joinButton == null)
+            {
+                GetElementById("public_subscribe").Click();
+                return;
+            }
+            joinButton.Click();
+        }
+        /// <summary>
+        /// Задержка платежа
+        /// </summary>
+        public void DelayPayments()
+        {
+            try
+            {
+                var modal = GetElementById("modal");
+                while (modal.Displayed)
+                {
+                    GetElementByXPath("//*[@id='buttons']/a[2]").Click();
+                    AlertAccept();
+                    Thread.Sleep(4000);
+                }
+            }
+            catch
+            {
+                //Alert'a нет, значит модал. окно закрылось
+            }
+        }
+        /// <summary>
+        /// Пропустить задание
+        /// </summary>
+        public void SkipTask()
+        {
+            CloseTab();
+            SwitchToTab();
+            GetElementByXPath("//*[@id='buttons']/a[1]").Click();
+            Thread.Sleep(1000);
+            GetElementByXPath("//*[@id='content']/div[3]/div[1]/a[1]").Click();
+        }
+        /// <summary>
+        /// Частная группа
+        /// </summary>
+        public bool IsPrivateGroup()
+        {
+            if (GetTitlePage() == "Частная группа")
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+
+
         /// <summary>
         /// Работа с лайками
         /// </summary>
@@ -113,38 +155,19 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             GetElementByXPath("//*[@id='vk2']/a").Click();
 
             var perfomanse = GetElementByClassName("groups").GetInnerText();
-            while (perfomanse != string.Empty && perfomanse != "Нет доступных заданий. Заходите позже!")
+            if (perfomanse != string.Empty && perfomanse != "Нет доступных заданий. Заходите позже!")
             {
                 ButtonsVisible();
+            }
 
+            while (perfomanse != string.Empty && perfomanse != "Нет доступных заданий. Заходите позже!")
+            {
                 GetElementByXPath("//*[@id='content']/div[3]/div[1]/div[3]/a").Click();
-                var title = GetElementByXPath("//*[@id='content']/div[3]/div[1]/div[2]/p").GetInnerText();
+                var titleTask = GetElementByXPath("//*[@id='content']/div[3]/div[1]/div[2]/p").GetInnerText();
                 SwitchToLastTab();
                 Thread.Sleep(500);
-                BeautifulAddressForVK();
-                LinkEmailVK();
-
-                if (IsError())
-                {
-                    CloseTab();
-                    SwitchToTab();
-                    GetElementByXPath("//*[@id='buttons']/a[1]").Click();
-                    GetElementByXPath("//*[@id='content']/div[3]/div[1]/div[3]/span").Click();
-                    AlertAccept();
-                    continue;
-                }
-
-                LinkEmailVK();
-
-                if (title == "Поставить Лайк + Рассказать друзьям")
-                {
-                    LikeIt();
-                    MakeRepost();
-                }
-                else
-                {
-                    LikeIt();
-                }
+                RemoveWindowMessage();
+                LikeItAndMakeRepost(titleTask);
 
                 string url = GetUrlPage();
                 CloseTab();
@@ -152,42 +175,80 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 Thread.Sleep(5000);
                 GetElementByXPath("//*[@id='buttons']/a[2]").Click();
 
-                if (GetTextFromAlert() == "К сожалению, уже было поставлено нужное количество лайков к данном объекту. Обновите список заданий.")
+                if (IsMaxLikes())
                 {
-                    OpenPageInNewTab(url);
-                    SwitchToLastTab();
-                    LikeIt();
-                    CloseTab();
-                    SwitchToTab();
-                    GetElementByXPath("//*[@id='buttons']/a[1]").Click();
-                    GetElementByXPath("//*[@id='vk2']/a").Click();
+                    TakeOffLike(url);
+                    SkipTask();
+                    perfomanse = GetElementByClassName("groups").GetInnerText();
+                    continue;
+                }
+                else if(GetTextFromAlert() == "Лайк не был поставлен")
+                {
+                    DelayPayments();
                 }
 
-                Thread.Sleep(1000);
                 perfomanse = GetElementByClassName("groups").GetInnerText();
             }
         }
-
         /// <summary>
-        /// Привязка Email к аккаунту Vk
+        /// Убрать лайк
         /// </summary>
-        protected void LinkEmailVK()
+        /// <param name="url">URL-адрес страницы с постом</param>
+        protected void TakeOffLike(string url)
         {
-            if (GetElementById("stl_left").Displayed)
+            OpenPageInNewTab(url);
+            SwitchToLastTab();
+            LikeItAndMakeRepost(string.Empty);
+            CloseTab();
+            SwitchToTab();
+            GetElementByXPath("//*[@id='buttons']/a[1]").Click();
+            GetElementByXPath("//*[@id='vk2']/a").Click();
+        }
+        /// <summary>
+        /// Максимум лайков
+        /// </summary>
+        /// <returns>True - да, иначе false</returns>
+        protected bool IsMaxLikes()
+        {
+            return GetTextFromAlert() ==
+                    "К сожалению, уже было поставлено нужное количество лайков к данном объекту. Обновите список заданий." ?
+                    true : false;
+        }
+        /// <summary>
+        /// Удаление модальных окон vk (всякие тупые предложения)
+        /// </summary>
+        protected void RemoveWindowMessage()
+        {
+            ExecuteScript("document.querySelector('#box_layer_bg').remove();");
+            ExecuteScript("document.querySelector('#stl_left').remove();");
+            ExecuteScript("document.querySelector('#box_layer_wrap').remove()");
+        }
+        /// <summary>
+        /// Поставить лайк и сделать репост
+        /// </summary>
+        protected void LikeItAndMakeRepost(string titleTask)
+        {
+            SetScrollPosition(10000);
+
+            var post = GetUrlPage().Replace("https://vk.com/wall", "post");
+            var buttons = GetElementsByXPath($"//*[@id='{post}']/div/div[2]/div/div[2]/div/div[1]", SearchMethod.Tag, "a");
+            foreach (var item in buttons)
             {
-                ExecuteScript("document.querySelector('#box_layer_bg').remove();");
-                ExecuteScript("document.querySelector('#box_layer_wrap').remove()");
+                if (item.GetTitle() == "Нравится")
+                {
+                    item.Click();
+                }
+                else if (item.GetTitle() == "Поделиться" && titleTask == "Поставить Лайк + Рассказать друзьям")
+                {
+                    item.Click();
+                    GetElementById("like_share_my").Click();
+                    GetElementById("like_share_send").Click();
+                    return;
+                }
             }
         }
 
-        protected void BeautifulAddressForVK()
-        {
-            if (GetElementById("stl_left").Displayed)
-            {
-                ExecuteScript("document.querySelector('#stl_left').remove();");
-                ExecuteScript("document.querySelector('#box_layer_wrap').remove()");
-            }
-        }
+
 
         /// <summary>
         /// Добавить в друзья
@@ -203,8 +264,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 GetElementByXPath("//*[@id='friend20321']/div[3]/a").Click();
                 SwitchToLastTab();
 
-                BeautifulAddressForVK();
-                LinkEmailVK();
+                RemoveWindowMessage();
 
                 GetElementByXPath("//*[@id='friend_status']/div/button").Click();
                 CloseTab();
@@ -214,6 +274,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 message = GetElementByXPath("//*[@id='content']/div[2]/h3").GetInnerText();
             }
         }
+
+
         /// <summary>
         /// Подписки в инстаграмм
         /// </summary>
@@ -226,51 +288,52 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 GetElementByXPath("//*[@id='content']/div[2]/div[1]/div[3]/a").Click();
                 SwitchToLastTab();
+                Thread.Sleep(1000);
 
-                var subscribe = GetElementByTagName("button");
-                if (subscribe == null)
+                if (CheckPageInstagram())
                 {
-                    CloseTab();
-                    SwitchToTab();
-                    GetElementByXPath("//*[@id='buttons']/a[1]").Click();
-                    Thread.Sleep(1500);
-                    GetElementByXPath("//*[@id='content']/div[2]/div[1]/a[1]").Click();
-                    AlertAccept();
-                    Thread.Sleep(2000);
+                    SkipTask();
+                    groups = GetElementsByClassName("groups");
                     continue;
                 }
-                subscribe.Click();
 
-                var loginForm = GetElementById("loginForm");
-                if (loginForm != null && loginForm.Displayed)
+                var buttons = GetElementsByTagName("button");
+                for (int i = buttons.Count() - 1; i >= 0; i--)
                 {
-                    AuthorizationInInstagram();
-                    GetElementByTagName("button").Click();
+                    var button = buttons.ElementAt(i);
+                    if (button.GetInnerText() == "Войти")
+                    {
+                        button.Click();
+                        AuthorizationInInstagram();
+                        buttons = GetElementsByTagName("button");
+                    }
+                    else if (button.GetInnerText() == "Подписаться")
+                    {
+                        button.Click();
+                        break;
+                    }
                 }
 
                 CloseTab();
                 SwitchToTab();
+                DelayPayments();
+
                 Thread.Sleep(1000);
-
-                try
-                {
-                    var modal = GetElementById("modal");
-                    while (modal.Displayed)
-                    {
-                        GetElementByXPath("//*[@id='buttons']/a[2]").Click();
-                        AlertAccept();
-                        Thread.Sleep(2000);
-                    }
-                }
-                catch
-                {
-                    //Alert'a нет
-                }
-
-                Thread.Sleep(2000);
                 groups = GetElementsByClassName("groups");
             }
         }
+
+        /// <summary>
+        /// Проверить страницу инстаграма
+        /// </summary>
+        /// <returns>True - не найдена, иначе false</returns>
+        protected bool CheckPageInstagram()
+        {
+            return GetTitlePage().Contains("Страница не найдена") == true;
+        }
+
+
+
         protected void WorkWithLikeInstagram()
         {
             GetElementByXPath("//*[@id='in1']/a").Click();
@@ -281,46 +344,33 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 GetElementByXPath("//*[@id='content']/div[2]/div[1]/div[3]/a").Click();
                 SwitchToLastTab();
 
-                var subscribe = GetElementByTagName("button");
-                if (subscribe == null)
+                if (CheckPageInstagram())
                 {
-                    CloseTab();
-                    SwitchToTab();
-                    GetElementByXPath("//*[@id='buttons']/a[1]").Click();
-                    Thread.Sleep(1500);
-                    GetElementByXPath("//*[@id='content']/div[2]/div[1]/a[1]").Click();
+                    SkipTask();
+                    groups = GetElementsByClassName("groups");
                     continue;
                 }
 
-                var likeButton = GetElementByXPath("//*[@id='react-root']/section/main/div/div[1]/article/div[3]/section[1]/span[1]/button");
-                likeButton.Click();
-
-                var loginForm = GetElementById("loginForm"); //TODO: 
-                if (loginForm != null && loginForm.Displayed)
+                var buttons = GetElementsByTagName("button");
+                for (int i = buttons.Count() - 1; i >= 0; i--)
                 {
-                    AuthorizationInInstagram();
-                    GetElementByTagName("button").Click();
-                    likeButton.Click();
+                    var button = buttons.ElementAt(i);
+                    if (button.GetInnerText() == "Войти")
+                    {
+                        button.Click();
+                        AuthorizationInInstagram();
+                        buttons = GetElementsByTagName("button");
+                    }
+                    else if (button.GetInnerText() == "Нравится")
+                    {
+                        button.Click();
+                        break;
+                    }
                 }
 
                 CloseTab();
                 SwitchToTab();
-                Thread.Sleep(1000);
-
-                try
-                {
-                    var modal = GetElementById("modal");
-                    while (modal.Displayed)
-                    {
-                        GetElementByXPath("//*[@id='buttons']/a[2]").Click();
-                        AlertAccept();
-                        Thread.Sleep(3000);
-                    }
-                }
-                catch
-                {
-                    //Alert'a нет
-                }
+                DelayPayments();
 
                 Thread.Sleep(2000);
                 groups = GetElementsByClassName("groups");
@@ -347,6 +397,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         }
         protected void AuthorizationInInstagram()
         {
+
+
             Thread.Sleep(1000);
             GetElementByXPath("//*[@id='loginForm']/div[1]/div[1]/div/label/input").SendKeys(_loginInstagram);
             GetElementByXPath("//*[@id='loginForm']/div[1]/div[2]/div/label/input").SendKeys(_passwordInstagram);
@@ -373,38 +425,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             return false;
         }
 
-        /// <summary>
-        /// Поставить лайк
-        /// </summary>
-        protected void LikeIt()
-        {
-            var post = GetUrlPage().Replace("https://vk.com/wall", "post");
-            SetScrollPosition(10000);
-            GetElementByXPath($"//*[@id='{post}']/div/div[2]/div/div[2]/div/div[1]/a[1]/div[1]")?.Click();
-            GetElementByXPath("//*[@id='pv_narrow']/div[1]/div[1]/div/div/div[1]/div[3]/div/div[1]/a[1]/div[1]")?.Click();
-        }
-        /// <summary>
-        /// Сделать репост
-        /// </summary>
-        protected void MakeRepost()
-        {
-            var post = GetUrlPage().Replace("https://vk.com/wall", "post");
-            SetScrollPosition(10000);
-
-            string script = $"return document.querySelector('#{post}>div>div.post_content>div>div.like_wrap._like_wall-197684583_14').getElementsByTagName('a').length;";
-            ExecuteScript(script);
-            if (Convert.ToInt32(ExecuteScript(script)) == 3)
-            {
-                GetElementByXPath($"//*[@id='{post}']/div/div[2]/div/div[2]/div/div[1]/a[3]/div[1]").Click();
-            }
-            else
-            {
-                GetElementByXPath($"//*[@id='{post}']/div/div[2]/div/div[2]/div/div[1]/a[2]/div[1]")?.Click();
-            }
-            
-            GetElementById("like_share_my").Click();
-            GetElementById("like_share_send").Click();
-        }
+        
         /// <summary>
         /// Кнопки видимы
         /// </summary>
