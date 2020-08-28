@@ -7,7 +7,6 @@ using AutoBot.Models;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Linq;
-using System.Security.Policy;
 using System.Threading;
 
 namespace AutoBot.Area.PerformanceTasks.InternetServices
@@ -53,6 +52,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             JoinInCommunityVK();
             WorkWithLikesVK();
             //AddToFriendsVK();
+            //WorkWithYouTube(); //TODO: Не отлажен
             SubscriptionsInInstagram();
             WorkWithLikeInstagram();
         }
@@ -97,9 +97,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             if (joinButton == null)
             {
                 GetElementById("public_subscribe").Click();
+                Thread.Sleep(1500);
                 return;
             }
             joinButton.Click();
+            Thread.Sleep(1500);
         }
         /// <summary>
         /// Задержка платежа
@@ -182,7 +184,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     perfomanse = GetElementByClassName("groups").GetInnerText();
                     continue;
                 }
-                else if(GetTextFromAlert() == "Лайк не был поставлен")
+                else if(GetTextFromAlert() == "Лайк не был поставлен" )
                 {
                     DelayPayments();
                 }
@@ -202,7 +204,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             CloseTab();
             SwitchToTab();
             GetElementByXPath("//*[@id='buttons']/a[1]").Click();
-            GetElementByXPath("//*[@id='vk2']/a").Click();
+            Thread.Sleep(1000);
+            GetElementByClassName("groups").FindElements(SearchMethod.ClassName, "group").First().Click();
+            AlertAccept();
         }
         /// <summary>
         /// Максимум лайков
@@ -210,9 +214,14 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <returns>True - да, иначе false</returns>
         protected bool IsMaxLikes()
         {
-            return GetTextFromAlert() ==
-                    "К сожалению, уже было поставлено нужное количество лайков к данном объекту. Обновите список заданий." ?
-                    true : false;
+            var massage = GetTextFromAlert();
+            if (massage == "К сожалению, уже было поставлено нужное количество лайков к данному объекту. Обновите список заданий.")
+            {
+                AlertAccept();
+                return true;
+            }
+
+            return false;
         }
         /// <summary>
         /// Удаление модальных окон vk (всякие тупые предложения)
@@ -231,7 +240,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SetScrollPosition(10000);
 
             var post = GetUrlPage().Replace("https://vk.com/wall", "post");
-            var buttons = GetElementsByXPath($"//*[@id='{post}']/div/div[2]/div/div[2]/div/div[1]", SearchMethod.Tag, "a");
+            var buttons = GetElementsByXPath($"//*[@id='{post}']/div/div[2]/div/div[2]/div/div[1]").First().FindElements(SearchMethod.Tag, "a");
             foreach (var item in buttons)
             {
                 if (item.GetTitle() == "Нравится")
@@ -241,6 +250,14 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 else if (item.GetTitle() == "Поделиться" && titleTask == "Поставить Лайк + Рассказать друзьям")
                 {
                     item.Click();
+
+                    if (GetElementById("system_msg").Displayed)
+                    {
+                        RefreshPage();
+                        GetElementByClassName("_share active")?.Click(); //TODO:Отладить. Похоже в разных ситуациях разные стили
+                        GetElementByClassName("like_btn share _share")?.Click(); //TODO:Отладить. Похоже в разных ситуациях разные стили
+                    }
+
                     GetElementById("like_share_my").Click();
                     GetElementById("like_share_send").Click();
                     return;
@@ -249,6 +266,42 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         }
 
 
+
+        protected void WorkWithYouTube()
+        {
+            GetElementByXPath("//*[@id='yt0']/a").Click();
+
+            var groups = GetElementByClassName("groups");
+            while (true) //TODO:Проверка на отсутствие заданий
+            {
+                GetElementByXPath("//*[@id='content']/div[3]/div[1]/div[3]/a").Click();
+                SwitchToLastTab();
+
+                if (IsVideoAvailable())
+                {
+                    SkipTask();
+                    groups = GetElementByClassName("groups");
+                    continue;
+                }
+
+                GetElementById("button").Click();
+                CloseTab();
+                SwitchToTab();
+                GetElementByXPath("//*[@id='buttons']/a[2]").Click();
+                DelayPayments();
+
+                groups = GetElementByClassName("groups");
+            }
+        }
+
+        /// <summary>
+        /// Доступно ли видео
+        /// </summary>
+        /// <returns>True - не доступно, иначе false</returns>
+        protected bool IsVideoAvailable()
+        {
+            return GetElementById("reason") != null;
+        }
 
         /// <summary>
         /// Добавить в друзья
@@ -288,7 +341,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 GetElementByXPath("//*[@id='content']/div[2]/div[1]/div[3]/a").Click();
                 SwitchToLastTab();
-                Thread.Sleep(1000);
+                Thread.Sleep(2500);
 
                 if (CheckPageInstagram())
                 {
@@ -310,6 +363,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     else if (button.GetInnerText() == "Подписаться")
                     {
                         button.Click();
+                        Thread.Sleep(1500);
                         break;
                     }
                 }
@@ -343,6 +397,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 GetElementByXPath("//*[@id='content']/div[2]/div[1]/div[3]/a").Click();
                 SwitchToLastTab();
+                Thread.Sleep(2500);
 
                 if (CheckPageInstagram())
                 {
@@ -364,6 +419,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     else if (button.GetInnerText() == "Нравится")
                     {
                         button.Click();
+                        Thread.Sleep(1500);
                         break;
                     }
                 }

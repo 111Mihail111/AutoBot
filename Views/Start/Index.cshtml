@@ -26,7 +26,11 @@
             <div id="InternetService" class="mt-5">
                 @{await Html.RenderPartialAsync("_InternetService", Model.InternetServices);}
             </div>
-                        
+
+            <div id="InternetService" class="mt-5">
+                @{await Html.RenderPartialAsync("_ManualStart", Model.InternetServices);}
+            </div>
+
             <form class="row" style="margin-top:300px" asp-action="SaveAccounts" asp-controller="Start" method="post" enctype="multipart/form-data">
                 <div class="col-4">
                     <div class="input-group mb-1">

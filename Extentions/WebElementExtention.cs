@@ -1,4 +1,6 @@
-﻿using OpenQA.Selenium;
+﻿using AutoBot.Area.Enums;
+using OpenQA.Selenium;
+using System.Collections.Generic;
 
 namespace AutoBot.Extentions
 {
@@ -57,11 +59,71 @@ namespace AutoBot.Extentions
         /// <summary>
         /// Получить содержимое title атрибута
         /// </summary>
-        /// <param name="webElement"></param>
-        /// <returns></returns>
+        /// <param name="webElement">Вэб-элемент</param>
+        /// <returns>Значение атрибута</returns>
         public static string GetTitle(this IWebElement webElement)
         {
             return webElement.GetAttribute("title");
+        }
+
+        /// <summary>
+        /// Получить содержимое class атрибута
+        /// </summary>
+        /// <param name="webElement">Вэб-элемент</param>
+        /// <returns>Значение атрибута</returns>
+        public static string GetClass(this IWebElement webElement)
+        {
+            return webElement.GetAttribute("class");
+        }
+
+        /// <summary>
+        /// Получить содержимое href атрибута
+        /// </summary>
+        /// <param name="webElement">Вэб-элемент</param>
+        /// <returns>Значение атрибута</returns>
+        public static string GetHref(this IWebElement webElement)
+        {
+            return webElement.GetAttribute("href");
+        }
+
+        /// <summary>
+        /// Найти элемент
+        /// </summary>
+        /// <param name="webElement">Веб-элемент</param>
+        /// <param name="searchMethod">Метод поиска</param>
+        /// <param name="attribute">Атрибут, по которому осуществляется поиск</param>
+        /// <returns>Элемент</returns>
+        public static IWebElement FindElement(this IWebElement webElement, SearchMethod searchMethod, string attribute)
+        {
+            switch (searchMethod)
+            {
+                case SearchMethod.Tag:
+                    return webElement.FindElement(By.TagName(attribute));
+                case SearchMethod.ClassName:
+                    return webElement.FindElement(By.ClassName(attribute));
+                default:
+                    return null;
+            }
+        }
+
+        /// <summary>
+        /// Найти элементы
+        /// </summary>
+        /// <param name="webElement">Веб-элемент</param>
+        /// <param name="searchMethod">Метод поиска</param>
+        /// <param name="attribute">Атрибут, по которому осуществляется поиск</param>
+        /// <returns>Коллекция элементов</returns>
+        public static IEnumerable<IWebElement> FindElements(this IWebElement webElement, SearchMethod searchMethod, string attribute)
+        {
+            switch (searchMethod)
+            {
+                case SearchMethod.Tag:
+                    return webElement.FindElements(By.TagName(attribute));
+                case SearchMethod.ClassName:
+                    return webElement.FindElements(By.ClassName(attribute));
+                default:
+                    return null;
+            }
         }
     }
 }

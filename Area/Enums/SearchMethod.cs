@@ -9,5 +9,9 @@
         /// Тэг
         /// </summary>
         Tag = 0,
+        /// <summary>
+        /// Название html-тэга
+        /// </summary>
+        ClassName = 1,
     }
 }

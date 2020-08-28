@@ -17,5 +17,13 @@
         /// Инстаграм
         /// </summary>
         Instagram = 2,
+        /// <summary>
+        /// Однокласники
+        /// </summary>
+        Classmates = 3,
+        /// <summary>
+        /// Ютуб
+        /// </summary>
+        YouTube = 4,
     }
 }

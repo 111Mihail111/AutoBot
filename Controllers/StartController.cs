@@ -20,9 +20,10 @@ namespace AutoBot.Controllers
         private IMoonLitecoin _moonLitecoin;
         private IMoonDash _moonDash;
         private IVLike _v_Like;
+        private IVkTarget _vkTarget;
 
         public StartController(IFreeBitcoin freeBitcoin, IMoonBitcoin moonBitcoin, IBonusBitcoin bonusBitcoin, 
-            IMoonDogecoin moonDogecoin, IMoonLitecoin moonLitecoin, IMoonDash moonDash, IVLike v_Like)
+            IMoonDogecoin moonDogecoin, IMoonLitecoin moonLitecoin, IMoonDash moonDash, IVLike v_Like, IVkTarget vkTarget)
         {
             _freeBitcoin = freeBitcoin;
             _moonBitcoin = moonBitcoin;
@@ -31,6 +32,7 @@ namespace AutoBot.Controllers
             _moonLitecoin = moonLitecoin;
             _moonDash = moonDash;
             _v_Like = v_Like;
+            _vkTarget = vkTarget;
         }
 
         public ActionResult Index() => View(WebService.GetAllData());
@@ -126,11 +128,27 @@ namespace AutoBot.Controllers
                 case TypeService.VLike:
                     internetService = _v_Like.GoTo(internetService);
                     break;
+                case TypeService.VkTarget:
+                    internetService = _vkTarget.GoTo(internetService);
+                    break;
             }
 
             WebService.UpdateInternetService(internetService);
 
             return PartialView("_InternetService", WebService.GetInternetServices());
+        }
+
+        [HttpGet]
+        public PartialViewResult GoToInternetService(string url, TypeService typeService)
+        {
+            switch (typeService)
+            {
+                case TypeService.VkTarget:
+                    _vkTarget.GoTo(url);
+                    break;
+            }
+
+            return PartialView("_ManualStart", null);
         }
 
         [HttpPost]

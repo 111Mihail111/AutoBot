@@ -28,5 +28,9 @@ namespace AutoBot.Models
         /// Тип сервиса
         /// </summary>
         public TypeService TypeService { get; set; }
+        /// <summary>
+        /// Тип запуска
+        /// </summary>
+        public bool RunType { get; set; }
     }
 }

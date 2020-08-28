@@ -26,6 +26,7 @@ namespace AutoBot
             services.AddScoped<IMoonLitecoin, MoonLitecoin>();
             services.AddScoped<IMoonDash, MoonDash>();
             services.AddScoped<IVLike, VLike>();
+            services.AddScoped<IVkTarget, VkTarget>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
