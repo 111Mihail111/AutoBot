@@ -1,5 +1,6 @@
 ﻿using AutoBot.Area.Enums;
 using AutoBot.Area.Managers;
+using AutoBot.Area.Managers.Interface;
 using AutoBot.Area.PerformanceTasks.Interface;
 using AutoBot.Area.Services;
 using AutoBot.Extentions;
@@ -17,6 +18,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
     public class VkTarget : BrowserManager, IVkTarget
     {                                          
         const string BROWSER_PROFILE_SERVICE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\PerformanceTasks\\VkTarget\\";
+        private IVkManager _VkManager;
+
         private string _login;
         private string _password;
         private string _loginVK;
@@ -25,6 +28,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         private string _passwordClassmates;
         private string _loginYouTube;
         private string _passwordYouTube;
+
+        public VkTarget(IVkManager vkManager)
+        {
+            _VkManager = vkManager;
+        }
 
         protected void Init()
         {
@@ -61,6 +69,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void BeginCollecting()
         {
+            _VkManager.Authorization(_loginVK, _passwordVK);
+
             while (true)
             {
                 var task = GetTask();
@@ -90,9 +100,18 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (taskText)
             {
                 case "Вступите в сообщество":
-                    JoinToComunity();
+                    if (_VkManager.IsBlockedCommunity())
+                    {
+                        CloseTab();
+                        SwitchToTab();
+                        SkipTask();
+                        Thread.Sleep(1000);
+                        return;
+                    }
+                    _VkManager.JoinToComunity();
                     break;
                 case "Поставьте лайк на странице":
+                    _VkManager.PutLike();
                     break;
             }
 
@@ -123,17 +142,29 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         }
 
         /// <summary>
+        /// Пропуск задания
+        /// </summary>
+        protected void SkipTask()
+        {
+            ExecuteScript("var task = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>" +
+                "div.container-fluid.available__table').getElementsByClassName('row tb__row')" +
+                "task[0].children[5].getElementsByClassName('control__item close')[0].click();");
+        }
+
+        /// <summary>
         /// Получить задачу
         /// </summary>
         /// <returns></returns>
         protected string[] GetTask()
         {
             return ExecuteScript(
-                "var tasks = document.getElementsByClassName('row tb__row last');" +
-                "if (tasks.length === 0)" +
+                "var taskEmpty = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>div.empty');" +
+                "if (taskEmpty.classList.length == 1)" +
                 "{" +
                 "return 'NoTasks'" +
                 "}" +
+                "var tasks = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>div.container-fluid" +
+                ".available__table').getElementsByClassName('row tb__row')" +
                 "var systemType = tasks[0].getElementsByClassName('social__img')[0].class.toString().replace('social__img ', '');" +
                 "var button = tasks[0].children[2].getElementsByTagName('a')[0];" +
                 "var task = document.getElementsByClassName('wrap')[1].innerText;" +
@@ -146,39 +177,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             webElement.Click();
 
             SwitchToLastTab();
-            AuthorizationVK();
             GetElementByClassName("flat_button button_wide").Click(); //TODO:Вызов менеджера и добавление в друзья
-        }
-
-        protected void JoinToComunity()
-        {
-            AuthorizationVK();
-
-            var joinButton = GetElementById("join_button"); //TODO:Заменить код ниже на вызов из менеджера
-            if (joinButton == null)
-            {
-                GetElementById("public_subscribe").Click();
-                Thread.Sleep(1500);
-                return;
-            }
-            joinButton.Click();
-            Thread.Sleep(1500);
-        }
-
-        /// <summary>
-        /// Авторизация
-        /// </summary>
-        protected void AuthorizationVK()
-        {
-            if (GetElementById("quick_login") == null)
-            {
-                return;
-            }
-
-            //TODO:Код ниже заменится на вызов менеджера
-            GetElementById("quick_email").SendKeys(_loginVK);
-            GetElementById("quick_pass").SendKeys(_passwordVK);
-            GetElementById("quick_login_button").Click();
         }
 
         /// <summary>
@@ -193,13 +192,13 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             }
 
             var login = GetElementByXPath("//*[@id='login_form']/div[1]/div/div[2]/div[2]/input");
-            if (login.Text != string.Empty)
+            if (string.IsNullOrWhiteSpace(login.Text))
             {
                 login.SendKeys(_login);
             }
 
             var password = GetElementByXPath("//*[@id='login_form']/div[1]/div/div[3]/div[2]/input");
-            if (password.Text != string.Empty)
+            if (string.IsNullOrWhiteSpace(password.Text))
             {
                 password.SendKeys(_password);
             }

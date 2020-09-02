@@ -176,6 +176,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 SwitchToTab();
                 Thread.Sleep(5000);
                 GetElementByXPath("//*[@id='buttons']/a[2]").Click();
+                Thread.Sleep(1000);
 
                 if (IsMaxLikes())
                 {

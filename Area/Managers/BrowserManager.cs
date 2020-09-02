@@ -58,9 +58,8 @@ namespace AutoBot.Area.Managers
         /// <param name="url">Url-адрес страницы</param>
         public void OpenPageInNewTab(string url)
         {
-            _browser.ExecuteScript("window.open();");
+            _browser.ExecuteScript($"window.open({url});");
             SwitchToLastTab();
-            _browser.Navigate().GoToUrl(url);
         }
         /// <summary>
         /// Закрыть вкладку

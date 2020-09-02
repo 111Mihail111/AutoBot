@@ -128,9 +128,6 @@ namespace AutoBot.Controllers
                 case TypeService.VLike:
                     internetService = _v_Like.GoTo(internetService);
                     break;
-                case TypeService.VkTarget:
-                    internetService = _vkTarget.GoTo(internetService);
-                    break;
             }
 
             WebService.UpdateInternetService(internetService);
@@ -139,7 +136,7 @@ namespace AutoBot.Controllers
         }
 
         [HttpGet]
-        public PartialViewResult GoToInternetService(string url, TypeService typeService)
+        public PartialViewResult GoToInternetService2(string url, TypeService typeService)
         {
             switch (typeService)
             {

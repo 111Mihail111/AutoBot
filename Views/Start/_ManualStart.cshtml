@@ -8,15 +8,9 @@
 
 <div class="row mt-4 mb-1 text-center">
 
-    <div class="col-2" style="background-color: rgb(138,198,66); border: 2px solid white;">
+    <div class="col-4" style="background-color: rgb(138,198,66); border: 2px solid white;">
         <div class="mt-2 mb-2">
             <span class="text-light" style="font-size: 20px">URL</span>
-        </div>
-    </div>
-
-    <div class="col-2" style="background-color: rgb(138,198,66); border: 2px solid white;">
-        <div class="mt-2 mb-2">
-            <span class="text-light" style="font-size: 20px">Время до активации</span>
         </div>
     </div>
 
@@ -59,13 +53,13 @@
         <div><input id="TypeService" value="@item.TypeService" /></div>
     </div>
 
-    <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
+    <div class="col-4 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
         <div class="mt-2 mb-2"><span>@item.URL</span></div>
     </div>
 
     <div class="col-2">
         <div class="row">
-            @Html.DropDownList("StatusCrane", new SelectList(new string[] { "Work", "NoWork", "InWork" }, item.StatusService), new
+            @Html.DropDownList("StatusCrane", new SelectList(new string[] { "Work", "NoWork", "InWork" }, item.StatusService.ToString()), new
             {
                 @class = "form-control",
                 @style = "background-color: rgb(222,243,202); border: 2px solid white; height: 44px; text-align-last: center;",
@@ -79,17 +73,13 @@
     </div>
 
     <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
-        <div class="mt-2 mb-2"><span>@item.BalanceOnService</span></div>
-    </div>
-
-    <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
         <div class="mt-2 mb-2"><span>@item.TypeService</span></div>
     </div>
 
     <div class="col-2" style="background-color: rgb(222,243,202); border: 2px solid white;">
-        <button class="btn btn-primary" asp-controller="Start" asp-action="GoToInternetService" asp-route-url="@item.URL" asp-route-typeService="@item.TypeService">
+        <a class="btn btn-primary" asp-controller="Start"asp-route-url="@item.URL" asp-route-typeService="@item.TypeService" asp-action="GoToInternetService2">
             <span>Запуск</span>
-        </button>
+        </a>
     </div>
 </div>
 }
