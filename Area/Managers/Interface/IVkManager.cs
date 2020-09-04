@@ -1,4 +1,6 @@
-﻿namespace AutoBot.Area.Managers.Interface
+﻿using OpenQA.Selenium.Chrome;
+
+namespace AutoBot.Area.Managers.Interface
 {
     public interface IVkManager
     {
@@ -24,5 +26,7 @@
         /// <param name="loginVK">Логин вк</param>
         /// <param name="passwordVK">Пароль вк</param>
         public void Authorization(string loginVK, string passwordVK);
+
+        public void SetContextBrowserManager(ChromeDriver chromeDriver);
     }
 }

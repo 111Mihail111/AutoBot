@@ -30,6 +30,7 @@ namespace AutoBot
             services.AddScoped<IVLike, VLike>();
             services.AddScoped<IVkTarget, VkTarget>();
             services.AddScoped<IVkManager, VkManager>();
+            services.AddScoped<IClassmatesManager, ClassmatesManager>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

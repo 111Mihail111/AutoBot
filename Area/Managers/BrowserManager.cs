@@ -1,6 +1,7 @@
 ﻿using AutoBot.Area.Enums;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Interactions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,6 +46,24 @@ namespace AutoBot.Area.Managers
         }
 
         /// <summary>
+        /// Получить объект драйвера
+        /// </summary>
+        /// <returns>Хром-драйвер</returns>
+        public ChromeDriver GetDriver()
+        {
+            return _browser;
+        }
+        /// <summary>
+        /// Считать драйвер
+        /// </summary>
+        /// <param name="chromeDriver">Хром драйвер</param>
+        public void SetDriver(ChromeDriver chromeDriver)
+        {
+            _browser = chromeDriver;
+        }
+
+
+        /// <summary>
         /// Перейти по адресу
         /// </summary>
         /// <param name="url">Адрес</param>
@@ -58,7 +77,8 @@ namespace AutoBot.Area.Managers
         /// <param name="url">Url-адрес страницы</param>
         public void OpenPageInNewTab(string url)
         {
-            _browser.ExecuteScript($"window.open({url});");
+            Thread.Sleep(2000);
+            _browser.ExecuteScript($"window.open('{url}');");
             SwitchToLastTab();
         }
         /// <summary>
@@ -173,7 +193,7 @@ namespace AutoBot.Area.Managers
             {
                 return new List<IWebElement>();
             }
-        }        
+        }
         protected async Task<IWebElement> GetAsyncElementByXPath(string xPath, int waitingTimeSecond = 5)
         {
             return await Task.Run(() => ExpectationElement(xPath, waitingTimeSecond));
@@ -211,7 +231,7 @@ namespace AutoBot.Area.Managers
             }
 
         }
-        
+
         public IWebElement GetElementByTagName(string tagName, int waitingTimeSecond = 5)
         {
             return ExpectationElement(tagName, waitingTimeSecond);
@@ -221,7 +241,7 @@ namespace AutoBot.Area.Managers
             return _browser.FindElementsByTagName(tagName);
         }
 
-        
+
 
         /// <summary>
         /// Ожидание элемента на странице
@@ -294,6 +314,26 @@ namespace AutoBot.Area.Managers
         public void QuitBrowser()
         {
             _browser.Quit();
+        }
+
+
+        /// <summary>
+        /// Перейти к элементу и нажать
+        /// </summary>
+        /// <param name="webElement">Вэб-элемент</param>
+        public void MoveToElementAndClick(IWebElement webElement)
+        {
+            Actions action = new Actions(_browser);
+            action.MoveToElement(webElement).Click().Build().Perform();
+        }
+        /// <summary>
+        /// Фокус на элемент
+        /// </summary>
+        /// <param name="webElement">Веб-элемент</param>
+        public void FocusOnElement(IWebElement webElement)
+        {
+            Actions action = new Actions(_browser);
+            action.MoveToElement(webElement).Build().Perform();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoBot.Area.Enums;
 using AutoBot.Area.Managers.Interface;
 using AutoBot.Extentions;
+using OpenQA.Selenium.Chrome;
 using System.Linq;
 using System.Threading;
 
@@ -42,11 +43,12 @@ namespace AutoBot.Area.Managers
 
         public void Authorization(string loginVK, string passwordVK)
         {
-            Thread.Sleep(3000);
             OpenPageInNewTab("https://vk.com/");
 
-            if (!GetElementById("index_login").Displayed)
+            if (GetElementById("index_login") == null)
             {
+                CloseTab();
+                SwitchToTab();
                 return;
             }
 
@@ -67,6 +69,12 @@ namespace AutoBot.Area.Managers
 
             CloseTab();
             SwitchToTab();
+            Thread.Sleep(1000);
+        }
+
+        public void SetContextBrowserManager(ChromeDriver chromeDriver)
+        {
+            SetDriver(chromeDriver);
         }
     }
 }

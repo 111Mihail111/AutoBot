@@ -18,7 +18,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
     public class VkTarget : BrowserManager, IVkTarget
     {                                          
         const string BROWSER_PROFILE_SERVICE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\PerformanceTasks\\VkTarget\\";
-        private IVkManager _VkManager;
+        private IVkManager _vkManager;
 
         private string _login;
         private string _password;
@@ -28,11 +28,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         private string _passwordClassmates;
         private string _loginYouTube;
         private string _passwordYouTube;
-
-        public VkTarget(IVkManager vkManager)
-        {
-            _VkManager = vkManager;
-        }
 
         protected void Init()
         {
@@ -54,6 +49,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _passwordYouTube = accountYouTube.Password;
 
             Initialization(BROWSER_PROFILE_SERVICE);
+            _vkManager = new VkManager();
+            _vkManager.SetContextBrowserManager(GetDriver());
         }
 
         public void GoTo(string url)
@@ -69,7 +66,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void BeginCollecting()
         {
-            _VkManager.Authorization(_loginVK, _passwordVK);
+            _vkManager.Authorization(_loginVK, _passwordVK);
 
             while (true)
             {
@@ -100,7 +97,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (taskText)
             {
                 case "Вступите в сообщество":
-                    if (_VkManager.IsBlockedCommunity())
+                    if (_vkManager.IsBlockedCommunity())
                     {
                         CloseTab();
                         SwitchToTab();
@@ -108,15 +105,17 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                         Thread.Sleep(1000);
                         return;
                     }
-                    _VkManager.JoinToComunity();
+                    _vkManager.JoinToComunity();
                     break;
                 case "Поставьте лайк на странице":
-                    _VkManager.PutLike();
+                    _vkManager.PutLike();
                     break;
             }
 
             CloseTab();
             SwitchToTab();
+            Thread.Sleep(1000);
+            CheckTask();
         }
 
         /// <summary>
@@ -139,6 +138,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
             CloseTab();
             SwitchToTab();
+            Thread.Sleep(1000);
+            CheckTask();
         }
 
         /// <summary>
@@ -149,6 +150,16 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             ExecuteScript("var task = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>" +
                 "div.container-fluid.available__table').getElementsByClassName('row tb__row')" +
                 "task[0].children[5].getElementsByClassName('control__item close')[0].click();");
+        }
+
+        /// <summary>
+        /// Проверить задание
+        /// </summary>
+        protected void CheckTask()
+        {
+            ExecuteScript("var task = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>" +
+                "div.container-fluid.available__table').getElementsByClassName('row tb__row')" +
+                "task[0].children[3].getElementsByClassName('default__small__btn check__btn')[0].click();");
         }
 
         /// <summary>
@@ -164,7 +175,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 "return 'NoTasks'" +
                 "}" +
                 "var tasks = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>div.container-fluid" +
-                ".available__table').getElementsByClassName('row tb__row')" +
+                ".available__table').getElementsByClassName('row tb__row');" +
                 "var systemType = tasks[0].getElementsByClassName('social__img')[0].class.toString().replace('social__img ', '');" +
                 "var button = tasks[0].children[2].getElementsByTagName('a')[0];" +
                 "var task = document.getElementsByClassName('wrap')[1].innerText;" +

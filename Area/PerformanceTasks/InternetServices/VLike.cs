@@ -5,6 +5,7 @@ using AutoBot.Area.Services;
 using AutoBot.Extentions;
 using AutoBot.Models;
 using Microsoft.CodeAnalysis;
+using OpenQA.Selenium.Interactions;
 using System;
 using System.Linq;
 using System.Threading;
@@ -238,23 +239,23 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void LikeItAndMakeRepost(string titleTask)
         {
-            SetScrollPosition(10000);
-
             var post = GetUrlPage().Replace("https://vk.com/wall", "post");
             var buttons = GetElementsByXPath($"//*[@id='{post}']/div/div[2]/div/div[2]/div/div[1]").First().FindElements(SearchMethod.Tag, "a");
             foreach (var item in buttons)
             {
                 if (item.GetTitle() == "Нравится")
                 {
-                    item.Click();
+                    MoveToElementAndClick(item);
                 }
                 else if (item.GetTitle() == "Поделиться" && titleTask == "Поставить Лайк + Рассказать друзьям")
                 {
                     item.Click();
+                    Thread.Sleep(1000);
 
                     if (GetElementById("system_msg").Displayed)
                     {
                         RefreshPage();
+                        Thread.Sleep(2000);
                         GetElementByClassName("_share active")?.Click(); //TODO:Отладить. Похоже в разных ситуациях разные стили
                         GetElementByClassName("like_btn share _share")?.Click(); //TODO:Отладить. Похоже в разных ситуациях разные стили
                     }

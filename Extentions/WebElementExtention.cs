@@ -1,5 +1,6 @@
 ﻿using AutoBot.Area.Enums;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
 using System.Collections.Generic;
 
 namespace AutoBot.Extentions
@@ -86,6 +87,7 @@ namespace AutoBot.Extentions
             return webElement.GetAttribute("href");
         }
 
+
         /// <summary>
         /// Найти элемент
         /// </summary>
@@ -125,5 +127,6 @@ namespace AutoBot.Extentions
                     return null;
             }
         }
+
     }
 }
