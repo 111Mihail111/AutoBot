@@ -22,23 +22,71 @@ namespace AutoBot.Area.Managers
             Thread.Sleep(1500);
         }
 
-        public void PutLike()
+        public void UnsubscribeToComunity()
         {
-            var post = GetUrlPage().Replace("https://vk.com/wall", "post");
-            var buttons = GetElementsByXPath($"//*[@id='{post}']/div/div[2]/div/div[2]/div/div[1]").First().FindElements(SearchMethod.Tag, "a");
-            foreach (var item in buttons)
+            GetElementById("page_actions_btn").Click();
+            GetElementsByClassName("page_actions_inner").First().FindElements(SearchMethod.Tag, "a").First().Click();
+            Thread.Sleep(1500);
+        }
+
+        public void PutLikeAndRepost(bool isRepost = false)
+        {
+            var button = GetElementByClassName("like_btns").FindElements(SearchMethod.Tag, "a");
+            int scrollTop = 100;
+            bool isBlocked = true;
+
+            while (isBlocked)
             {
-                if (item.GetTitle() == "Нравится")
+                try
                 {
-                    item.Click();
+                    if (isRepost)
+                    {
+                        button.Where(w => w.GetTitle() == "Поделиться").FirstOrDefault().Click();
+
+                        GetElementById("like_share_my").Click();
+                        GetElementById("like_share_send").Click();
+                        Thread.Sleep(1000);
+                    }
+
+                    button.Where(w => w.GetTitle() == "Нравится").FirstOrDefault().Click();
+                    isBlocked = false;
+                }
+                catch
+                {
+                    SetScrollPosition(scrollTop);
+                    scrollTop += 50;
+                    Thread.Sleep(1000);
                 }
             }
+
+        }
+
+        public void RemoveLike(string url)
+        {
+            OpenPageInNewTab(url);
+            SwitchToLastTab();
+            PutLikeAndRepost();
         }
 
         public bool IsBlockedCommunity()
         {
             return GetElementByXPath("/html/body/div").GetInnerText()
                 .Contains("Данный материал заблокирован на территории Российской Федерации");
+        }
+
+        public bool IsPrivateGroup()
+        {
+            if (GetTitlePage() == "Частная группа")
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public void RepostEntries()
+        {
+
         }
 
         public void Authorization(string loginVK, string passwordVK)
@@ -74,7 +122,7 @@ namespace AutoBot.Area.Managers
 
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
         {
-            SetDriver(chromeDriver);
+            GetDriver(chromeDriver);
         }
     }
 }

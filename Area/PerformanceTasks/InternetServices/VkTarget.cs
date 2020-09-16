@@ -19,6 +19,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
     {                                          
         const string BROWSER_PROFILE_SERVICE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\PerformanceTasks\\VkTarget\\";
         private IVkManager _vkManager;
+        private IYouTubeManager _ytManager;
 
         private string _login;
         private string _password;
@@ -49,14 +50,24 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _passwordYouTube = accountYouTube.Password;
 
             Initialization(BROWSER_PROFILE_SERVICE);
+            InitializationManagers();
+        }
+
+        protected void InitializationManagers()
+        {
             _vkManager = new VkManager();
-            _vkManager.SetContextBrowserManager(GetDriver());
+            _ytManager = new YouTubeManager();
+            
+            var driver = GetDriver();
+            _vkManager.SetContextBrowserManager(driver);
+            _ytManager.SetContextBrowserManager(driver);
         }
 
         public void GoTo(string url)
         {
             Init();
             GoToUrl(url);
+            AuthorizationInSocialToils();
             AuthorizationOnService(url);
             BeginCollecting();
         }
@@ -66,7 +77,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void BeginCollecting()
         {
-            _vkManager.Authorization(_loginVK, _passwordVK);
+            AuthorizationInSocialToils();
 
             while (true)
             {
@@ -80,10 +91,27 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                         CarryOutTaskInYouTube(task[1]);
                         break;
                     case "NoTasks":
+                        OnFocusElement();
                         Thread.Sleep(60000);
                         break;
                 }
             }
+        }
+
+        /// <summary>
+        /// Авторизация в соц. сетях
+        /// </summary>
+        protected void AuthorizationInSocialToils()
+        {
+            _vkManager.Authorization(_loginVK, _passwordVK);
+            _ytManager.Authorization(_loginYouTube, _passwordYouTube);
+            //TODO: Авторизация одноклассники
+        }
+
+        protected void OnFocusElement()
+        {
+            var button = GetElementByXPath("//*[@id='list']/main/section[1]/div[2]/div/div/div/ul/li[1]");
+            FocusOnElement(button);
         }
 
         /// <summary>
@@ -102,19 +130,17 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                         CloseTab();
                         SwitchToTab();
                         SkipTask();
-                        Thread.Sleep(1000);
                         return;
                     }
                     _vkManager.JoinToComunity();
                     break;
                 case "Поставьте лайк на странице":
-                    _vkManager.PutLike();
+                    _vkManager.PutLikeAndRepost();
                     break;
             }
 
             CloseTab();
             SwitchToTab();
-            Thread.Sleep(1000);
             CheckTask();
         }
 
@@ -129,16 +155,18 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (taskText)
             {
                 case "Подпишитесь на канал":
+                    _ytManager.SubscribeToChannel();
                     break;
                 case "Поставьте 'Лайк' под видео":
+                    _ytManager.LikeUnderVideo();
                     break;
                 case "Поставьте 'Не нравится' под видео":
+                    _ytManager.DislikeUnderVideo();
                     break;
             }
 
             CloseTab();
             SwitchToTab();
-            Thread.Sleep(1000);
             CheckTask();
         }
 
@@ -158,7 +186,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected void CheckTask()
         {
             ExecuteScript("var task = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>" +
-                "div.container-fluid.available__table').getElementsByClassName('row tb__row')" +
+                "div.container-fluid.available__table').getElementsByClassName('row tb__row');" +
                 "task[0].children[3].getElementsByClassName('default__small__btn check__btn')[0].click();");
         }
 

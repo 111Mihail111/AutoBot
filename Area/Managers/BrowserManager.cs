@@ -54,10 +54,10 @@ namespace AutoBot.Area.Managers
             return _browser;
         }
         /// <summary>
-        /// Считать драйвер
+        /// Получить драйвер
         /// </summary>
         /// <param name="chromeDriver">Хром драйвер</param>
-        public void SetDriver(ChromeDriver chromeDriver)
+        public void GetDriver(ChromeDriver chromeDriver)
         {
             _browser = chromeDriver;
         }
@@ -93,6 +93,7 @@ namespace AutoBot.Area.Managers
         /// </summary>
         public void SwitchToLastTab()
         {
+            Thread.Sleep(1000);
             var newTabInstance = _browser.WindowHandles[_browser.WindowHandles.Count - 1];
             _browser.SwitchTo().Window(newTabInstance);
         }
@@ -102,6 +103,7 @@ namespace AutoBot.Area.Managers
         /// <param name="indexTab">Индекс вкладки. По умолчанию нулевой</param>
         public void SwitchToTab(int indexTab = 0)
         {
+            Thread.Sleep(1500);
             _browser.SwitchTo().Window(_browser.WindowHandles[indexTab]);
         }
         /// <summary>
@@ -307,6 +309,7 @@ namespace AutoBot.Area.Managers
         public void RefreshPage()
         {
             _browser.Navigate().Refresh();
+            Thread.Sleep(2000);
         }
         /// <summary>
         /// Выйти из браузера
