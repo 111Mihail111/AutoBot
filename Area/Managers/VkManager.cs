@@ -55,7 +55,6 @@ namespace AutoBot.Area.Managers
                 {
                     SetScrollPosition(scrollTop);
                     scrollTop += 50;
-                    Thread.Sleep(1000);
                 }
             }
 
@@ -113,11 +112,20 @@ namespace AutoBot.Area.Managers
             }
 
             GetElementById("index_login_button").Click();
-            Thread.Sleep(2000);
+            Thread.Sleep(3000);
 
             CloseTab();
             SwitchToTab();
-            Thread.Sleep(1000);
+        }
+
+        /// <summary>
+        /// Удаление модальных окон vk (всякие тупые предложения)
+        /// </summary>
+        public void RemoveWindowMessage()
+        {
+            ExecuteScript("document.querySelector('#box_layer_bg').remove();");
+            ExecuteScript("document.querySelector('#stl_left').remove();");
+            ExecuteScript("document.querySelector('#box_layer_wrap').remove()");
         }
 
         public void SetContextBrowserManager(ChromeDriver chromeDriver)

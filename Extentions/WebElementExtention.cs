@@ -87,6 +87,16 @@ namespace AutoBot.Extentions
             return webElement.GetAttribute("href");
         }
 
+        /// <summary>
+        /// Получить содержимое name атрибута
+        /// </summary>
+        /// <param name="webElement">Вэб-элемент</param>
+        /// <returns>Значение атрибута</returns>
+        public static string GetName(this IWebElement webElement)
+        {
+            return webElement.GetAttribute("name");
+        }
+
 
         /// <summary>
         /// Найти элемент

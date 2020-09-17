@@ -32,6 +32,7 @@ namespace AutoBot
             services.AddScoped<IVkManager, VkManager>();
             services.AddScoped<IClassmatesManager, ClassmatesManager>();
             services.AddScoped<IYouTubeManager, YouTubeManager>();
+            services.AddScoped<IInstagramManager, InstagramManager>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
