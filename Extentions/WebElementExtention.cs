@@ -97,6 +97,25 @@ namespace AutoBot.Extentions
             return webElement.GetAttribute("name");
         }
 
+        /// <summary>
+        /// Получить содержимое aria-label атрибута
+        /// </summary>
+        /// <param name="webElement">Вэб-элемент</param>
+        /// <returns>Значение атрибута</returns>
+        public static string GetAriaLabel(this IWebElement webElement)
+        {
+            return webElement.GetAttribute("aria-label");
+        }
+
+        /// <summary>
+        /// Получить содержимое id атрибута
+        /// </summary>
+        /// <param name="webElement">Вэб-элемент</param>
+        /// <returns>Значение атрибута</returns>
+        public static string GetId(this IWebElement webElement)
+        {
+            return webElement.GetAttribute("id");
+        }
 
         /// <summary>
         /// Найти элемент

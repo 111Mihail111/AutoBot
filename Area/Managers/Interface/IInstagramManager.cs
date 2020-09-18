@@ -17,6 +17,16 @@ namespace AutoBot.Area.Managers.Interface
         public void Subscribe();
 
         /// <summary>
+        /// Отписаться от пользователя
+        /// </summary>
+        public void Unsubscribe();
+
+        /// <summary>
+        /// Поставить лайк
+        /// </summary>
+        public void PutLike();
+
+        /// <summary>
         /// Найдена ли страница
         /// </summary>
         /// <returns>True - найдена, иначе false</returns>

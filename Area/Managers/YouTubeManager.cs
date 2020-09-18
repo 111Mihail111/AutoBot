@@ -11,7 +11,8 @@ namespace AutoBot.Area.Managers
     {
         public void Authorization(string login, string password)
         {
-            OpenPageInNewTab("https://www.youtube.com/");
+            string url = "https://www.youtube.com/";
+            OpenPageInNewTab(url);
 
             if (GetElementById("avatar-btn") != null)
             {
@@ -20,36 +21,97 @@ namespace AutoBot.Area.Managers
                 return;
             }
 
-            GetElementById("buttons").FindElement(SearchMethod.ClassName, "style-scope ytd-masthead style-suggestive size-small")
-                .FindElement(SearchMethod.Tag, "a").Click();
-            GetElementById("identifierId").SendKeys(login);
+            ButtonLoginClick();
+
+            var savedAccountDiv = GetElementById("profileIdentifier");
+            if (savedAccountDiv != null)
+            {
+                savedAccountDiv.Click();
+                AuthorizationUnderSavedProfile(password);
+                return;
+            }
+
+            var inputLogin = GetElementById("identifierId");
+            if (string.IsNullOrWhiteSpace(inputLogin.GetValue()))
+            {
+                inputLogin.SendKeys(login);
+            }
+
             GetElementById("identifierNext").FindElement(SearchMethod.Tag, "button").Click();
-            GetElementById("password").FindElement(SearchMethod.Tag, "input").SendKeys(password);
+
+            var inputPassword = GetElementById("password").FindElement(SearchMethod.Tag, "input");
+            if (string.IsNullOrWhiteSpace(inputPassword.GetValue()))
+            {
+                inputPassword.SendKeys(password);
+            }
+
             GetElementById("passwordNext").FindElement(SearchMethod.Tag, "button").Click();
+            Thread.Sleep(2000);
+
+            GoToUrl(url);
+            ButtonLoginClick();
+
+            CloseTab();
+            SwitchToTab();
         }
 
         public void SubscribeToChannel()
         {
             GetElementsByClassName("style-scope ytd-subscribe-button-renderer").First().Click();
-            Thread.Sleep(1500);
+            Thread.Sleep(2000);
         }
 
         public void LikeUnderVideo()
         {
             GetElementById("top-level-buttons").FindElements(SearchMethod.Tag, "button").First().Click();
-            Thread.Sleep(1500);
+            Thread.Sleep(2000);
         }
 
         public void DislikeUnderVideo()
         {
             GetElementById("top-level-buttons").FindElements(SearchMethod.Tag, "button")
                 .Where(w => w.GetAttribute("aria-pressed") == "false").Last().Click();
-            Thread.Sleep(1500);
+            Thread.Sleep(2000);
         }
 
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
         {
             GetDriver(chromeDriver);
+        }
+
+
+        /// <summary>
+        /// Авторизация под сохраненным профилем
+        /// </summary>
+        /// <param name="password">Пароль</param>
+        protected void AuthorizationUnderSavedProfile(string password)
+        {
+            var inputPass = GetElementById("password").FindElement(SearchMethod.Tag, "input");
+            if (string.IsNullOrWhiteSpace(inputPass.GetValue()))
+            {
+                inputPass.SendKeys(password);
+            }
+
+            GetElementById("passwordNext").FindElement(SearchMethod.Tag, "button").Click();
+            Thread.Sleep(2000);
+
+            CloseTab();
+            SwitchToTab();
+        }
+        /// <summary>
+        /// Нажать на кнопку авторизации
+        /// </summary>
+        protected void ButtonLoginClick()
+        {
+            var divContainer = GetElementById("buttons").FindElements(SearchMethod.ClassName, "style-suggestive");
+            foreach (var item in divContainer)
+            {
+                if (item.GetId() == "button")
+                {
+                    item.Click();
+                    break;
+                }
+            }
         }
     }
 }

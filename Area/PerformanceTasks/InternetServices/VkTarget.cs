@@ -3,14 +3,8 @@ using AutoBot.Area.Managers;
 using AutoBot.Area.Managers.Interface;
 using AutoBot.Area.PerformanceTasks.Interface;
 using AutoBot.Area.Services;
-using AutoBot.Extentions;
-using AutoBot.Models;
 using OpenQA.Selenium;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading;
 
 namespace AutoBot.Area.PerformanceTasks.InternetServices
@@ -18,42 +12,29 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
     public class VkTarget : BrowserManager, IVkTarget
     {                                          
         const string BROWSER_PROFILE_SERVICE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\PerformanceTasks\\VkTarget\\";
+        
+        private static bool _isAuthorization;
+        private string _login;
+        private string _password;
+
         private IVkManager _vkManager;
         private IYouTubeManager _ytManager;
 
-        private string _login;
-        private string _password;
-        private string _loginVK;
-        private string _passwordVK;
-        private string _loginClassmates;
-        private string _passwordClassmates;
-        private string _loginYouTube;
-        private string _passwordYouTube;
-
         protected void Init()
         {
-            var accounts = AccountService.GetAccount(TypeService.VkTarget);
-
-            var accountMain = accounts.Where(w => w.AccountType == AccountType.Main).First();
-            _login = accountMain.Login;
-            _password = accountMain.Password;
-
-            _loginClassmates = _login;
-            _passwordClassmates = _password;
-
-            var accountVK = accounts.Where(w => w.AccountType == AccountType.Vk).First();
-            _loginVK = accountVK.Login;
-            _passwordVK = accountVK.Password;
-
-            var accountYouTube = accounts.Where(w => w.AccountType == AccountType.YouTube).First();
-            _loginYouTube = accountYouTube.Login;
-            _passwordYouTube = accountYouTube.Password;
-
             Initialization(BROWSER_PROFILE_SERVICE);
-            InitializationManagers();
+            SetContextForManagers();
+
+            if (!_isAuthorization)
+            {
+                AuthorizationSocialNetworks();
+            }
         }
 
-        protected void InitializationManagers()
+        /// <summary>
+        /// Установить контекст для менеджеров
+        /// </summary>
+        protected void SetContextForManagers()
         {
             _vkManager = new VkManager();
             _ytManager = new YouTubeManager();
@@ -63,11 +44,28 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _ytManager.SetContextBrowserManager(driver);
         }
 
+        protected void AuthorizationSocialNetworks()
+        {
+            var accounts = AccountService.GetAccount(TypeService.VkTarget);
+            var accountMain = accounts.Where(w => w.AccountType == AccountType.Main).First();
+            _login = accountMain.Login;
+            _password = accountMain.Password;
+
+            //_loginClassmates = _login;
+            //_passwordClassmates = _password;
+
+            var accountVK = accounts.Where(w => w.AccountType == AccountType.Vk).First();
+            var accountYouTube = accounts.Where(w => w.AccountType == AccountType.YouTube).First();
+
+            _vkManager.Authorization(accountVK.Login, accountVK.Password);
+            _ytManager.Authorization(accountYouTube.Login, accountYouTube.Password);
+            //TODO: Авторизация одноклассники
+        }
+
         public void GoTo(string url)
         {
             Init();
             GoToUrl(url);
-            AuthorizationInSocialToils();
             AuthorizationOnService(url);
             BeginCollecting();
         }
@@ -77,8 +75,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void BeginCollecting()
         {
-            AuthorizationInSocialToils();
-
             while (true)
             {
                 var task = GetTask();
@@ -96,16 +92,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                         break;
                 }
             }
-        }
-
-        /// <summary>
-        /// Авторизация в соц. сетях
-        /// </summary>
-        protected void AuthorizationInSocialToils()
-        {
-            _vkManager.Authorization(_loginVK, _passwordVK);
-            _ytManager.Authorization(_loginYouTube, _passwordYouTube);
-            //TODO: Авторизация одноклассники
         }
 
         protected void OnFocusElement()
@@ -135,7 +121,16 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _vkManager.JoinToComunity();
                     break;
                 case "Поставьте лайк на странице":
-                    _vkManager.PutLikeAndRepost();
+                    _vkManager.PutLike();
+                    break;
+                case "Посмотреть пост":
+                    Thread.Sleep(1500);
+                    break;
+                case "Нажмите поделиться записью":
+                    _vkManager.MakeRepost();
+                    break;
+                case "Добавить в друзья":
+                    //TODO: Реализовать добавление в други
                     break;
             }
 
@@ -188,6 +183,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             ExecuteScript("var task = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>" +
                 "div.container-fluid.available__table').getElementsByClassName('row tb__row');" +
                 "task[0].children[3].getElementsByClassName('default__small__btn check__btn')[0].click();");
+            Thread.Sleep(4000);
         }
 
         /// <summary>

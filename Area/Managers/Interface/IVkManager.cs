@@ -15,10 +15,14 @@ namespace AutoBot.Area.Managers.Interface
         public void UnsubscribeToComunity();
 
         /// <summary>
-        /// Поставить лайк и репост
+        /// Поставить лайк
         /// </summary>
-        /// <param name="isRepost">Сделать ли репост</param>
-        public void PutLikeAndRepost(bool isRepost = false);
+        public void PutLike();
+
+        /// <summary>
+        /// Сделать репост
+        /// </summary>
+        public void MakeRepost();
 
         /// <summary>
         /// Убрать лайк

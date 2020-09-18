@@ -29,7 +29,7 @@ namespace AutoBot.Area.Managers
             Thread.Sleep(1500);
         }
 
-        public void PutLikeAndRepost(bool isRepost = false)
+        public void PutLike()
         {
             var button = GetElementByClassName("like_btns").FindElements(SearchMethod.Tag, "a");
             int scrollTop = 100;
@@ -39,15 +39,6 @@ namespace AutoBot.Area.Managers
             {
                 try
                 {
-                    if (isRepost)
-                    {
-                        button.Where(w => w.GetTitle() == "Поделиться").FirstOrDefault().Click();
-
-                        GetElementById("like_share_my").Click();
-                        GetElementById("like_share_send").Click();
-                        Thread.Sleep(1000);
-                    }
-
                     button.Where(w => w.GetTitle() == "Нравится").FirstOrDefault().Click();
                     isBlocked = false;
                 }
@@ -57,14 +48,37 @@ namespace AutoBot.Area.Managers
                     scrollTop += 50;
                 }
             }
+        }
 
+        public void MakeRepost()
+        {
+            var button = GetElementByClassName("like_btns").FindElements(SearchMethod.Tag, "a");
+            int scrollTop = 100;
+            bool isBlocked = true;
+
+            while (isBlocked)
+            {
+                try
+                {
+                    button.Where(w => w.GetTitle() == "Поделиться").FirstOrDefault().Click();
+
+                    GetElementById("like_share_my").Click();
+                    GetElementById("like_share_send").Click();
+                    Thread.Sleep(1000);
+                }
+                catch
+                {
+                    SetScrollPosition(scrollTop);
+                    scrollTop += 50;
+                }
+            }
         }
 
         public void RemoveLike(string url)
         {
             OpenPageInNewTab(url);
             SwitchToLastTab();
-            PutLikeAndRepost();
+            PutLike();
         }
 
         public bool IsBlockedCommunity()
@@ -118,9 +132,6 @@ namespace AutoBot.Area.Managers
             SwitchToTab();
         }
 
-        /// <summary>
-        /// Удаление модальных окон vk (всякие тупые предложения)
-        /// </summary>
         public void RemoveWindowMessage()
         {
             ExecuteScript("document.querySelector('#box_layer_bg').remove();");

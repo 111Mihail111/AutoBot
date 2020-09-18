@@ -56,12 +56,52 @@ namespace AutoBot.Area.Managers
 
         public void Subscribe()
         {
+            var buttons = GetElementsByTagName("button");
+            foreach (var item in buttons)
+            {
+                if (item.GetInnerText() == "Подписаться")
+                {
+                    item.Click();
+                    Thread.Sleep(2000);
+                    return;
+                }
+            }
+        }
 
+        public void Unsubscribe()
+        {
+            var buttons = GetElementsByTagName("button");
+            foreach (var item in buttons)
+            {
+                var span = item.FindElement(SearchMethod.Tag, "span");
+                if (span.GetAriaLabel() == "Подписки")
+                {
+                    item.Click();
+
+                    GetElementByClassName("aOOlW -Cab_   ").Click();
+                    Thread.Sleep(2000);
+                }
+            }
+        }
+
+        public void PutLike()
+        {
+            var buttons = GetElementsByClassName("wpO6b");
+            foreach (var item in buttons)
+            {
+                var svg = item.FindElement(SearchMethod.Tag, "svg");
+                if (svg.GetAriaLabel() == "Нравится")
+                {
+                    svg.Click();
+                    Thread.Sleep(2000);
+                    return;
+                }
+            }
         }
 
         public bool IsFoundPage()
         {
-            return GetTitlePage().Contains("Страница не найдена") == false;
+            return !GetTitlePage().Contains("Страница не найдена") != false;
         }
 
         public void SetContextBrowserManager(ChromeDriver chromeDriver)

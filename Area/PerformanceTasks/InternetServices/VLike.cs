@@ -79,7 +79,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 login.Click();
             }
 
-            JoinInCommunityVK();
+            JoinInCommunityVK(); //Полностью отлажен!
             WorkWithLikesVK();
             //AddToFriendsVK();
             //WorkWithYouTube(); //TODO: Не отлажен
@@ -106,7 +106,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
                 if (_vkManager.IsPrivateGroup() || _vkManager.IsBlockedCommunity())
                 {
-                    SkipTask();
+                    SkipTask("vkCommunity");
                     message = GetElementByXPath("//*[@id='content']/div[3]/div/p[1]/b");
                     continue;
                 }
@@ -115,13 +115,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
                 CloseTab();
                 SwitchToTab();
-                GetElementByXPath("//*[@id='buttons']/a[2]").Click();
 
                 if (DelayPayments())
                 {
                     OpenPageInNewTab(url);
                     _vkManager.UnsubscribeToComunity();
-                    SkipTask();
+                    SkipTask("vkCommunity");
                 }
 
                 message = GetElementByXPath("//*[@id='content']/div[3]/div/p[1]/b");
@@ -148,10 +147,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
                 if (titleTask == "Поставить Лайк + Рассказать друзьям")
                 {
-                    _vkManager.PutLikeAndRepost(true);
+                    _vkManager.MakeRepost();
                 }
 
-                _vkManager.PutLikeAndRepost();
+                _vkManager.PutLike();
                 Thread.Sleep(3500);
 
                 string url = GetUrlPage();
@@ -164,7 +163,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 if (IsMaxLikes())
                 {
                     _vkManager.RemoveLike(url);
-                    SkipTask();
+                    SkipTask("vkLike");
                     perfomanse = GetElementByClassName("groups").GetInnerText();
                     continue;
                 }
@@ -197,8 +196,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 while (modal.Displayed)
                 {
                     GetElementByXPath("//*[@id='buttons']/a[2]").Click();
-                    AlertAccept();
                     Thread.Sleep(5000);
+                    AlertAccept();
 
                     counter++;
                     if (counter == 20)
@@ -217,13 +216,29 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Пропустить задание
         /// </summary>
-        public void SkipTask()
+        public void SkipTask(string typeTask)
         {
             CloseTab();
             SwitchToTab();
             GetElementByXPath("//*[@id='buttons']/a[1]").Click();
             Thread.Sleep(1000);
-            GetElementByXPath("//*[@id='content']/div[3]/div[1]/a[1]").Click(); //У лайков есть еще такой путь //*[@id="like457756"]/div[3]/a или вот (//*[@id="like457856"]/div[3]/span) - Этот используется у лайков Вк
+
+            switch (typeTask)
+            {
+                case "vkLike":
+                    GetElementByXPath("//*[@id='content']/div[3]/div/div[3]/span").Click();
+                    AlertAccept();
+                    break;
+                case "instaSubscription":
+                case "instaLike":
+                    GetElementByXPath("//*[@id='content']/div[2]/div/a[1]").Click();
+                    break;
+                case "vkCommunity":
+                    GetElementByXPath("//*[@id='content']/div[3]/div/a[1]").Click();
+                    break;
+            }
+
+            //GetElementByXPath("//*[@id='content']/div[3]/div[1]/a[1]").Click(); //У лайков есть еще такой путь //*[@id="like457756"]/div[3]/a
         }
 
         /// <summary>
@@ -254,7 +269,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
                 if (IsVideoAvailable())
                 {
-                    SkipTask();
+                    SkipTask("");
                     groups = GetElementByClassName("groups");
                     continue;
                 }
@@ -320,16 +335,23 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
                 if (!_instaManager.IsFoundPage())
                 {
-                    SkipTask();
+                    SkipTask("instaSubscription");
                     groups = GetElementsByClassName("groups");
                     continue;
                 }
 
                 _instaManager.Subscribe();
+                string url = GetUrlPage();
 
                 CloseTab();
                 SwitchToTab();
-                DelayPayments(); //TODO: если true тогда отписка и пропуск задания
+
+                if (DelayPayments())
+                {
+                    OpenPageInNewTab(url);
+                    _instaManager.Unsubscribe();
+                    SkipTask("instaSubscription");
+                }
 
                 Thread.Sleep(1000);
                 groups = GetElementsByClassName("groups");
@@ -360,35 +382,28 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 SwitchToLastTab();
                 Thread.Sleep(2500);
 
-                if (CheckPageInstagram())
+                if (!_instaManager.IsFoundPage())
                 {
-                    SkipTask();
+                    SkipTask("instaLike");
                     groups = GetElementsByClassName("groups");
                     continue;
                 }
 
-                var buttons = GetElementsByTagName("button");
-                for (int i = buttons.Count() - 1; i >= 0; i--)
-                {
-                    var button = buttons.ElementAt(i);
-                    if (button.GetInnerText() == "Войти")
-                    {
-                        button.Click();
-                        buttons = GetElementsByTagName("button");
-                    }
-                    else if (button.GetInnerText() == "Нравится")
-                    {
-                        button.Click();
-                        Thread.Sleep(2000);
-                        break;
-                    }
-                }
+                _instaManager.PutLike();
+                string url = GetUrlPage();
 
                 CloseTab();
                 SwitchToTab();
-                DelayPayments(); //TODO: если true тогда отмена лайка и пропуск задания
+               
+                if (DelayPayments())
+                {
+                    OpenPageInNewTab(url);
+                    _instaManager.PutLike();
+                    SkipTask("instaLike");
+                    groups = GetElementsByClassName("groups");
+                    continue;
+                }
 
-                Thread.Sleep(2000);
                 groups = GetElementsByClassName("groups");
             }
         }
