@@ -1,7 +1,7 @@
 ﻿setInterval(function () {
     //CheckSites("Cranes", true);
     CheckSites("InternetService", false);
-}, 60000)
+}, 100000)
 
 /**
  * Проверка сайтов
@@ -109,7 +109,6 @@ function UpdatingTimerService(internetService) {
         url: "/Start/UpdateTimerService",
         success: function (data) {
             $('#InternetService').html(data);
-            debugger;
             CheckTimersInternetService(internetService);
         }
     });
@@ -178,7 +177,6 @@ function GoToService(internetService) {
         url: "/Start/GoToInternetService",
         success: function (data) {
             $('#InternetService').html(data);
-            debugger;
         }
     });
 }

@@ -7,7 +7,6 @@ using AutoBot.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Threading.Tasks;
 
 namespace AutoBot.Controllers
 {
@@ -37,7 +36,6 @@ namespace AutoBot.Controllers
 
         public ActionResult Index() => View(WebService.GetAllData());
 
-
         [HttpGet]
         public PartialViewResult UpdateTimerCrane(Crane crane)
         {
@@ -64,7 +62,6 @@ namespace AutoBot.Controllers
             return PartialView("_InternetService", WebService.GetInternetServices());
         }
 
-
         [HttpGet]
         public PartialViewResult UpdateStatusCrane(string url, Status statusCrane)
         {
@@ -80,7 +77,7 @@ namespace AutoBot.Controllers
         }
 
         [HttpGet]
-        public async Task<PartialViewResult> GoToCrane(Crane crane)
+        public PartialViewResult GoToCrane(Crane crane)
         {
             try
             {
@@ -108,7 +105,7 @@ namespace AutoBot.Controllers
 
                 WebService.UpdateCrane(crane);
             }
-            catch (Exception exeption)
+            catch
             {
                 if (crane != null)
                 {
@@ -151,18 +148,15 @@ namespace AutoBot.Controllers
         [HttpPost]
         public ActionResult SaveAccounts(IFormFile fileAccounts)
         {
-            var data = WebService.GetAllData();
             if (fileAccounts == null)
             {
-                ViewBag.Message = "Вы не загрузили файл!";
-                return View("Index", data);
+                return RedirectToAction("Index");
             }
 
             AccountManager accountManager = new AccountManager();  //TODO:Прокинуть через DI
             accountManager.SaveAccounts(fileAccounts);
 
-            ViewBag.Message = "Все сохранено!";
-            return View("Index", data);
+            return RedirectToAction("Index");
         }
     }
 }
