@@ -63,15 +63,25 @@ function GetDataCrane(row) {
         TypeCrane: row.getElementsByTagName("input")[5].value,
     }
 }
+
 /*Получить данные сервиса*/
 function GetDataService(row) {
-    return {
-        URL: row.getElementsByTagName("input")[0].value,
-        ActivityTime: row.getElementsByTagName("input")[1].value,
-        StatusService: row.getElementsByTagName("input")[2].value,
-        BalanceOnService: row.getElementsByTagName("input")[3].value,
-        TypeService: row.getElementsByTagName("input")[4].value,
+    var service = [];
+    var collectionInput = row.getElementsByTagName("input");
+    for (var i = 0; i < collectionInput.length; i++) {
+        var element = collectionInput[i];
+        service[element.id] = element.value;
     }
+
+    return service;
+
+    //return {
+    //    URL: row.getElementsByTagName("input")[0].value,
+    //    ActivityTime: row.getElementsByTagName("input")[1].value,
+    //    StatusService: row.getElementsByTagName("input")[2].value,
+    //    BalanceOnService: row.getElementsByTagName("input")[3].value,
+    //    TypeService: row.getElementsByTagName("input")[4].value,
+    //}
 }
 
 /*Обновить таймер крана*/
@@ -94,6 +104,7 @@ function UpdatingTimerCrane(crane) {
         }
     });
 }
+
 /*Обновить таймер сервиса*/
 function UpdatingTimerService(internetService) {
     $.ajax({
@@ -129,6 +140,7 @@ function UpdatingStatusCrane(url, status) {
         }
     });
 }
+
 /*Обновить статус сервиса*/
 function UpdatingStatusService(url, status) {
     $.ajax({
@@ -163,6 +175,7 @@ function GoToCrane(crane) {
         }
     });
 }
+
 /*Перейти на сервис*/
 function GoToService(internetService) {
     $.ajax({
@@ -213,4 +226,26 @@ function CheckTimersInternetService(internetService) {
             CheckSites("InternetService", false);
         }
     }
+}
+
+
+function InternetServicesManualStart(button) {
+    var divContainer = button.parentElement;
+    var data = GetDataService(divContainer.parentElement);
+    button.remove();
+    if (button.children[0].innerText === "Старт") {
+        divContainer.insertAdjacentHTML('beforeend',
+            '<button class="btn btn-warning btn-sm btn-block mt-1" onclick="InternetServicesManualStart(this)"><span>Стоп</span></button>');
+        GoToInternetServicesManualStart(data)
+    }
+    else {
+        divContainer.insertAdjacentHTML('beforeend',
+            '<button class="btn btn-warning btn-sm btn-block mt-1" onclick="InternetServicesManualStart(this)"><span>Старт</span></button>');
+        //TODO:Закрытие браузера
+    }
+    
+}
+
+function GoToInternetServicesManualStart() {
+    //TODO:Отправка данных на контроллер и запуск браузера
 }

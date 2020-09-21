@@ -77,9 +77,7 @@
     </div>
 
     <div class="col-2" style="background-color: rgb(222,243,202); border: 2px solid white;">
-        <a class="btn btn-primary" asp-controller="Start"asp-route-url="@item.URL" asp-route-typeService="@item.TypeService" asp-action="GoToInternetService2">
-            <span>Запуск</span>
-        </a>
+        <button class="btn btn-warning btn-sm btn-block mt-1" onclick="InternetServicesManualStart(this)"><span>Старт</span></button>
     </div>
 </div>
 }

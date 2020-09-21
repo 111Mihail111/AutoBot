@@ -133,7 +133,7 @@ namespace AutoBot.Controllers
         }
 
         [HttpGet]
-        public PartialViewResult GoToInternetService2(string url, TypeService typeService)
+        public PartialViewResult InternetServicesManualStart(string url, TypeService typeService)
         {
             switch (typeService)
             {
