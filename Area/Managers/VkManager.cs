@@ -65,6 +65,7 @@ namespace AutoBot.Area.Managers
                     GetElementById("like_share_my").Click();
                     GetElementById("like_share_send").Click();
                     Thread.Sleep(1000);
+                    isBlocked = false;
                 }
                 catch
                 {
