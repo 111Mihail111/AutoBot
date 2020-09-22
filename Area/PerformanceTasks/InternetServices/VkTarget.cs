@@ -3,6 +3,7 @@ using AutoBot.Area.Managers;
 using AutoBot.Area.Managers.Interface;
 using AutoBot.Area.PerformanceTasks.Interface;
 using AutoBot.Area.Services;
+using AutoBot.Models;
 using OpenQA.Selenium;
 using System.Linq;
 using System.Threading;
@@ -60,6 +61,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _vkManager.Authorization(accountVK.Login, accountVK.Password);
             _ytManager.Authorization(accountYouTube.Login, accountYouTube.Password);
             //TODO: Авторизация одноклассники
+            _isAuthorization = true;
         }
 
         public void GoTo(string url)
@@ -68,6 +70,14 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             GoToUrl(url);
             AuthorizationOnService(url);
             BeginCollecting();
+        }
+
+        public void Quit() //ЕСТЬ TODO
+        {
+            var service = WebService.GetInternetServices().Where(w => w.URL == GetUrlPage()).FirstOrDefault();
+            //TODO:Получение баланса с сервиса
+            WebService.UpdateInternetService(service);
+            QuitBrowser();
         }
 
         /// <summary>

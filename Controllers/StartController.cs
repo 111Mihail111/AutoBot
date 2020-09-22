@@ -133,7 +133,7 @@ namespace AutoBot.Controllers
         }
 
         [HttpGet]
-        public PartialViewResult InternetServicesManualStart(string url, TypeService typeService)
+        public void InternetServicesManualStart(string url, TypeService typeService)
         {
             switch (typeService)
             {
@@ -141,8 +141,19 @@ namespace AutoBot.Controllers
                     _vkTarget.GoTo(url);
                     break;
             }
+        }
 
-            return PartialView("_ManualStart", null);
+        [HttpGet]
+        public PartialViewResult CloseBrowserManualStart(TypeService typeService)
+        {
+            switch (typeService)
+            {
+                case TypeService.VkTarget:
+                    _vkTarget.Quit();
+                    break;
+            }
+
+            return PartialView("_ManualStart", WebService.GetInternetServices());
         }
 
         [HttpPost]

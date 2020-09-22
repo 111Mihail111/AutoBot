@@ -1,5 +1,5 @@
 ﻿setInterval(function () {
-    //CheckSites("Cranes", true);
+    CheckSites("Cranes", true);
     CheckSites("InternetService", false);
 }, 60000)
 
@@ -23,22 +23,22 @@ function CheckSites(site, isCrane) {
 
             var data;
             if (isCrane) {
-                data = GetDataCrane(notes.children[i]);
+                data = GetRowData(notes.children[i]);
                 UpdatingStatusCrane(data.URL, data.StatusCrane);
                 GoToCrane(data);
             }
             else {
-                data = GetDataService(notes.children[i]);
+                data = GetRowData(notes.children[i]);
                 UpdatingStatusService(data.URL, data.StatusService);
                 GoToService(data);
             }
         }
         else {
             if (isCrane) {
-                UpdatingTimerCrane(GetDataCrane(notes.children[i]));
+                UpdatingTimerCrane(GetRowData(notes.children[i]));
                 return;
             }
-            UpdatingTimerService(GetDataService(notes.children[i]));
+            UpdatingTimerService(GetRowData(notes.children[i]));
         }
     }
 }
@@ -52,36 +52,16 @@ function ChangeStatus(select) {
     row.children[0].children[2].children[0].value = select.value;
 }
 
-/*Получить данные крана*/
-function GetDataCrane(row) {
-    return {
-        URL: row.getElementsByTagName("input")[0].value,
-        ActivityTime: row.getElementsByTagName("input")[1].value,
-        StatusCrane: row.getElementsByTagName("input")[2].value,
-        BalanceOnCrane: row.getElementsByTagName("input")[3].value,
-        TypeCurrencies: row.getElementsByTagName("input")[4].value,
-        TypeCrane: row.getElementsByTagName("input")[5].value,
-    }
-}
-
-/*Получить данные сервиса*/
-function GetDataService(row) {
-    var service = [];
+/*Получить данные строки*/
+function GetRowData(row) {
+    var rowDetails = [];
     var collectionInput = row.getElementsByTagName("input");
     for (var i = 0; i < collectionInput.length; i++) {
         var element = collectionInput[i];
-        service[element.id] = element.value;
+        rowDetails[element.id] = element.value;
     }
 
-    return service;
-
-    //return {
-    //    URL: row.getElementsByTagName("input")[0].value,
-    //    ActivityTime: row.getElementsByTagName("input")[1].value,
-    //    StatusService: row.getElementsByTagName("input")[2].value,
-    //    BalanceOnService: row.getElementsByTagName("input")[3].value,
-    //    TypeService: row.getElementsByTagName("input")[4].value,
-    //}
+    return rowDetails;
 }
 
 /*Обновить таймер крана*/
@@ -200,7 +180,7 @@ function CheckTimersCrane(crane) {
     var list = [];
 
     for (var i = 2; i < row.childElementCount; i++) {
-        list[i - 2] = GetDataCrane(row.children[i]);
+        list[i - 2] = GetRowData(row.children[i]);
     }
 
     for (var i = 0; i < list.length; i++) {
@@ -217,7 +197,7 @@ function CheckTimersInternetService(internetService) {
     var list = [];
 
     for (var i = 2; i < row.childElementCount; i++) {
-        list[i - 2] = GetDataService(row.children[i]);
+        list[i - 2] = GetRowData(row.children[i]);
     }
 
     for (var i = 0; i < list.length; i++) {
@@ -231,21 +211,37 @@ function CheckTimersInternetService(internetService) {
 
 function InternetServicesManualStart(button) {
     var divContainer = button.parentElement;
-    var data = GetDataService(divContainer.parentElement);
+    var data = GetRowData(divContainer.parentElement);
     button.remove();
     if (button.children[0].innerText === "Старт") {
         divContainer.insertAdjacentHTML('beforeend',
             '<button class="btn btn-warning btn-sm btn-block mt-1" onclick="InternetServicesManualStart(this)"><span>Стоп</span></button>');
-        GoToInternetServicesManualStart(data)
+        GoToInternetServicesManualStart(data);
     }
     else {
         divContainer.insertAdjacentHTML('beforeend',
             '<button class="btn btn-warning btn-sm btn-block mt-1" onclick="InternetServicesManualStart(this)"><span>Старт</span></button>');
-        //TODO:Закрытие браузера
-    }
-    
+        CloseBrowser(data.TypeService);
+    }    
 }
 
-function GoToInternetServicesManualStart() {
-    //TODO:Отправка данных на контроллер и запуск браузера
+function GoToInternetServicesManualStart(data) {
+    $.ajax({
+        type: "GET",
+        data: {
+            'URL': data.URL,
+            'TypeService': data.TypeService,
+        },
+        url: "/Start/InternetServicesManualStart"
+    });
+}
+
+function CloseBrowser(typeService) {
+    $.ajax({
+        type: "GET",
+        data: {
+            'TypeService': typeService,
+        },
+        url: "/Start/CloseBrowserManualStart"
+    });
 }
