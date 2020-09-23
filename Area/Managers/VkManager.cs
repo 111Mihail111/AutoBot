@@ -98,11 +98,6 @@ namespace AutoBot.Area.Managers
             return false;
         }
 
-        public void RepostEntries()
-        {
-
-        }
-
         public void Authorization(string loginVK, string passwordVK)
         {
             OpenPageInNewTab("https://vk.com/");
