@@ -71,7 +71,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Начать сбор
         /// </summary>
-        private void BeginCollecting()
+        private void BeginCollecting() //ЕСТЬ TODO
         {
             var login = GetElementByXPath("//*[@id='uLogin']/div");
             if (login != null)
@@ -79,7 +79,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 login.Click();
             }
 
-            JoinInCommunityVK(); //Полностью отлажен!
+            JoinInCommunityVK();
             WorkWithLikesVK();
             //AddToFriendsVK();
             //WorkWithYouTube(); //TODO: Не отлажен
@@ -257,7 +257,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             return false;
         }
 
-        protected void WorkWithYouTube()
+        protected void WorkWithYouTube() //ЕСТЬ TODO
         {
             GetElementByXPath("//*[@id='yt0']/a").Click();
 
@@ -357,16 +357,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 groups = GetElementsByClassName("groups");
             }
         }
-
-        /// <summary>
-        /// Проверить страницу инстаграма
-        /// </summary>
-        /// <returns>True - не найдена, иначе false</returns>
-        protected bool CheckPageInstagram()
-        {
-            return GetTitlePage().Contains("Страница не найдена") == false;
-        }
-
 
         /// <summary>
         /// Лайки в инстаграмме

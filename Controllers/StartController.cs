@@ -18,11 +18,11 @@ namespace AutoBot.Controllers
         private IMoonDogecoin _moonDogecoin;
         private IMoonLitecoin _moonLitecoin;
         private IMoonDash _moonDash;
-        private IVLike _v_Like;
+        private IVLike _vLike;
         private IVkTarget _vkTarget;
 
         public StartController(IFreeBitcoin freeBitcoin, IMoonBitcoin moonBitcoin, IBonusBitcoin bonusBitcoin, 
-            IMoonDogecoin moonDogecoin, IMoonLitecoin moonLitecoin, IMoonDash moonDash, IVLike v_Like, IVkTarget vkTarget)
+            IMoonDogecoin moonDogecoin, IMoonLitecoin moonLitecoin, IMoonDash moonDash, IVLike vLike, IVkTarget vkTarget)
         {
             _freeBitcoin = freeBitcoin;
             _moonBitcoin = moonBitcoin;
@@ -30,7 +30,7 @@ namespace AutoBot.Controllers
             _moonDogecoin = moonDogecoin;
             _moonLitecoin = moonLitecoin;
             _moonDash = moonDash;
-            _v_Like = v_Like;
+            _vLike = vLike;
             _vkTarget = vkTarget;
         }
 
@@ -123,7 +123,7 @@ namespace AutoBot.Controllers
             switch (internetService.TypeService)
             {
                 case TypeService.VLike:
-                    internetService = _v_Like.GoTo(internetService);
+                    internetService = _vLike.GoTo(internetService);
                     break;
             }
 
@@ -157,7 +157,7 @@ namespace AutoBot.Controllers
         }
 
         [HttpPost]
-        public ActionResult SaveAccounts(IFormFile fileAccounts)
+        public ActionResult SaveAccounts(IFormFile fileAccounts) //ЕСТЬ TODO
         {
             if (fileAccounts == null)
             {

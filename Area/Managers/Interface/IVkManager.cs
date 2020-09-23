@@ -37,11 +37,6 @@ namespace AutoBot.Area.Managers.Interface
         public bool IsBlockedCommunity();
 
         /// <summary>
-        /// Репост записи
-        /// </summary>
-        public void RepostEntries();
-
-        /// <summary>
         /// Приватное ли сообщество
         /// </summary>
         /// <returns>True - да, иначе false</returns>

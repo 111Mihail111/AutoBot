@@ -45,7 +45,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _ytManager.SetContextBrowserManager(driver);
         }
 
-        protected void AuthorizationSocialNetworks()
+        protected void AuthorizationSocialNetworks() //ЕСТЬ TODO
         {
             var accounts = AccountService.GetAccount(TypeService.VkTarget);
             var accountMain = accounts.Where(w => w.AccountType == AccountType.Main).First();
@@ -114,7 +114,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Выполнить задачу в вк
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInVk(string taskText)
+        protected void CarryOutTaskInVk(string taskText) //Есть TODO
         {
             SwitchToLastTab();
 
@@ -217,7 +217,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 "return systemType + '|' + task;").Split("|");
         }
 
-        protected void AddToFrend(IWebElement webElement)
+        protected void AddToFrend(IWebElement webElement) //Есть TODO
         {
             webElement.Click();
 
