@@ -3,6 +3,7 @@ using AutoBot.Area.Managers;
 using AutoBot.Area.Managers.Interface;
 using AutoBot.Area.PerformanceTasks.Interface;
 using AutoBot.Area.Services;
+using AutoBot.Extentions;
 using AutoBot.Models;
 using OpenQA.Selenium;
 using System.Linq;
@@ -69,21 +70,19 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             Init();
             GoToUrl(url);
             AuthorizationOnService(url);
-            BeginCollecting();
+            BeginCollecting(url);
         }
 
-        public void Quit() //ЕСТЬ TODO
+        public void Quit()
         {
-            var service = WebService.GetInternetServices().Where(w => w.URL == GetUrlPage()).FirstOrDefault();
-            //TODO:Получение баланса с сервиса
-            WebService.UpdateInternetService(service);
+            UpdateModel(GetUrlPage());
             QuitBrowser();
         }
 
         /// <summary>
         /// Начать сбор
         /// </summary>
-        protected void BeginCollecting()
+        protected void BeginCollecting(string url)
         {
             while (true)
             {
@@ -97,17 +96,29 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                         CarryOutTaskInYouTube(task[1]);
                         break;
                     case "NoTasks":
-                        OnFocusElement();
-                        Thread.Sleep(60000);
+                        OnFocusElements();
                         break;
                 }
+
+                UpdateModel(url);
             }
         }
 
-        protected void OnFocusElement()
+        protected void OnFocusElements()
         {
-            var button = GetElementByXPath("//*[@id='list']/main/section[1]/div[2]/div/div/div/ul/li[1]");
-            FocusOnElement(button);
+            var liCollection = GetElementByXPath("//*[@id='list']/main/section[1]/div[2]/div/div/div/ul").FindElements(SearchMethod.Tag, "li");
+            foreach (var item in liCollection)
+            {
+                FocusOnElement(item);
+                Thread.Sleep(10000);
+            }
+
+            var buttons = GetElementByClassName("header__links").FindElements(SearchMethod.Tag, "a");
+            foreach (var item in buttons)
+            {
+                FocusOnElement(item);
+                Thread.Sleep(5000);
+            }
         }
 
         /// <summary>
@@ -193,7 +204,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             ExecuteScript("var task = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>" +
                 "div.container-fluid.available__table').getElementsByClassName('row tb__row');" +
                 "task[0].children[3].getElementsByClassName('default__small__btn check__btn')[0].click();");
-            Thread.Sleep(4000);
+            Thread.Sleep(6000);
         }
 
         /// <summary>
@@ -249,6 +260,27 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             }
 
             GetElementByXPath("//*[@id='login_form']/div[2]/div/div/div[1]/button").Click();
+            Thread.Sleep(2000);
+        }
+
+        /// <summary>
+        /// Получить баланс
+        /// </summary>
+        protected string GetBalance()
+        {
+            return GetElementByXPath("//*[@id='header']/div/div/div[3]/div/div/div[2]/span[2]").GetInnerText();
+        }
+
+        /// <summary>
+        /// Обновить модель
+        /// </summary>
+        /// <param name="url">Url-адрес</param>
+        protected void UpdateModel(string url)
+        {
+            var internetService = WebService.GetInternetServices().Where(w => w.URL == url).FirstOrDefault();
+            internetService.BalanceOnService = GetBalance();
+
+            WebService.UpdateInternetService(internetService);
         }
     }
 }

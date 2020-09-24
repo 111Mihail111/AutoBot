@@ -238,7 +238,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     break;
             }
 
-            //GetElementByXPath("//*[@id='content']/div[3]/div[1]/a[1]").Click(); //У лайков есть еще такой путь //*[@id="like457756"]/div[3]/a
+            Thread.Sleep(2000);
         }
 
         /// <summary>
