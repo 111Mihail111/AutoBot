@@ -33,7 +33,7 @@ namespace AutoBot.Area.Managers
         #endregion Path for driver
 
 
-        public void Initialization(string pathToProfile)
+        public void Initialization(string pathToProfile) //Есть TODO
         {
             ChromeOptions options = new ChromeOptions();
             options.AddArgument($"--user-data-dir={pathToProfile}"); //Путь к папке с профилем
@@ -41,8 +41,9 @@ namespace AutoBot.Area.Managers
             options.AddArgument("--start-maximized"); //Полностью открывает браузер
             options.AddAdditionalCapability("useAutomationExtension", false); //Скрывает расширение
             options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
+            //TODO: Запускать браузер в свернутом режиме
 
-            _browser = new ChromeDriver("/_VS_Project/Mihail/AutoBot/BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
+            _browser = new ChromeDriver("/Project/AutoBot/bin/Debug/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
         }
 
         /// <summary>
