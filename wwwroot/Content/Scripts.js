@@ -14,8 +14,8 @@ function CheckSites(site, isCrane) {
         let timer = notes.children[i].getElementsByTagName("input")[1].value;
         if (timer === "00:00:00") {
 
-            let statusCrane = notes.children[i].getElementsByTagName("input")[2].value;
-            if (statusCrane === "NoWork" || statusCrane === "InWork") {
+            let status = notes.children[i].getElementsByTagName("input")[2].value;
+            if (status === "NoWork" || status === "InWork") {
                 continue;
             }
 
@@ -24,12 +24,12 @@ function CheckSites(site, isCrane) {
             var data;
             if (isCrane) {
                 data = GetRowData(notes.children[i]);
-                UpdatingStatusCrane(data.URL, data.StatusCrane);
+                UpdatingStatusCrane(data.URL, data.Status);
                 GoToCrane(data);
             }
             else {
                 data = GetRowData(notes.children[i]);
-                UpdatingStatusService(data.URL, data.StatusService);
+                UpdatingStatusService(data.URL, data.Status);
                 GoToService(data);
             }
         }
@@ -50,6 +50,9 @@ function CheckSites(site, isCrane) {
 function ChangeStatus(select) {
     var row = select.parentElement.parentElement.parentElement;
     row.children[0].children[2].children[0].value = select.value;
+
+    var model = GetRowData(row);
+    UpdatingStatusService(model.URL, model.Status)
 }
 
 /*Получить данные строки*/
@@ -71,7 +74,7 @@ function UpdatingTimerCrane(crane) {
         data: {
             'URL': crane.URL,
             'ActivityTime': crane.ActivityTime,
-            'StatusCrane': crane.StatusCrane,
+            'StatusCrane': crane.Status,
             'BalanceOnCrane': crane.BalanceOnCrane,
             'TypeCurrencies': crane.TypeCurrencies,
             'TypeCrane': crane.TypeCrane,
@@ -92,7 +95,7 @@ function UpdatingTimerService(internetService) {
         data: {
             'URL': internetService.URL,
             'ActivityTime': internetService.ActivityTime,
-            'StatusService': internetService.StatusService,
+            'StatusService': internetService.Status,
             'BalanceOnService': internetService.BalanceOnService,
             'TypeService': internetService.TypeService,
         },
@@ -144,7 +147,7 @@ function GoToCrane(crane) {
         data: {
             'URL': crane.URL,
             'ActivityTime': crane.ActivityTime,
-            'StatusCrane': crane.StatusCrane,
+            'StatusCrane': crane.Status,
             'BalanceOnCrane': crane.BalanceOnCrane,
             'TypeCurrencies': crane.TypeCurrencies,
             'TypeCrane': crane.TypeCrane,
@@ -163,7 +166,7 @@ function GoToService(internetService) {
         data: {
             'URL': internetService.URL,
             'ActivityTime': internetService.ActivityTime,
-            'StatusService': internetService.StatusService,
+            'StatusService': internetService.Status,
             'BalanceOnService': internetService.BalanceOnService,
             'TypeService': internetService.TypeService,
         },

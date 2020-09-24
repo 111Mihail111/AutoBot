@@ -6,6 +6,7 @@ using AutoBot.Area.Services;
 using AutoBot.Extentions;
 using AutoBot.Models;
 using OpenQA.Selenium;
+using System;
 using System.Linq;
 using System.Threading;
 
@@ -46,9 +47,13 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _ytManager.SetContextBrowserManager(driver);
         }
 
+        /// <summary>
+        /// Авторизация в соц сетях
+        /// </summary>
         protected void AuthorizationSocialNetworks() //ЕСТЬ TODO
         {
             var accounts = AccountService.GetAccount(TypeService.VkTarget);
+
             var accountMain = accounts.Where(w => w.AccountType == AccountType.Main).First();
             _login = accountMain.Login;
             _password = accountMain.Password;
@@ -56,11 +61,18 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             //_loginClassmates = _login;
             //_passwordClassmates = _password;
 
-            var accountVK = accounts.Where(w => w.AccountType == AccountType.Vk).First();
-            var accountYouTube = accounts.Where(w => w.AccountType == AccountType.YouTube).First();
+            var accountVK = accounts.Where(w => w.AccountType == AccountType.Vk).FirstOrDefault();//?.First();
+            if (accountVK != null)
+            {                
+                _vkManager.Authorization(accountVK.Login, accountVK.Password);
+            }
 
-            _vkManager.Authorization(accountVK.Login, accountVK.Password);
-            _ytManager.Authorization(accountYouTube.Login, accountYouTube.Password);
+            var accountYouTube = accounts.Where(w => w.AccountType == AccountType.YouTube).FirstOrDefault();
+            if (accountYouTube != null)
+            {
+                _ytManager.Authorization(accountYouTube.Login, accountYouTube.Password);
+            }
+            
             //TODO: Авторизация одноклассники
             _isAuthorization = true;
         }
@@ -96,7 +108,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                         CarryOutTaskInYouTube(task[1]);
                         break;
                     case "NoTasks":
-                        OnFocusElements();
+                        ShowActivity();
                         break;
                 }
 
@@ -104,21 +116,40 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             }
         }
 
-        protected void OnFocusElements()
+        /// <summary>
+        /// Проявить активность
+        /// </summary>
+        protected void ShowActivity()
         {
-            var liCollection = GetElementByXPath("//*[@id='list']/main/section[1]/div[2]/div/div/div/ul").FindElements(SearchMethod.Tag, "li");
-            foreach (var item in liCollection)
+            int forAdditionalAction = GetRandomNumber(0, 2);
+            switch (GetRandomNumber(0, 2))
             {
-                FocusOnElement(item);
-                Thread.Sleep(10000);
-            }
+                case 0:
+                    var liCollection = GetElementByXPath("//*[@id='list']/main/section[1]/div[2]/div/div/div/ul").FindElements(SearchMethod.Tag, "li").ToList();
+                    var randomIndex = GetRandomNumber(0, liCollection.Count);
+                    var liElement = liCollection[randomIndex];
 
-            var buttons = GetElementByClassName("header__links").FindElements(SearchMethod.Tag, "a");
-            foreach (var item in buttons)
-            {
-                FocusOnElement(item);
-                Thread.Sleep(5000);
-            }
+                    FocusOnElement(liElement);
+
+                    if (liElement.GetInnerText().Contains("Доступные") && forAdditionalAction == 1)
+                    {
+                        liElement.Click();
+                        Thread.Sleep(2000);
+                    }
+                    break;
+                case 1:
+                    var logotype = GetElementByXPath("//*[@id='header']/div/div/div[1]/div/a");
+                    FocusOnElement(logotype);
+
+                    if (forAdditionalAction == 1)
+                    {
+                        logotype.Click();
+                        Thread.Sleep(2000);
+                    }
+                    break;
+                case 2:
+                    break;
+            }            
         }
 
         /// <summary>
@@ -281,6 +312,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             internetService.BalanceOnService = GetBalance();
 
             WebService.UpdateInternetService(internetService);
+        }
+
+        protected int GetRandomNumber(int min, int max)
+        {
+            return new Random().Next(min, max);
         }
     }
 }
