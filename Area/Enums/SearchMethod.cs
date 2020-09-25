@@ -6,12 +6,16 @@
     public enum SearchMethod
     {
         /// <summary>
-        /// Тэг
+        /// Наименование html-тэга
         /// </summary>
         Tag = 0,
         /// <summary>
-        /// Название html-тэга
+        /// Наименование класса
         /// </summary>
         ClassName = 1,
+        /// <summary>
+        /// Наименование id
+        /// </summary>
+        Id = 2,
     }
 }

@@ -41,7 +41,7 @@ namespace AutoBot.Area.Managers
             options.AddArgument("--start-maximized"); //Полностью открывает браузер
             options.AddAdditionalCapability("useAutomationExtension", false); //Скрывает расширение
             options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
-            //TODO: Запускать браузер в свернутом режиме
+            //TODO: Запускать браузер в свернутом режиме. Попробовать через это kWindowSize
 
             _browser = new ChromeDriver("/Project/AutoBot/bin/Debug/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
         }
@@ -94,7 +94,7 @@ namespace AutoBot.Area.Managers
         /// </summary>
         public void SwitchToLastTab()
         {
-            Thread.Sleep(1000);
+            Thread.Sleep(1500);
             var newTabInstance = _browser.WindowHandles[_browser.WindowHandles.Count - 1];
             _browser.SwitchTo().Window(newTabInstance);
         }

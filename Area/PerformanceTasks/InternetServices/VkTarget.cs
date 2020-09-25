@@ -6,6 +6,7 @@ using AutoBot.Area.Services;
 using AutoBot.Extentions;
 using AutoBot.Models;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using System;
 using System.Linq;
 using System.Threading;
@@ -41,7 +42,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         {
             _vkManager = new VkManager();
             _ytManager = new YouTubeManager();
-            
+
             var driver = GetDriver();
             _vkManager.SetContextBrowserManager(driver);
             _ytManager.SetContextBrowserManager(driver);
@@ -121,8 +122,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void ShowActivity()
         {
-            int forAdditionalAction = GetRandomNumber(0, 2);
-            switch (GetRandomNumber(0, 2))
+            int randomSleep = GetRandomNumber(1, 3) * 10000;
+
+            int randomAction = GetRandomNumber(0, 3);
+            switch (randomAction)
             {
                 case 0:
                     var liCollection = GetElementByXPath("//*[@id='list']/main/section[1]/div[2]/div/div/div/ul").FindElements(SearchMethod.Tag, "li").ToList();
@@ -131,25 +134,32 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
                     FocusOnElement(liElement);
 
-                    if (liElement.GetInnerText().Contains("Доступные") && forAdditionalAction == 1)
+                    if (liElement.GetInnerText().Contains("Доступные") && randomAction == 1)
                     {
                         liElement.Click();
-                        Thread.Sleep(2000);
+                        Thread.Sleep(randomSleep * 1500);
                     }
                     break;
                 case 1:
                     var logotype = GetElementByXPath("//*[@id='header']/div/div/div[1]/div/a");
                     FocusOnElement(logotype);
 
-                    if (forAdditionalAction == 1)
+                    if (randomAction == 1)
                     {
                         logotype.Click();
-                        Thread.Sleep(2000);
+                        Thread.Sleep(randomSleep * 1500);
                     }
                     break;
                 case 2:
+                    OpenPageInNewTab(string.Empty);
+                    Thread.Sleep(5000);
+
+                    CloseTab();
+                    SwitchToTab();
                     break;
-            }            
+            }
+
+            Thread.Sleep(randomSleep);
         }
 
         /// <summary>
@@ -232,10 +242,21 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void CheckTask()
         {
-            ExecuteScript("var task = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>" +
-                "div.container-fluid.available__table').getElementsByClassName('row tb__row');" +
-                "task[0].children[3].getElementsByClassName('default__small__btn check__btn')[0].click();");
-            Thread.Sleep(6000);
+            string getTaskIdScript = "var task = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>" +
+                "div.container-fluid.available__table').getElementsByClassName('row tb__row')[0];" +
+                "return task.getAttribute('data-task-item');";
+
+            bool isCheked = true;
+            while (isCheked)
+            {
+                var taksId = ExecuteScript(getTaskIdScript);
+                ExecuteScript(getTaskIdScript + "task.children[3].getElementsByClassName('default__small__btn check__btn')[0].click();");
+
+                if (taksId != ExecuteScript(getTaskIdScript))
+                {
+                    isCheked = false;
+                }
+            }
         }
 
         /// <summary>
@@ -318,5 +339,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         {
             return new Random().Next(min, max);
         }
+
     }
 }

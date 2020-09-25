@@ -132,6 +132,8 @@ namespace AutoBot.Extentions
                     return webElement.FindElement(By.TagName(attribute));
                 case SearchMethod.ClassName:
                     return webElement.FindElement(By.ClassName(attribute));
+                case SearchMethod.Id:
+                    return webElement.FindElement(By.Id(attribute));
                 default:
                     return null;
             }
@@ -152,6 +154,8 @@ namespace AutoBot.Extentions
                     return webElement.FindElements(By.TagName(attribute));
                 case SearchMethod.ClassName:
                     return webElement.FindElements(By.ClassName(attribute));
+                case SearchMethod.Id:
+                    return webElement.FindElements(By.Id(attribute));
                 default:
                     return null;
             }

@@ -1,6 +1,7 @@
 ﻿using AutoBot.Area.Enums;
 using AutoBot.Area.Managers.Interface;
 using AutoBot.Extentions;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System.Linq;
 using System.Threading;
@@ -57,7 +58,8 @@ namespace AutoBot.Area.Managers
 
         public void SubscribeToChannel()
         {
-            GetElementsByClassName("style-scope ytd-subscribe-button-renderer").First().Click();
+            GetElementById("channel-header-container")
+                .FindElement(SearchMethod.Id, "subscribe-button").FindElement(SearchMethod.Tag, "paper-button").Click();
             Thread.Sleep(2000);
         }
 
@@ -78,7 +80,6 @@ namespace AutoBot.Area.Managers
         {
             GetDriver(chromeDriver);
         }
-
 
         /// <summary>
         /// Авторизация под сохраненным профилем
