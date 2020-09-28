@@ -58,7 +58,7 @@ namespace AutoBot.Area.Managers
             GetElementById("passwordNext").FindElement(SearchMethod.Tag, "button").Click();
             Thread.Sleep(2000);
 
-            SwitchToTab();
+            SwitchToLastTab();
             CloseTab();
             SwitchToTab();
         }
