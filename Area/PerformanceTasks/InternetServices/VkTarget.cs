@@ -8,6 +8,7 @@ using AutoBot.Models;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -23,6 +24,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
         private IVkManager _vkManager;
         private IYouTubeManager _ytManager;
+        private IClassmatesManager _classmatesManager;
 
         protected void Init()
         {
@@ -42,27 +44,26 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         {
             _vkManager = new VkManager();
             _ytManager = new YouTubeManager();
+            _classmatesManager = new ClassmatesManager();
 
             var driver = GetDriver();
             _vkManager.SetContextBrowserManager(driver);
             _ytManager.SetContextBrowserManager(driver);
+            _classmatesManager.SetContextBrowserManager(driver);
         }
 
         /// <summary>
         /// Авторизация в соц сетях
         /// </summary>
-        protected void AuthorizationSocialNetworks() //ЕСТЬ TODO
+        protected void AuthorizationSocialNetworks()
         {
             var accounts = AccountService.GetAccount(TypeService.VkTarget);
 
             var accountMain = accounts.Where(w => w.AccountType == AccountType.Main).First();
             _login = accountMain.Login;
             _password = accountMain.Password;
-
-            //_loginClassmates = _login;
-            //_passwordClassmates = _password;
-
-            var accountVK = accounts.Where(w => w.AccountType == AccountType.Vk).FirstOrDefault();//?.First();
+            
+            var accountVK = accounts.Where(w => w.AccountType == AccountType.Vk).FirstOrDefault();
             if (accountVK != null)
             {                
                 _vkManager.Authorization(accountVK.Login, accountVK.Password);
@@ -73,8 +74,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 _ytManager.Authorization(accountYouTube.Login, accountYouTube.Password);
             }
-            
-            //TODO: Авторизация одноклассники
+
+            _classmatesManager.AuthorizationThroughMail(_login, _password);
             _isAuthorization = true;
         }
 
@@ -124,10 +125,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         {
             int randomSleep = GetRandomNumber(1, 3) * 10000;
 
-            int randomAction = GetRandomNumber(0, 3);
+            int randomAction = GetRandomNumber(1, 5);
             switch (randomAction)
             {
-                case 0:
+                case 1:
                     var liCollection = GetElementByXPath("//*[@id='list']/main/section[1]/div[2]/div/div/div/ul").FindElements(SearchMethod.Tag, "li").ToList();
                     var randomIndex = GetRandomNumber(0, liCollection.Count);
                     var liElement = liCollection[randomIndex];
@@ -137,25 +138,28 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     if (liElement.GetInnerText().Contains("Доступные") && randomAction == 1)
                     {
                         liElement.Click();
-                        Thread.Sleep(randomSleep * 1500);
+                        Thread.Sleep(randomSleep + 5000 / randomAction);
                     }
                     break;
-                case 1:
+                case 2:
                     var logotype = GetElementByXPath("//*[@id='header']/div/div/div[1]/div/a");
                     FocusOnElement(logotype);
 
                     if (randomAction == 1)
                     {
                         logotype.Click();
-                        Thread.Sleep(randomSleep * 1500);
+                        Thread.Sleep(randomSleep + 5000 / randomAction);
                     }
                     break;
-                case 2:
+                case 3:
                     OpenPageInNewTab(string.Empty);
                     Thread.Sleep(5000);
 
                     CloseTab();
                     SwitchToTab();
+                    break;
+                case 4:
+                    Thread.Sleep(randomSleep);
                     break;
             }
 
@@ -242,17 +246,19 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void CheckTask()
         {
-            string getTaskIdScript = "var task = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>" +
-                "div.container-fluid.available__table').getElementsByClassName('row tb__row')[0];" +
-                "return task.getAttribute('data-task-item');";
+            string getTaskScript = "var task = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>div" +
+                ".container-fluid.available__table').getElementsByClassName('row tb__row')[0];";
+            string clickButtonScript = "task.children[3].getElementsByClassName('default__small__btn check__btn')[0].click();";
+            string getAttribute = "return task.getAttribute('data-task-item');";
+
+            var taksId = ExecuteScript(getTaskScript + clickButtonScript + getAttribute);
 
             bool isCheked = true;
             while (isCheked)
             {
-                var taksId = ExecuteScript(getTaskIdScript);
-                ExecuteScript(getTaskIdScript + "task.children[3].getElementsByClassName('default__small__btn check__btn')[0].click();");
+                Thread.Sleep(1500);
 
-                if (taksId != ExecuteScript(getTaskIdScript))
+                if (taksId != ExecuteScript(getTaskScript + getAttribute))
                 {
                     isCheked = false;
                 }

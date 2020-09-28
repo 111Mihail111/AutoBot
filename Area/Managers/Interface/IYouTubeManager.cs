@@ -2,6 +2,9 @@
 
 namespace AutoBot.Area.Managers.Interface
 {
+    /// <summary>
+    /// Ютуб менеджер
+    /// </summary>
     public interface IYouTubeManager
     {
         /// <summary>

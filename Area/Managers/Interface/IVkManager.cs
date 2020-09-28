@@ -2,6 +2,9 @@
 
 namespace AutoBot.Area.Managers.Interface
 {
+    /// <summary>
+    /// VK менеджер
+    /// </summary>
     public interface IVkManager
     {
         /// <summary>

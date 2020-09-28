@@ -81,7 +81,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
             JoinInCommunityVK();
             WorkWithLikesVK();
-            //AddToFriendsVK();
+            AddToFriendsVK();
             //WorkWithYouTube(); //TODO: Не отлажен
             SubscriptionsInInstagram();
             WorkWithLikeInstagram();
