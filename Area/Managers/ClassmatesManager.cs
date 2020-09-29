@@ -16,6 +16,8 @@ namespace AutoBot.Area.Managers
 
             if (url == GetUrlPage())
             {
+                CloseTab();
+                SwitchToTab();
                 return;
             }
 
@@ -61,6 +63,29 @@ namespace AutoBot.Area.Managers
             SwitchToLastTab();
             CloseTab();
             SwitchToTab();
+        }
+
+        public void JoinGroup()
+        {
+            var buttons = GetElementById("hook_Block_AltGroupMainMenu").FindElements(SearchMethod.Tag, "a");
+            foreach (var item in buttons)
+            {
+                if (item.GetInnerText() == "Вступить")
+                {
+                    item.Click();
+                }
+            }
+
+            Thread.Sleep(2000);
+        }
+
+        public void LeaveGroup()
+        {
+            GetElementByClassName("dropdown").Click();
+            Thread.Sleep(300);
+            GetElementByClassName("dropdown_n").Click();
+
+            Thread.Sleep(1000);
         }
 
         /// <summary>

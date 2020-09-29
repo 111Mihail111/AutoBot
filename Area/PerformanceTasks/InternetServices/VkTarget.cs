@@ -4,11 +4,8 @@ using AutoBot.Area.Managers.Interface;
 using AutoBot.Area.PerformanceTasks.Interface;
 using AutoBot.Area.Services;
 using AutoBot.Extentions;
-using AutoBot.Models;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -109,6 +106,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     case "youtube":
                         CarryOutTaskInYouTube(task[1]);
                         break;
+                    case "odnoklassniki":
+                        CarryOutTaskInСlassmates(task[1]);
+                        break;
                     case "NoTasks":
                         ShowActivity();
                         break;
@@ -116,54 +116,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
                 UpdateModel(url);
             }
-        }
-
-        /// <summary>
-        /// Проявить активность
-        /// </summary>
-        protected void ShowActivity()
-        {
-            int randomSleep = GetRandomNumber(1, 3) * 10000;
-
-            int randomAction = GetRandomNumber(1, 5);
-            switch (randomAction)
-            {
-                case 1:
-                    var liCollection = GetElementByXPath("//*[@id='list']/main/section[1]/div[2]/div/div/div/ul").FindElements(SearchMethod.Tag, "li").ToList();
-                    var randomIndex = GetRandomNumber(0, liCollection.Count);
-                    var liElement = liCollection[randomIndex];
-
-                    FocusOnElement(liElement);
-
-                    if (liElement.GetInnerText().Contains("Доступные") && randomAction == 1)
-                    {
-                        liElement.Click();
-                        Thread.Sleep(randomSleep + 5000 / randomAction);
-                    }
-                    break;
-                case 2:
-                    var logotype = GetElementByXPath("//*[@id='header']/div/div/div[1]/div/a");
-                    FocusOnElement(logotype);
-
-                    if (randomAction == 1)
-                    {
-                        logotype.Click();
-                        Thread.Sleep(randomSleep + 5000 / randomAction);
-                    }
-                    break;
-                case 3:
-                    OpenPageInNewTab(string.Empty);
-                    Thread.Sleep(5000);
-
-                    CloseTab();
-                    SwitchToTab();
-                    break;
-                case 4:
-                    Thread.Sleep(randomSleep);
-                    break;
-            }
-
-            Thread.Sleep(randomSleep);
         }
 
         /// <summary>
@@ -177,14 +129,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (taskText)
             {
                 case "Вступите в сообщество":
-                    if (_vkManager.IsBlockedCommunity())
+                    if (!_vkManager.IsBlockedCommunity())
                     {
-                        CloseTab();
-                        SwitchToTab();
-                        SkipTask();
-                        return;
+                        _vkManager.JoinToComunity();
+                        break;
                     }
-                    _vkManager.JoinToComunity();
+                    SkipTask();
                     break;
                 case "Поставьте лайк на странице":
                     _vkManager.PutLike();
@@ -232,6 +182,75 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         }
 
         /// <summary>
+        /// Выполнить задачу в одноклассниках
+        /// </summary>
+        /// <param name="taskText">Текст задачи</param>
+        protected void CarryOutTaskInСlassmates(string taskText)
+        {
+            SwitchToLastTab();
+
+            switch (taskText)
+            {
+                case "Вступить в группу":
+                    _classmatesManager.JoinGroup();
+                    break;
+            }
+
+            CloseTab();
+            SwitchToTab();
+            CheckTask();
+        }
+
+        /// <summary>
+        /// Проявить активность
+        /// </summary>
+        protected void ShowActivity()
+        {
+            int randomSleep = GetRandomNumber(1, 3) * 10000;
+
+            int randomAction = GetRandomNumber(1, 5);
+            switch (randomAction)
+            {
+                case 1:
+                    var liCollection = GetElementByXPath("//*[@id='list']/main/section[1]/div[2]/div/div/div/ul")
+                        .FindElements(SearchMethod.Tag, "li").ToList();
+                    var randomIndex = GetRandomNumber(0, liCollection.Count);
+                    var liElement = liCollection[randomIndex];
+
+                    FocusOnElement(liElement);
+
+                    if (liElement.GetInnerText().Contains("Доступные") && randomAction == 1)
+                    {
+                        liElement.Click();
+                        Thread.Sleep(randomSleep + 5000 / randomAction);
+                    }
+                    break;
+                case 2:
+                    var logotype = GetElementByXPath("//*[@id='header']/div/div/div[1]/div/a");
+                    FocusOnElement(logotype);
+
+                    if (randomAction == 1)
+                    {
+                        logotype.Click();
+                        Thread.Sleep(randomSleep + 5000 / randomAction);
+                    }
+                    break;
+                case 3:
+                    OpenPageInNewTab(string.Empty);
+                    Thread.Sleep(5000);
+
+                    CloseTab();
+                    SwitchToTab();
+                    break;
+                case 4:
+                    Thread.Sleep(randomSleep);
+                    break;
+            }
+
+            Thread.Sleep(randomSleep);
+        }
+
+        /// <summary>
         /// Пропуск задания
         /// </summary>
         protected void SkipTask()
@@ -244,7 +263,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Проверить задание
         /// </summary>
-        protected void CheckTask()
+        protected void CheckTask() //Есть TODO
         {
             string getTaskScript = "var task = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>div" +
                 ".container-fluid.available__table').getElementsByClassName('row tb__row')[0];";
@@ -258,11 +277,13 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 Thread.Sleep(1500);
 
-                if (taksId != ExecuteScript(getTaskScript + getAttribute))
+                if (taksId != ExecuteScript(getTaskScript + getAttribute)) //TODO:Когда остается последнее задание, записи из разметки не уходят и цикл становится вечным
                 {
                     isCheked = false;
-                }
+                }    
             }
+
+            //TODO:Нужно придумыть способ, как отменять проделанные действия, в случае не оплаты задания
         }
 
         /// <summary>

@@ -15,6 +15,16 @@ namespace AutoBot.Area.Managers.Interface
         public void AuthorizationThroughMail(string email, string password);
 
         /// <summary>
+        /// Вступить в группу
+        /// </summary>
+        public void JoinGroup();
+
+        /// <summary>
+        /// Покинуть группу
+        /// </summary>
+        public void LeaveGroup();
+
+        /// <summary>
         /// Считать контекст браузер менеджера
         /// </summary>
         /// <param name="chromeDriver">Хром драйвер</param>

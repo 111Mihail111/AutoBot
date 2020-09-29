@@ -2,6 +2,7 @@
 using AutoBot.Area.Managers.Interface;
 using AutoBot.Extentions;
 using OpenQA.Selenium.Chrome;
+using System.Linq;
 using System.Threading;
 
 namespace AutoBot.Area.Managers
@@ -70,29 +71,58 @@ namespace AutoBot.Area.Managers
 
         public void Unsubscribe()
         {
+            string canselSubscribeButtonClickScript = "document.getElementsByClassName('aOOlW -Cab_   ')[0].click();";
+
             var buttons = GetElementsByTagName("button");
             foreach (var item in buttons)
             {
-                var span = item.FindElement(SearchMethod.Tag, "span");
-                if (span.GetAriaLabel() == "Подписки")
+                var spanCollection = item.FindElements(SearchMethod.Tag, "span");
+                if (item.GetInnerText() == "Запрос отправлен")
                 {
                     item.Click();
+                    Thread.Sleep(400);
 
-                    GetElementByClassName("aOOlW -Cab_   ").Click();
-                    Thread.Sleep(2000);
+                    ExecuteScript(canselSubscribeButtonClickScript);
+                    break;
+                }
+                else if (spanCollection.Any())
+                {
+                    if (spanCollection.First().GetAriaLabel() == "Подписки")
+                    {
+                        item.Click();
+                        Thread.Sleep(400);
+
+                        ExecuteScript(canselSubscribeButtonClickScript);
+                        break;
+                    }
                 }
             }
+
+            Thread.Sleep(2000);
         }
 
         public void PutLike()
         {
-            var buttons = GetElementsByClassName("wpO6b");
-            foreach (var item in buttons)
+            var svgCollection = GetElementsByClassName("_8-yf5");
+            foreach (var item in svgCollection)
             {
-                var svg = item.FindElement(SearchMethod.Tag, "svg");
-                if (svg.GetAriaLabel() == "Нравится")
+                if (item.GetAriaLabel() == "Нравится")
                 {
-                    svg.Click();
+                    item.Click();
+                    Thread.Sleep(2000);
+                    return;
+                }
+            }
+        }
+
+        public void RemoveLike()
+        {
+            var svgCollection = GetElementsByClassName("_8-yf5");
+            foreach (var item in svgCollection)
+            {
+                if (item.GetAriaLabel() == "Не нравится")
+                {
+                    item.Click();
                     Thread.Sleep(2000);
                     return;
                 }

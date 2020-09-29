@@ -91,7 +91,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Вступить в сообщество ВК
         /// </summary>
-        protected void JoinInCommunityVK()
+        protected void JoinInCommunityVK() //Есть TODO
         {
             GetElementByXPath("//*[@id='vk1']/a").Click();
 
@@ -119,7 +119,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 if (DelayPayments())
                 {
                     OpenPageInNewTab(url);
-                    _vkManager.UnsubscribeToComunity();
+                    _vkManager.UnsubscribeToComunity(); //TODO:Протестировать
                     SkipTask("vkCommunity");
                 }
 
@@ -200,7 +200,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     AlertAccept();
 
                     counter++;
-                    if (counter == 20)
+                    if (counter == 10)
                     {
                         return true;
                     }
@@ -232,6 +232,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 case "instaSubscription":
                 case "instaLike":
                     GetElementByXPath("//*[@id='content']/div[2]/div/a[1]").Click();
+                    AlertAccept();
                     break;
                 case "vkCommunity":
                     GetElementByXPath("//*[@id='content']/div[3]/div/a[1]").Click();
@@ -331,7 +332,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 GetElementByXPath("//*[@id='content']/div[2]/div[1]/div[3]/a").Click();
                 SwitchToLastTab();
-                Thread.Sleep(2500);
+                Thread.Sleep(1000);
 
                 if (!_instaManager.IsFoundPage())
                 {
@@ -353,7 +354,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     SkipTask("instaSubscription");
                 }
 
-                Thread.Sleep(1000);
                 groups = GetElementsByClassName("groups");
             }
         }
@@ -388,7 +388,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 if (DelayPayments())
                 {
                     OpenPageInNewTab(url);
-                    _instaManager.PutLike();
+                    _instaManager.RemoveLike();
                     SkipTask("instaLike");
                     groups = GetElementsByClassName("groups");
                     continue;

@@ -27,6 +27,11 @@ namespace AutoBot.Area.Managers.Interface
         public void PutLike();
 
         /// <summary>
+        /// Удалить лайк
+        /// </summary>
+        public void RemoveLike();
+
+        /// <summary>
         /// Найдена ли страница
         /// </summary>
         /// <returns>True - найдена, иначе false</returns>
