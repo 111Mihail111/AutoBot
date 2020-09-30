@@ -25,6 +25,8 @@ namespace AutoBot.Area.Managers
         public void UnsubscribeToComunity()
         {
             GetElementById("page_actions_btn").Click();
+            Thread.Sleep(400);
+
             GetElementsByClassName("page_actions_inner").First().FindElements(SearchMethod.Tag, "a").First().Click();
             Thread.Sleep(1500);
         }

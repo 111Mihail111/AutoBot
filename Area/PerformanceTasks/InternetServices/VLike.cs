@@ -301,11 +301,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         {
             GetElementByXPath("//*[@id='vk3']/a").Click();
 
-            var message = GetElementByXPath("//*[@id='content']/div[2]/h3").GetInnerText();
+            var message = GetElementByXPath("//*[@id='content']/div[2]/h3").GetInnerText(); ////*[@id="content"]/div[2]
             while (message != "Никто не ищет друзей :-(")
             {
                 ButtonsVisible();
-                GetElementByXPath("//*[@id='friend20321']/div[3]/a").Click();
+                GetElementByXPath("//*[@id='content']/div[2]/div[2]/div[3]/a").Click();
                 SwitchToLastTab();
 
                 //RemoveWindowMessage();
