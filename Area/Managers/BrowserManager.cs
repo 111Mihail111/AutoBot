@@ -43,7 +43,7 @@ namespace AutoBot.Area.Managers
             options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
             //TODO: Запускать браузер в свернутом режиме. Попробовать через это kWindowSize
 
-            _browser = new ChromeDriver("/Project/AutoBot/bin/Debug/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
+            _browser = new ChromeDriver("/_VS_Project/Mihail/AutoBot/BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
         }
 
         /// <summary>
@@ -167,9 +167,9 @@ namespace AutoBot.Area.Managers
         /// </summary>
         /// <param name="jsScript">Скрипт</param>
         /// <returns>Возвращаемое значение скрипта</returns>
-        public string ExecuteScript(string jsScript)
+        public string ExecuteScript(string jsScript) //Есть TODO
         {
-            return _browser.ExecuteScript(jsScript)?.ToString();
+            return _browser.ExecuteScript(jsScript)?.ToString(); //TODO: unknown error: session deleted because of page crash from unknown error: cannot determine loading status from tab crashed
         }
         /// <summary>
         /// Асинхронно выполнить скрипт
