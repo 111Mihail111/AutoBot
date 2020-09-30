@@ -12,14 +12,19 @@ namespace AutoBot.Area.Managers
         public void JoinToComunity()
         {
             var joinButton = GetElementById("join_button");
-            if (joinButton == null)
+            if (joinButton != null)
             {
-                GetElementById("public_subscribe").Click();
+                joinButton.Click();
                 Thread.Sleep(1500);
                 return;
             }
-            joinButton.Click();
-            Thread.Sleep(1500);
+
+            var publicSubscribe = GetElementById("public_subscribe");
+            if (publicSubscribe != null)
+            {
+                publicSubscribe.Click();
+                Thread.Sleep(1500);
+            }
         }
 
         public void UnsubscribeToComunity()

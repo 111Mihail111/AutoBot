@@ -194,6 +194,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 case "Вступить в группу":
                     _classmatesManager.JoinGroup();
                     break;
+                case "Поставьте класс под записью":
+                    //https://ok.ru/nashuralmash/topic/152174172910436 //divId hook_Block_AltGroupTopicLayerBody
+                    break;
+                case "Поставить 'Класс' на публикации":
+                    break;
             }
 
             CloseTab();
@@ -206,7 +211,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void ShowActivity()
         {
-            int randomSleep = GetRandomNumber(1, 3) * 10000;
+            int randomSleep = GetRandomNumber(1, 3) * 5000;
 
             int randomAction = GetRandomNumber(1, 5);
             switch (randomAction)
@@ -236,10 +241,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     }
                     break;
                 case 3:
-                    OpenPageInNewTab(string.Empty);
-                    Thread.Sleep(5000);
+                    //OpenPageInNewTab(string.Empty);
+                    Thread.Sleep(randomSleep + 5000 / randomAction);
 
-                    CloseTab();
+                    //CloseTab();
                     SwitchToTab();
                     break;
                 case 4:
@@ -277,13 +282,18 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 Thread.Sleep(1500);
 
-                if (taksId != ExecuteScript(getTaskScript + getAttribute)) //TODO:Когда остается последнее задание, записи из разметки не уходят и цикл становится вечным
+                if (taksId != ExecuteScript(getTaskScript + getAttribute))
                 {
                     isCheked = false;
-                }    
+                }
+                else
+                {
+                    ShowActivity();
+                }
             }
 
             //TODO:Нужно придумыть способ, как отменять проделанные действия, в случае не оплаты задания
+            //document.getElementsByClassName("is_error") Если null и нет строки с taskId, значит за задание уплотили
         }
 
         /// <summary>

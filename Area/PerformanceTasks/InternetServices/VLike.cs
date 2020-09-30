@@ -130,12 +130,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Работа с лайками
         /// </summary>
-        protected void WorkWithLikesVK() //Есть TODO
+        protected void WorkWithLikesVK()
         {
             GetElementByXPath("//*[@id='vk2']/a").Click();
 
-            var perfomanse = GetElementByClassName("groups")?.GetInnerText(); //TODO: null в коллекции
-            while (perfomanse != null && perfomanse != string.Empty && perfomanse != "Нет доступных заданий. Заходите позже!")
+            var perfomanse = GetElementByClassName("groups")?.GetInnerText();
+            while (!string.IsNullOrEmpty(perfomanse) && perfomanse != "Нет доступных заданий. Заходите позже!")
             {
                 ButtonsVisible();
                 GetElementByXPath("//*[@id='content']/div[3]/div[1]/div[3]/a").Click();
