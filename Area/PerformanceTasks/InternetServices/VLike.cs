@@ -130,7 +130,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Работа с лайками
         /// </summary>
-        protected void WorkWithLikesVK()
+        protected void WorkWithLikesVK() //Есть TODO
         {
             GetElementByXPath("//*[@id='vk2']/a").Click();
 
@@ -145,12 +145,14 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 _vkManager.RemoveWindowMessage();
                 RefreshPage();
 
+                //TODO: Проверка вдруг запись не найдена https://vk.com/wall-35192468_75363
+
                 if (titleTask == "Поставить Лайк + Рассказать друзьям")
                 {
                     _vkManager.MakeRepost();
                 }
 
-                _vkManager.PutLike();
+                _vkManager.PutLike(); 
                 Thread.Sleep(3500);
 
                 string url = GetUrlPage();
