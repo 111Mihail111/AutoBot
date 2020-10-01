@@ -87,7 +87,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             WorkWithLikeInstagram();
         }
 
-
         /// <summary>
         /// Вступить в сообщество ВК
         /// </summary>
@@ -100,7 +99,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 GetElementByXPath("//*[@id='content']/div[3]/div[1]/div[3]/a").Click();
                 SwitchToLastTab();
-                _vkManager.RemoveWindowMessage();
 
                 string url = GetUrlPage();
 
@@ -119,7 +117,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 if (DelayPayments())
                 {
                     OpenPageInNewTab(url);
-                    _vkManager.RemoveWindowMessage();
                     _vkManager.UnsubscribeToComunity(); //TODO:Протестировать
                     SkipTask("vkCommunity");
                 }
@@ -127,7 +124,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 message = GetElementByXPath("//*[@id='content']/div[3]/div/p[1]/b");
             }
         }
-
         /// <summary>
         /// Работа с лайками
         /// </summary>
@@ -143,8 +139,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 var titleTask = GetElementByXPath("//*[@id='content']/div[3]/div[1]/div[2]/p").GetInnerText();
 
                 SwitchToLastTab();
-                _vkManager.RemoveWindowMessage();
-                RefreshPage();
 
                 //TODO: Проверка вдруг запись не найдена https://vk.com/wall-35192468_75363
 
@@ -153,7 +147,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _vkManager.MakeRepost();
                 }
 
-                _vkManager.PutLike(); 
+                _vkManager.PutLike();
                 Thread.Sleep(3500);
 
                 string url = GetUrlPage();
@@ -186,6 +180,83 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 perfomanse = GetElementByClassName("groups").GetInnerText();
             }
         }
+        /// <summary>
+        /// Подписки в инстаграмм
+        /// </summary>
+        protected void SubscriptionsInInstagram()
+        {
+            GetElementByXPath("//*[@id='in0']/a").Click();
+
+            var groups = GetElementsByClassName("groups");
+            while (groups.Count() != 0)
+            {
+                GetElementByXPath("//*[@id='content']/div[2]/div[1]/div[3]/a").Click();
+                SwitchToLastTab();
+                Thread.Sleep(1000);
+
+                if (!_instaManager.IsFoundPage())
+                {
+                    SkipTask("instaSubscription");
+                    groups = GetElementsByClassName("groups");
+                    continue;
+                }
+
+                _instaManager.Subscribe();
+                string url = GetUrlPage();
+
+                CloseTab();
+                SwitchToTab();
+
+                if (DelayPayments())
+                {
+                    OpenPageInNewTab(url);
+                    _instaManager.Unsubscribe();
+                    SkipTask("instaSubscription");
+                }
+
+                groups = GetElementsByClassName("groups");
+            }
+        }
+        /// <summary>
+        /// Лайки в инстаграмме
+        /// </summary>
+        protected void WorkWithLikeInstagram()
+        {
+            GetElementByXPath("//*[@id='in1']/a").Click();
+
+            var groups = GetElementsByClassName("groups");
+            while (groups.Count() != 0)
+            {
+                GetElementByXPath("//*[@id='content']/div[2]/div[1]/div[3]/a").Click();
+                SwitchToLastTab();
+                Thread.Sleep(2500);
+
+                if (!_instaManager.IsFoundPage())
+                {
+                    SkipTask("instaLike");
+                    groups = GetElementsByClassName("groups");
+                    continue;
+                }
+
+                _instaManager.PutLike();
+                string url = GetUrlPage();
+
+                CloseTab();
+                SwitchToTab();
+
+                if (DelayPayments())
+                {
+                    OpenPageInNewTab(url);
+                    _instaManager.RemoveLike();
+                    SkipTask("instaLike");
+                    groups = GetElementsByClassName("groups");
+                    continue;
+                }
+
+                groups = GetElementsByClassName("groups");
+            }
+        }
+
 
         /// <summary>
         /// Задержка платежа
@@ -321,86 +392,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 message = GetElementByXPath("//*[@id='content']/div[2]/h3").GetInnerText();
             }
         }
-
-
-        /// <summary>
-        /// Подписки в инстаграмм
-        /// </summary>
-        protected void SubscriptionsInInstagram()
-        {
-            GetElementByXPath("//*[@id='in0']/a").Click();
-
-            var groups = GetElementsByClassName("groups");
-            while (groups.Count() != 0)
-            {
-                GetElementByXPath("//*[@id='content']/div[2]/div[1]/div[3]/a").Click();
-                SwitchToLastTab();
-                Thread.Sleep(1000);
-
-                if (!_instaManager.IsFoundPage())
-                {
-                    SkipTask("instaSubscription");
-                    groups = GetElementsByClassName("groups");
-                    continue;
-                }
-
-                _instaManager.Subscribe();
-                string url = GetUrlPage();
-
-                CloseTab();
-                SwitchToTab();
-
-                if (DelayPayments())
-                {
-                    OpenPageInNewTab(url);
-                    _instaManager.Unsubscribe();
-                    SkipTask("instaSubscription");
-                }
-
-                groups = GetElementsByClassName("groups");
-            }
-        }
-
-        /// <summary>
-        /// Лайки в инстаграмме
-        /// </summary>
-        protected void WorkWithLikeInstagram()
-        {
-            GetElementByXPath("//*[@id='in1']/a").Click();
-
-            var groups = GetElementsByClassName("groups");
-            while (groups.Count() != 0)
-            {
-                GetElementByXPath("//*[@id='content']/div[2]/div[1]/div[3]/a").Click();
-                SwitchToLastTab();
-                Thread.Sleep(2500);
-
-                if (!_instaManager.IsFoundPage())
-                {
-                    SkipTask("instaLike");
-                    groups = GetElementsByClassName("groups");
-                    continue;
-                }
-
-                _instaManager.PutLike();
-                string url = GetUrlPage();
-
-                CloseTab();
-                SwitchToTab();
-               
-                if (DelayPayments())
-                {
-                    OpenPageInNewTab(url);
-                    _instaManager.RemoveLike();
-                    SkipTask("instaLike");
-                    groups = GetElementsByClassName("groups");
-                    continue;
-                }
-
-                groups = GetElementsByClassName("groups");
-            }
-        }
-
 
         /// <summary>
         /// Кнопки видимы

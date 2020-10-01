@@ -156,6 +156,12 @@ namespace AutoBot.Controllers
             return PartialView("_ManualStart", WebService.GetInternetServices());
         }
 
+        [HttpGet]
+        public PartialViewResult UpdateDataManualStartView()
+        {
+            return PartialView("_ManualStart", WebService.GetInternetServices());
+        }
+
         [HttpPost]
         public ActionResult SaveAccounts(IFormFile fileAccounts) //ЕСТЬ TODO
         {

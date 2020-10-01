@@ -23,22 +23,22 @@ function CheckSites(site, isCrane) {
 
             var data;
             if (isCrane) {
-                data = GetRowData(notes.children[i]);
+                data = GetDataRow(notes.children[i]);
                 UpdatingStatusCrane(data.URL, data.Status);
                 GoToCrane(data);
             }
             else {
-                data = GetRowData(notes.children[i]);
+                data = GetDataRow(notes.children[i]);
                 UpdatingStatusService(data.URL, data.Status);
                 GoToService(data);
             }
         }
         else {
             if (isCrane) {
-                UpdatingTimerCrane(GetRowData(notes.children[i]));
+                UpdatingTimerCrane(GetDataRow(notes.children[i]));
                 return;
             }
-            UpdatingTimerService(GetRowData(notes.children[i]));
+            UpdatingTimerService(GetDataRow(notes.children[i]));
         }
     }
 }
@@ -51,12 +51,12 @@ function ChangeStatus(select) {
     var row = select.parentElement.parentElement.parentElement;
     row.children[0].children[2].children[0].value = select.value;
 
-    var model = GetRowData(row);
+    var model = GetDataRow(row);
     UpdatingStatusService(model.URL, model.Status)
 }
 
 /*Получить данные строки*/
-function GetRowData(row) {
+function GetDataRow(row) {
     var rowDetails = [];
     var collectionInput = row.getElementsByTagName("input");
     for (var i = 0; i < collectionInput.length; i++) {
@@ -183,7 +183,7 @@ function CheckTimersCrane(crane) {
     var list = [];
 
     for (var i = 2; i < row.childElementCount; i++) {
-        list[i - 2] = GetRowData(row.children[i]);
+        list[i - 2] = GetDataRow(row.children[i]);
     }
 
     for (var i = 0; i < list.length; i++) {
@@ -200,7 +200,7 @@ function CheckTimersInternetService(internetService) {
     var list = [];
 
     for (var i = 2; i < row.childElementCount; i++) {
-        list[i - 2] = GetRowData(row.children[i]);
+        list[i - 2] = GetDataRow(row.children[i]);
     }
 
     for (var i = 0; i < list.length; i++) {
@@ -211,14 +211,14 @@ function CheckTimersInternetService(internetService) {
     }
 }
 
-
 function InternetServicesManualStart(button) {
     var divContainer = button.parentElement;
-    var data = GetRowData(divContainer.parentElement);
+    var data = GetDataRow(divContainer.parentElement);
     button.remove();
     if (button.children[0].innerText === "Старт") {
         divContainer.insertAdjacentHTML('beforeend',
             '<button class="btn btn-warning btn-sm btn-block mt-1" onclick="InternetServicesManualStart(this)"><span>Стоп</span></button>');
+        UpdatingStatusService(data.URL, data.Status);
         GoToInternetServicesManualStart(data);
     }
     else {
@@ -239,12 +239,25 @@ function GoToInternetServicesManualStart(data) {
     });
 }
 
+setInterval(function () {
+    $.ajax({
+        type: "GET",
+        url: "/Start/UpdateDataManualStartView",
+        success: function (data) {
+            $('#ManualStart').html(data);
+        }
+    });
+}, 60000)
+
 function CloseBrowser(typeService) {
     $.ajax({
         type: "GET",
         data: {
             'TypeService': typeService,
         },
-        url: "/Start/CloseBrowserManualStart"
+        url: "/Start/CloseBrowserManualStart",
+        success: function (data) {
+            $('#ManualStart').html(data);
+        }
     });
 }

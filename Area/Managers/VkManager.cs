@@ -11,6 +11,8 @@ namespace AutoBot.Area.Managers
     {
         public void JoinToComunity()
         {
+            RemoveWindowMessage();
+
             var joinButton = GetElementById("join_button");
             if (joinButton != null)
             {
@@ -29,6 +31,8 @@ namespace AutoBot.Area.Managers
 
         public void UnsubscribeToComunity()
         {
+            RemoveWindowMessage();
+
             GetElementById("page_actions_btn").Click();
             Thread.Sleep(400);
 
@@ -38,6 +42,8 @@ namespace AutoBot.Area.Managers
 
         public void PutLike()
         {
+            RemoveWindowMessage();
+
             var button = GetElementByClassName("like_btns").FindElements(SearchMethod.Tag, "a");
             int scrollTop = 100;
             bool isBlocked = true;
@@ -59,6 +65,9 @@ namespace AutoBot.Area.Managers
 
         public void MakeRepost()
         {
+            RefreshPage();
+            RemoveWindowMessage();
+
             var button = GetElementByClassName("like_btns").FindElements(SearchMethod.Tag, "a");
             int scrollTop = 100;
             bool isBlocked = true;
@@ -84,6 +93,7 @@ namespace AutoBot.Area.Managers
 
         public void RemoveLike(string url)
         {
+            RemoveWindowMessage();
             OpenPageInNewTab(url);
             SwitchToLastTab();
             PutLike();
@@ -97,12 +107,7 @@ namespace AutoBot.Area.Managers
 
         public bool IsPrivateGroup()
         {
-            if (GetTitlePage() == "Частная группа")
-            {
-                return true;
-            }
-
-            return false;
+            return GetTitlePage() == "Частная группа";
         }
 
         public void Authorization(string loginVK, string passwordVK)
@@ -135,16 +140,19 @@ namespace AutoBot.Area.Managers
             SwitchToTab();
         }
 
-        public void RemoveWindowMessage()
+        public void SetContextBrowserManager(ChromeDriver chromeDriver)
+        {
+            SetDriver(chromeDriver);
+        }
+
+        /// <summary>
+        /// Удаление модальных окон vk
+        /// </summary>
+        protected void RemoveWindowMessage()
         {
             ExecuteScript("document.querySelector('#box_layer_bg').remove();");
             ExecuteScript("document.querySelector('#stl_left').remove();");
-            ExecuteScript("document.querySelector('#box_layer_wrap').remove()");
-        }
-
-        public void SetContextBrowserManager(ChromeDriver chromeDriver)
-        {
-            GetDriver(chromeDriver);
+            ExecuteScript("document.querySelector('#box_layer_wrap').remove();");
         }
     }
 }

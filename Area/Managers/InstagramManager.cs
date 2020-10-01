@@ -136,7 +136,7 @@ namespace AutoBot.Area.Managers
 
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
         {
-            GetDriver(chromeDriver);
+            SetDriver(chromeDriver);
         }
     }
 }

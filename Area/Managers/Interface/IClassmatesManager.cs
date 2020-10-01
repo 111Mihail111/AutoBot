@@ -25,6 +25,16 @@ namespace AutoBot.Area.Managers.Interface
         public void LeaveGroup();
 
         /// <summary>
+        /// Поставить класс
+        /// </summary>
+        public void PutClass();
+
+        /// <summary>
+        /// Удалить класс
+        /// </summary>
+        public void RemoveClass();
+
+        /// <summary>
         /// Считать контекст браузер менеджера
         /// </summary>
         /// <param name="chromeDriver">Хром драйвер</param>

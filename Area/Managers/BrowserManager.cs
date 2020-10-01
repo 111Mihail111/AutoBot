@@ -43,7 +43,7 @@ namespace AutoBot.Area.Managers
             options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
             //TODO: Запускать браузер в свернутом режиме. Попробовать через это kWindowSize
 
-            _browser = new ChromeDriver("/_VS_Project/Mihail/AutoBot/BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
+            _browser = new ChromeDriver("/Project/AutoBot/bin/Debug/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
         }
 
         /// <summary>
@@ -55,10 +55,10 @@ namespace AutoBot.Area.Managers
             return _browser;
         }
         /// <summary>
-        /// Получить драйвер
+        /// Установить драйвер
         /// </summary>
         /// <param name="chromeDriver">Хром драйвер</param>
-        public void GetDriver(ChromeDriver chromeDriver)
+        public void SetDriver(ChromeDriver chromeDriver)
         {
             _browser = chromeDriver;
         }
@@ -299,7 +299,7 @@ namespace AutoBot.Area.Managers
         /// <summary>
         /// Получить титул страницы
         /// </summary>
-        /// <returns>Титул</returns>
+        /// <returns>Титул страницы</returns>
         public string GetTitlePage()
         {
             return _browser.Title;

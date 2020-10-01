@@ -53,11 +53,6 @@ namespace AutoBot.Area.Managers.Interface
         public void Authorization(string loginVK, string passwordVK);
 
         /// <summary>
-        /// Удаление модальных окон vk
-        /// </summary>
-        public void RemoveWindowMessage();
-
-        /// <summary>
         /// Считать контекст браузер менеджера
         /// </summary>
         /// <param name="chromeDriver">Хром драйвер</param>

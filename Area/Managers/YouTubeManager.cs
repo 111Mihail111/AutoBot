@@ -65,6 +65,7 @@ namespace AutoBot.Area.Managers
 
         public void LikeUnderVideo()
         {
+            RemoveModalDialogs();
             GetElementById("top-level-buttons").FindElements(SearchMethod.Tag, "button").First().Click();
             Thread.Sleep(2000);
         }
@@ -78,7 +79,7 @@ namespace AutoBot.Area.Managers
 
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
         {
-            GetDriver(chromeDriver);
+            SetDriver(chromeDriver);
         }
 
         /// <summary>
@@ -113,6 +114,17 @@ namespace AutoBot.Area.Managers
                     break;
                 }
             }
+        }
+        /// <summary>
+        /// Удалить диалоговые окна
+        /// </summary>
+        protected void RemoveModalDialogs()
+        {
+            ExecuteScript("var modalDialog = document.getElementsByTagName('paper-dialog')[0];" +
+                "if (modalDialog != undefined)" +
+                "{" +
+                    "modalDialog.remove();" +
+                "}");
         }
     }
 }

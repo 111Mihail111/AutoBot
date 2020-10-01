@@ -195,7 +195,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _classmatesManager.JoinGroup();
                     break;
                 case "Поставьте класс под записью":
-                    //https://ok.ru/nashuralmash/topic/152174172910436 //divId hook_Block_AltGroupTopicLayerBody
+                    _classmatesManager.PutClass();
                     break;
                 case "Поставить 'Класс' на публикации":
                     break;
@@ -357,7 +357,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected string GetBalance()
         {
-            return GetElementByXPath("//*[@id='header']/div/div/div[3]/div/div/div[2]/span[2]").GetInnerText();
+            return GetElementByXPath("//*[@id='header']/div/div/div[3]/div/div/div[2]/span[2]").GetInnerText() + "руб";
         }
 
         /// <summary>

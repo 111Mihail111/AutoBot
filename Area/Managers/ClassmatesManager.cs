@@ -88,6 +88,21 @@ namespace AutoBot.Area.Managers
             Thread.Sleep(1000);
         }
 
+        public void PutClass()
+        {
+            GetElementByClassName("hook_Block_AltGroupTopicLayerBody").FindElement(SearchMethod.ClassName, "js-klass").Click();
+        }
+
+        public void RemoveClass()
+        {
+            GetElementByClassName("hook_Block_AltGroupTopicLayerBody").FindElement(SearchMethod.ClassName, "js-klass").Click();
+        }
+
+        public void SetContextBrowserManager(ChromeDriver chromeDriver)
+        {
+            SetDriver(chromeDriver);
+        }
+
         /// <summary>
         /// Авторизация под сохраненным профилем
         /// </summary>
@@ -105,11 +120,6 @@ namespace AutoBot.Area.Managers
 
             CloseTab();
             SwitchToTab();
-        }
-
-        public void SetContextBrowserManager(ChromeDriver chromeDriver)
-        {
-            GetDriver(chromeDriver);
         }
     }
 }
