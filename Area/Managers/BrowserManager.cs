@@ -43,7 +43,7 @@ namespace AutoBot.Area.Managers
             options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
             //TODO: Запускать браузер в свернутом режиме. Попробовать через это kWindowSize
 
-            _browser = new ChromeDriver("/Project/AutoBot/bin/Debug/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
+            _browser = new ChromeDriver("/_VS_Project/Mihail/AutoBot/BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace AutoBot.Area.Managers
         /// <param name="url">Адрес</param>
         public void GoToUrl(string url)
         {
-            _browser.Navigate().GoToUrl(url);
+            _browser.Navigate().GoToUrl(url); //The HTTP request to the remote WebDriver server for URL http://localhost:60218/session/157ce980ef266ec318973dab5b7a044d/url timed out after 200 seconds."
         }
         /// <summary>
         /// Открыть страницу в новой вкладке

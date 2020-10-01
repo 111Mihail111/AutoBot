@@ -119,6 +119,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 if (DelayPayments())
                 {
                     OpenPageInNewTab(url);
+                    _vkManager.RemoveWindowMessage();
                     _vkManager.UnsubscribeToComunity(); //TODO:Протестировать
                     SkipTask("vkCommunity");
                 }
