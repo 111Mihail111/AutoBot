@@ -109,8 +109,13 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     case "odnoklassniki":
                         CarryOutTaskInСlassmates(task[1]);
                         break;
+                    case "zen":
+                        CarryOutTaskInZen(task[1]);
+                        break;
                     case "NoTasks":
                         ShowActivity();
+                        break;
+                    default:
                         break;
                 }
 
@@ -198,6 +203,26 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _classmatesManager.PutClass();
                     break;
                 case "Поставить 'Класс' на публикации":
+                    break;
+            }
+
+            CloseTab();
+            SwitchToTab();
+            CheckTask();
+        }
+
+        /// <summary>
+        /// Выполнить задачу в Яндекс.Дзен
+        /// </summary>
+        /// <param name="taskText"></param>
+        protected void CarryOutTaskInZen(string taskText)
+        {
+            SwitchToLastTab();
+
+            switch (taskText)
+            {
+                case "Поставьте лайк на пост":
+                    //https://zen.yandex.ru/media/id/5f6b00ef805b0644446288be/how-blockchain-is-transforming-the-sports-industry-5f6cafdd07e34425cd686b16
                     break;
             }
 
