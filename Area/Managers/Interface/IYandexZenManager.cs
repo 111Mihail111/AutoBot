@@ -2,10 +2,7 @@
 
 namespace AutoBot.Area.Managers.Interface
 {
-    /// <summary>
-    /// Ютуб менеджер
-    /// </summary>
-    public interface IYouTubeManager
+    public interface IYandexZenManager
     {
         /// <summary>
         /// Авторизация
@@ -15,25 +12,24 @@ namespace AutoBot.Area.Managers.Interface
         public void Authorization(string login, string password);
 
         /// <summary>
-        /// Подписаться на канал
+        /// Поставить лайк
         /// </summary>
-        public void SubscribeToChannel();
+        public void PutLike();
 
         /// <summary>
-        /// Лайк под видео
+        /// Удалить лайк
         /// </summary>
-        public void LikeUnderVideo();
+        public void RemoveLike();
 
         /// <summary>
-        /// Дизлайк под видео
+        /// Подписаться
         /// </summary>
-        public void DislikeUnderVideo();
+        public void Subscribe();
 
         /// <summary>
-        /// Доступно ли видео
+        /// Отписаться
         /// </summary>
-        /// <returns>True - доступно, иначе false</returns>
-        public bool IsVideoAvailable();
+        public void Unsubscribe();
 
         /// <summary>
         /// Считать контекст браузер менеджера

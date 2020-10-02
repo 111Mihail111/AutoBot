@@ -12,9 +12,9 @@ using System.Threading;
 namespace AutoBot.Area.PerformanceTasks.InternetServices
 {
     public class VkTarget : BrowserManager, IVkTarget
-    {                                          
+    {
         const string BROWSER_PROFILE_SERVICE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\PerformanceTasks\\VkTarget\\";
-        
+
         private static bool _isAuthorization;
         private string _login;
         private string _password;
@@ -22,6 +22,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         private IVkManager _vkManager;
         private IYouTubeManager _ytManager;
         private IClassmatesManager _classmatesManager;
+        private IYandexZenManager _yandexZenManager;
 
         protected void Init()
         {
@@ -42,11 +43,13 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _vkManager = new VkManager();
             _ytManager = new YouTubeManager();
             _classmatesManager = new ClassmatesManager();
+            _yandexZenManager = new YandexZenManager();
 
             var driver = GetDriver();
             _vkManager.SetContextBrowserManager(driver);
             _ytManager.SetContextBrowserManager(driver);
             _classmatesManager.SetContextBrowserManager(driver);
+            _yandexZenManager.SetContextBrowserManager(driver);
         }
 
         /// <summary>
@@ -59,10 +62,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             var accountMain = accounts.Where(w => w.AccountType == AccountType.Main).First();
             _login = accountMain.Login;
             _password = accountMain.Password;
-            
+
             var accountVK = accounts.Where(w => w.AccountType == AccountType.Vk).FirstOrDefault();
             if (accountVK != null)
-            {                
+            {
                 _vkManager.Authorization(accountVK.Login, accountVK.Password);
             }
 
@@ -76,6 +79,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             if (accountClassmates != null)
             {
                 _classmatesManager.AuthorizationThroughMail(accountClassmates.Login, accountClassmates.Password);
+            }
+
+            var accountYandexZen = accounts.Where(w => w.AccountType == AccountType.YandexZen).FirstOrDefault();
+            if (accountYandexZen != null)
+            {
+                _yandexZenManager.Authorization(accountYandexZen.Login, accountYandexZen.Password);
             }
 
             _isAuthorization = true;
@@ -139,7 +148,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (taskText)
             {
                 case "Вступите в сообщество":
-                    if (!_vkManager.IsBlockedCommunity())
+                    if (!_vkManager.IsBlockedCommunity()) //TODO: протестировать
                     {
                         _vkManager.JoinToComunity();
                         break;
@@ -152,11 +161,13 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 case "Посмотреть пост":
                     Thread.Sleep(1500);
                     break;
-                case "Нажмите поделиться записью":
+                case "Нажмите поделиться записью": //TODO: Запись не найдена https://vk.com/wall-43706510_243181
                     _vkManager.MakeRepost();
                     break;
                 case "Добавить в друзья":
                     //TODO: Реализовать добавление в други
+                    break;
+                default:
                     break;
             }
 
@@ -169,7 +180,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Выполнить задачу в ютуб
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInYouTube(string taskText) //Есть TODO
+        protected void CarryOutTaskInYouTube(string taskText)
         {
             SwitchToLastTab();
 
@@ -179,10 +190,26 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _ytManager.SubscribeToChannel();
                     break;
                 case "Поставьте 'Лайк' под видео":
-                    _ytManager.LikeUnderVideo(); //TODO: Видео недоступно https://www.youtube.com/watch?v=Em3MQdx-8I0
+                    if (!_ytManager.IsVideoAvailable())
+                    {
+                        CloseTab();
+                        SwitchToTab();
+                        SkipTask();
+                        return;
+                    }
+                    _ytManager.LikeUnderVideo();
                     break;
                 case "Поставьте 'Не нравится' под видео":
+                    if (!_ytManager.IsVideoAvailable())
+                    {
+                        CloseTab();
+                        SwitchToTab();
+                        SkipTask();
+                        return;
+                    }
                     _ytManager.DislikeUnderVideo();
+                    break;
+                default:
                     break;
             }
 
@@ -209,6 +236,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     break;
                 case "Поставить 'Класс' на публикации":
                     break;
+                default:
+                    break;
             }
 
             CloseTab();
@@ -227,7 +256,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (taskText)
             {
                 case "Поставьте лайк на пост":
-                    //https://zen.yandex.ru/media/id/5f6b00ef805b0644446288be/how-blockchain-is-transforming-the-sports-industry-5f6cafdd07e34425cd686b16
+                    _yandexZenManager.PutLike();
+                    break;
+                case "Подпишитесь на пользователя":
+                    _yandexZenManager.Subscribe();
+                    break;
+                default:
                     break;
             }
 
@@ -235,6 +269,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToTab();
             CheckTask();
         }
+
 
         /// <summary>
         /// Проявить активность

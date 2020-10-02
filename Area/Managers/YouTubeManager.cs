@@ -77,6 +77,11 @@ namespace AutoBot.Area.Managers
             Thread.Sleep(2000);
         }
 
+        public bool IsVideoAvailable()
+        {
+            return GetElementById("reason") == null;
+        }
+
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
         {
             SetDriver(chromeDriver);

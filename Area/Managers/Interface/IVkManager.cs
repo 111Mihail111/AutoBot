@@ -46,6 +46,12 @@ namespace AutoBot.Area.Managers.Interface
         public bool IsPrivateGroup();
 
         /// <summary>
+        /// Найден ли пост
+        /// </summary>
+        /// <returns>True - найден, иначе false</returns>
+        public bool IsPostFound();
+
+        /// <summary>
         /// Авторизация
         /// </summary>
         /// <param name="loginVK">Логин вк</param>

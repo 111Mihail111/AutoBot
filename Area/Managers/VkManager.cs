@@ -65,37 +65,20 @@ namespace AutoBot.Area.Managers
 
         public void MakeRepost()
         {
-            RefreshPage();
-            RemoveWindowMessage();
+            ExecuteScript("document.getElementById('wpt579410707_402').remove();");
 
             var button = GetElementByClassName("like_btns").FindElements(SearchMethod.Tag, "a");
-            int scrollTop = 100;
-            bool isBlocked = true;
+            button.Where(w => w.GetTitle() == "Поделиться").FirstOrDefault().Click();
 
-            while (isBlocked)
-            {
-                try
-                {
-                    button.Where(w => w.GetTitle() == "Поделиться").FirstOrDefault().Click();
-
-                    GetElementById("like_share_my").Click();
-                    GetElementById("like_share_send").Click();
-                    Thread.Sleep(1000);
-                    isBlocked = false;
-                }
-                catch
-                {
-                    SetScrollPosition(scrollTop);
-                    scrollTop += 50;
-                }
-            }
+            GetElementById("like_share_my").Click();
+            GetElementById("like_share_send").Click();
+            Thread.Sleep(1500);
         }
 
         public void RemoveLike(string url)
         {
             RemoveWindowMessage();
             OpenPageInNewTab(url);
-            SwitchToLastTab();
             PutLike();
         }
 
@@ -108,6 +91,11 @@ namespace AutoBot.Area.Managers
         public bool IsPrivateGroup()
         {
             return GetTitlePage() == "Частная группа";
+        }
+
+        public bool IsPostFound()
+        {
+            return GetTitlePage() != "Ошибка";
         }
 
         public void Authorization(string loginVK, string passwordVK)

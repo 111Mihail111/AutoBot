@@ -25,5 +25,9 @@
         /// Ютуб
         /// </summary>
         YouTube = 4,
+        /// <summary>
+        /// Яндекс зен
+        /// </summary>
+        YandexZen = 5,
     }
 }

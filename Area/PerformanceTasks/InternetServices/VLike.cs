@@ -77,10 +77,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             if (login != null)
             {
                 login.Click();
+                Thread.Sleep(1500);
             }
 
             JoinInCommunityVK();
-            WorkWithLikesVK();
+            WorkWithLikesAndRepostVK();
             //AddToFriendsVK();
             //WorkWithYouTube(); //TODO: Не отлажен
             SubscriptionsInInstagram();
@@ -90,7 +91,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Вступить в сообщество ВК
         /// </summary>
-        protected void JoinInCommunityVK() //Есть TODO
+        protected void JoinInCommunityVK()
         {
             GetElementByXPath("//*[@id='vk1']/a").Click();
 
@@ -117,7 +118,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 if (DelayPayments())
                 {
                     OpenPageInNewTab(url);
-                    _vkManager.UnsubscribeToComunity(); //TODO:Протестировать
+                    _vkManager.UnsubscribeToComunity();
                     SkipTask("vkCommunity");
                 }
 
@@ -127,7 +128,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Работа с лайками
         /// </summary>
-        protected void WorkWithLikesVK() //Есть TODO
+        protected void WorkWithLikesAndRepostVK()
         {
             GetElementByXPath("//*[@id='vk2']/a").Click();
 
@@ -139,8 +140,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 var titleTask = GetElementByXPath("//*[@id='content']/div[3]/div[1]/div[2]/p").GetInnerText();
 
                 SwitchToLastTab();
-
-                //TODO: Проверка вдруг запись не найдена https://vk.com/wall-35192468_75363
+                if (!_vkManager.IsPostFound())
+                {
+                    SkipTask("vkLike");
+                    perfomanse = GetElementByClassName("groups").GetInnerText();
+                    continue;
+                }
 
                 if (titleTask == "Поставить Лайк + Рассказать друзьям")
                 {
