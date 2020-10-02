@@ -61,7 +61,6 @@ namespace AutoBot.Area.Managers
 
             return accounts;
         }
-
         /// <summary>
         /// Получить строки данных
         /// </summary>

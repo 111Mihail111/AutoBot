@@ -240,6 +240,7 @@ function GoToInternetServicesManualStart(data) {
 }
 
 setInterval(function () {
+    debugger;
     $.ajax({
         type: "GET",
         url: "/Start/UpdateDataManualStartView",

@@ -72,7 +72,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 _ytManager.Authorization(accountYouTube.Login, accountYouTube.Password);
             }
 
-            _classmatesManager.AuthorizationThroughMail(_login, _password);
+            var accountClassmates = accounts.Where(w => w.AccountType == AccountType.Classmates).FirstOrDefault();
+            if (accountClassmates != null)
+            {
+                _classmatesManager.AuthorizationThroughMail(accountClassmates.Login, accountClassmates.Password);
+            }
+
             _isAuthorization = true;
         }
 
@@ -164,7 +169,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Выполнить задачу в ютуб
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInYouTube(string taskText)
+        protected void CarryOutTaskInYouTube(string taskText) //Есть TODO
         {
             SwitchToLastTab();
 
@@ -174,7 +179,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _ytManager.SubscribeToChannel();
                     break;
                 case "Поставьте 'Лайк' под видео":
-                    _ytManager.LikeUnderVideo();
+                    _ytManager.LikeUnderVideo(); //TODO: Видео недоступно https://www.youtube.com/watch?v=Em3MQdx-8I0
                     break;
                 case "Поставьте 'Не нравится' под видео":
                     _ytManager.DislikeUnderVideo();
