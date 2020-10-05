@@ -165,7 +165,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _vkManager.MakeRepost();
                     break;
                 case "Добавить в друзья":
-                    //TODO: Реализовать добавление в други
+                    //TODO: Реализовать добавление в други https://vk.com/id492519995
+                    break;
+                case "Расскажите о группе":
+                    //https://vk.com/public193990452
                     break;
                 default:
                     break;
@@ -249,14 +252,14 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Выполнить задачу в Яндекс.Дзен
         /// </summary>
         /// <param name="taskText"></param>
-        protected void CarryOutTaskInZen(string taskText)
+        protected void CarryOutTaskInZen(string taskText) //Есть TODO
         {
             SwitchToLastTab();
 
             switch (taskText)
             {
                 case "Поставьте лайк на пост":
-                    _yandexZenManager.PutLike();
+                    _yandexZenManager.PutLike(); //TODO:Под этим постом возникла ошибка https://zen.yandex.ru/media/id/5f5e5e155991983cbdd5c170/i-snova-o-liubvi-5f7439becdcd496427519fa9
                     break;
                 case "Подпишитесь на пользователя":
                     _yandexZenManager.Subscribe();

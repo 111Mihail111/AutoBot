@@ -63,9 +63,9 @@ namespace AutoBot.Area.Managers
             }
         }
 
-        public void MakeRepost()
+        public void MakeRepost() //Есть TODO
         {
-            ExecuteScript("document.getElementById('wpt579410707_402').remove();");
+            ExecuteScript("document.getElementById('wpt579410707_402').remove();"); //TODO: id бывает разный https://vk.com/wall-178156022_1906
 
             var button = GetElementByClassName("like_btns").FindElements(SearchMethod.Tag, "a");
             button.Where(w => w.GetTitle() == "Поделиться").FirstOrDefault().Click();
@@ -96,6 +96,11 @@ namespace AutoBot.Area.Managers
         public bool IsPostFound()
         {
             return GetTitlePage() != "Ошибка";
+        }
+
+        public  void addToFrend()
+        {
+            //https://vk.com/id492519995
         }
 
         public void Authorization(string loginVK, string passwordVK)

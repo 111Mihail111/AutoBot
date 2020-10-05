@@ -73,6 +73,7 @@ namespace AutoBot.Area.Managers
                 if (item.GetInnerText() == "Вступить")
                 {
                     item.Click();
+                    break;
                 }
             }
 

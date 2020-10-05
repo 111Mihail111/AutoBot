@@ -13,6 +13,8 @@ namespace AutoBot.Area.Managers
 
             if (GetUrlPage().Contains(url))
             {
+                CloseTab();
+                SwitchToTab();
                 return;
             }
 
