@@ -153,7 +153,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                         _vkManager.JoinToComunity();
                         break;
                     }
-                    SkipTask();
+                    SkipTask(); //протестировать этот кейс
                     break;
                 case "Поставьте лайк на странице":
                     _vkManager.PutLike();
@@ -168,7 +168,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     //TODO: Реализовать добавление в други https://vk.com/id492519995
                     break;
                 case "Расскажите о группе":
-                    //https://vk.com/public193990452
+                    _vkManager.ToTellAboutGroup();
                     break;
                 default:
                     break;

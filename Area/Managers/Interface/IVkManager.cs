@@ -52,6 +52,11 @@ namespace AutoBot.Area.Managers.Interface
         public bool IsPostFound();
 
         /// <summary>
+        /// Рассказать о группе
+        /// </summary>
+        public void ToTellAboutGroup();
+
+        /// <summary>
         /// Авторизация
         /// </summary>
         /// <param name="loginVK">Логин вк</param>

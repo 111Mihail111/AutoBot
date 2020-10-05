@@ -42,30 +42,16 @@ namespace AutoBot.Area.Managers
 
         public void PutLike()
         {
+            RemovePostDetails();
             RemoveWindowMessage();
 
             var button = GetElementByClassName("like_btns").FindElements(SearchMethod.Tag, "a");
-            int scrollTop = 100;
-            bool isBlocked = true;
-
-            while (isBlocked)
-            {
-                try
-                {
-                    button.Where(w => w.GetTitle() == "Нравится").FirstOrDefault().Click();
-                    isBlocked = false;
-                }
-                catch
-                {
-                    SetScrollPosition(scrollTop);
-                    scrollTop += 50;
-                }
-            }
+            button.Where(w => w.GetTitle() == "Нравится").FirstOrDefault().Click();
         }
 
-        public void MakeRepost() //Есть TODO
+        public void MakeRepost()
         {
-            ExecuteScript("document.getElementById('wpt579410707_402').remove();"); //TODO: id бывает разный https://vk.com/wall-178156022_1906
+            RemovePostDetails();
 
             var button = GetElementByClassName("like_btns").FindElements(SearchMethod.Tag, "a");
             button.Where(w => w.GetTitle() == "Поделиться").FirstOrDefault().Click();
@@ -98,7 +84,14 @@ namespace AutoBot.Area.Managers
             return GetTitlePage() != "Ошибка";
         }
 
-        public  void addToFrend()
+        public void ToTellAboutGroup()
+        {
+            GetElementById("page_menu_group_share").Click();
+            GetElementById("like_share_send").Click();
+            Thread.Sleep(1500);
+        }
+
+        public void addToFrend()
         {
             //https://vk.com/id492519995
         }
@@ -107,7 +100,7 @@ namespace AutoBot.Area.Managers
         {
             OpenPageInNewTab("https://vk.com/");
 
-            if (GetElementById("index_login") == null)
+            if (GetTitlePage().Contains("Новости"))
             {
                 CloseTab();
                 SwitchToTab();
@@ -138,6 +131,14 @@ namespace AutoBot.Area.Managers
             SetDriver(chromeDriver);
         }
 
+        /// <summary>
+        /// Удалить данные поста
+        /// </summary>
+        protected void RemovePostDetails() //Есть TODO
+        {
+            string postId = GetUrlPage().Replace("https://vk.com/wall", "wpt");
+            ExecuteScript($"document.getElementById('{postId}')?.remove();"); //Если не null, то удаляем TODO:Переделать
+        }
         /// <summary>
         /// Удаление модальных окон vk
         /// </summary>

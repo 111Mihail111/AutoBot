@@ -6,7 +6,6 @@ using AutoBot.Area.Services;
 using AutoBot.Extentions;
 using AutoBot.Models;
 using Microsoft.CodeAnalysis;
-using OpenQA.Selenium.Interactions;
 using System;
 using System.Linq;
 using System.Threading;
