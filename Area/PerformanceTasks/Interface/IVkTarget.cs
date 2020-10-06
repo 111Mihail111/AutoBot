@@ -1,7 +1,4 @@
-﻿using AutoBot.Models;
-using OpenQA.Selenium.Chrome;
-
-namespace AutoBot.Area.PerformanceTasks.Interface
+﻿namespace AutoBot.Area.PerformanceTasks.Interface
 {
     public interface IVkTarget
     {

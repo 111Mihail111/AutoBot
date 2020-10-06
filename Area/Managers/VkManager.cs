@@ -91,9 +91,32 @@ namespace AutoBot.Area.Managers
             Thread.Sleep(1500);
         }
 
-        public void addToFrend()
+        public void AddToFriends()
         {
-            //https://vk.com/id492519995
+            GetElementByClassName("button_wide").Click();
+            Thread.Sleep(1500);
+        }
+
+        public void RemoveFromFriends() //TODO: Не отлажен
+        {
+            var hyperLinkCollection = GetElementsByClassName("page_actions_item");
+
+            GetElementByClassName("button_wide").Click();
+            Thread.Sleep(1500);
+            foreach (var item in hyperLinkCollection)
+            {
+                var textButton = item.GetInnerText();
+                if (textButton == "Отписаться" || textButton == "Удалить из друзей" || textButton == "Отменить заявку")
+                {
+                    item.Click();
+                    return;
+                }
+            }
+        }
+
+        public bool IsBlockedAccount() //TODO: Не отлажен
+        {
+            return GetElementsByClassName("profile_blocked") != null;
         }
 
         public void Authorization(string loginVK, string passwordVK)
@@ -137,7 +160,7 @@ namespace AutoBot.Area.Managers
         protected void RemovePostDetails() //Есть TODO
         {
             string postId = GetUrlPage().Replace("https://vk.com/wall", "wpt");
-            ExecuteScript($"document.getElementById('{postId}')?.remove();"); //Если не null, то удаляем TODO:Переделать
+            ExecuteScript($"document.getElementById('{postId}')?.remove();"); //Если не null, то удаляем TODO:Придумать способ лучше
         }
         /// <summary>
         /// Удаление модальных окон vk

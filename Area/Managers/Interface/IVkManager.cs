@@ -57,6 +57,22 @@ namespace AutoBot.Area.Managers.Interface
         public void ToTellAboutGroup();
 
         /// <summary>
+        /// Добавить в друзья
+        /// </summary>
+        public void AddToFriends();
+
+        /// <summary>
+        /// Удалить из друзей
+        /// </summary>
+        public void RemoveFromFriends();
+
+        /// <summary>
+        /// Заблокирован ли аккаунт
+        /// </summary>
+        /// <returns>True если аккаунт не заблокирован, иначе false</returns>
+        public bool IsBlockedAccount();
+
+        /// <summary>
         /// Авторизация
         /// </summary>
         /// <param name="loginVK">Логин вк</param>

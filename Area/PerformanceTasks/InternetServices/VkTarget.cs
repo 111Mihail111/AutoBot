@@ -165,7 +165,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _vkManager.MakeRepost();
                     break;
                 case "Добавить в друзья":
-                    //TODO: Реализовать добавление в други https://vk.com/id492519995
+                    _vkManager.AddToFriends();
                     break;
                 case "Расскажите о группе":
                     _vkManager.ToTellAboutGroup();
