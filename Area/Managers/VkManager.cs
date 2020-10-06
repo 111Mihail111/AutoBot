@@ -99,10 +99,10 @@ namespace AutoBot.Area.Managers
 
         public void RemoveFromFriends() //TODO: Не отлажен
         {
-            var hyperLinkCollection = GetElementsByClassName("page_actions_item");
-
             GetElementByClassName("button_wide").Click();
             Thread.Sleep(1500);
+
+            var hyperLinkCollection = GetElementById("friend_status").FindElements(SearchMethod.Tag, "a");
             foreach (var item in hyperLinkCollection)
             {
                 var textButton = item.GetInnerText();
@@ -116,7 +116,7 @@ namespace AutoBot.Area.Managers
 
         public bool IsBlockedAccount() //TODO: Не отлажен
         {
-            return GetElementsByClassName("profile_blocked") != null;
+            return GetElementsByClassName("profile_blocked").Count() != 0;
         }
 
         public void Authorization(string loginVK, string passwordVK)

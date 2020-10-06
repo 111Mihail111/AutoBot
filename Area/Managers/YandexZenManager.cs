@@ -1,5 +1,8 @@
-﻿using AutoBot.Area.Managers.Interface;
+﻿using AutoBot.Area.Enums;
+using AutoBot.Area.Managers.Interface;
+using AutoBot.Extentions;
 using OpenQA.Selenium.Chrome;
+using System.Linq;
 using System.Threading;
 
 namespace AutoBot.Area.Managers
@@ -55,13 +58,13 @@ namespace AutoBot.Area.Managers
 
         public void PutLike()
         {
-            GetElementByXPath("//*[@id='article__left']/div/div/div/div[1]/div[1]/div[1]/button").Click();
+            GetElementByClassName("socials-left-block__likes").FindElements(SearchMethod.ClassName, "ui-lib-mitten").First().Click();
             Thread.Sleep(2000);
         }
 
         public void RemoveLike()
         {
-            GetElementByXPath("//*[@id='article__left']/div/div/div/div[1]/div[1]/div[1]/button").Click();
+            GetElementByClassName("socials-left-block__likes").FindElements(SearchMethod.ClassName, "ui-lib-mitten").Last().Click();
             Thread.Sleep(2000);
         }
 

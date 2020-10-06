@@ -91,11 +91,13 @@ namespace AutoBot.Area.Managers
 
         public void PutClass()
         {
+            ExecuteScript("document.getElementsByClassName('mlr_cnt')[0].remove();");
             GetElementByClassName("hook_Block_AltGroupTopicLayerBody").FindElement(SearchMethod.ClassName, "js-klass").Click();
         }
 
         public void RemoveClass()
         {
+            ExecuteScript("document.getElementsByClassName('mlr_cnt')[0].remove();");
             GetElementByClassName("hook_Block_AltGroupTopicLayerBody").FindElement(SearchMethod.ClassName, "js-klass").Click();
         }
 

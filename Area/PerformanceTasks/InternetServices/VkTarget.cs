@@ -141,19 +141,20 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Выполнить задачу в вк
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInVk(string taskText) //Есть TODO
+        protected void CarryOutTaskInVk(string taskText)
         {
             SwitchToLastTab();
 
+            bool isError = false;
             switch (taskText)
             {
                 case "Вступите в сообщество":
-                    if (!_vkManager.IsBlockedCommunity()) //TODO: протестировать
+                    if (_vkManager.IsBlockedCommunity())
                     {
-                        _vkManager.JoinToComunity();
+                        isError = true;
                         break;
                     }
-                    SkipTask(); //протестировать этот кейс
+                    _vkManager.JoinToComunity();
                     break;
                 case "Поставьте лайк на странице":
                     _vkManager.PutLike();
@@ -161,13 +162,28 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 case "Посмотреть пост":
                     Thread.Sleep(1500);
                     break;
-                case "Нажмите поделиться записью": //TODO: Запись не найдена https://vk.com/wall-43706510_243181
+                case "Нажмите поделиться записью":
+                    if (!_vkManager.IsPostFound())
+                    {
+                        isError = true;
+                        break;
+                    }
                     _vkManager.MakeRepost();
                     break;
                 case "Добавить в друзья":
+                    if (_vkManager.IsBlockedAccount())
+                    {
+                        isError = true;
+                        break;
+                    }
                     _vkManager.AddToFriends();
                     break;
                 case "Расскажите о группе":
+                    if (_vkManager.IsBlockedCommunity())
+                    {
+                        isError = true;
+                        break;
+                    }
                     _vkManager.ToTellAboutGroup();
                     break;
                 default:
@@ -176,6 +192,13 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
             CloseTab();
             SwitchToTab();
+
+            if (isError)
+            {
+                SkipTask();
+                return;
+            }
+
             CheckTask();
         }
 
@@ -187,6 +210,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         {
             SwitchToLastTab();
 
+            bool isError = false;
             switch (taskText)
             {
                 case "Подпишитесь на канал":
@@ -195,20 +219,16 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 case "Поставьте 'Лайк' под видео":
                     if (!_ytManager.IsVideoAvailable())
                     {
-                        CloseTab();
-                        SwitchToTab();
-                        SkipTask();
-                        return;
+                        isError = true;
+                        break;
                     }
                     _ytManager.LikeUnderVideo();
                     break;
                 case "Поставьте 'Не нравится' под видео":
                     if (!_ytManager.IsVideoAvailable())
                     {
-                        CloseTab();
-                        SwitchToTab();
-                        SkipTask();
-                        return;
+                        isError = true;
+                        break;
                     }
                     _ytManager.DislikeUnderVideo();
                     break;
@@ -218,6 +238,13 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
             CloseTab();
             SwitchToTab();
+
+            if (isError)
+            {
+                SkipTask();
+                return;
+            }
+
             CheckTask();
         }
 
@@ -225,7 +252,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Выполнить задачу в одноклассниках
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInСlassmates(string taskText)
+        protected void CarryOutTaskInСlassmates(string taskText) //Есть TODO
         {
             SwitchToLastTab();
 
@@ -238,6 +265,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _classmatesManager.PutClass();
                     break;
                 case "Поставить 'Класс' на публикации":
+                    _classmatesManager.PutClass(); //TODO: Протестить https://ok.ru/vismarketru/topic/152066788526855
                     break;
                 default:
                     break;
@@ -252,14 +280,14 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Выполнить задачу в Яндекс.Дзен
         /// </summary>
         /// <param name="taskText"></param>
-        protected void CarryOutTaskInZen(string taskText) //Есть TODO
+        protected void CarryOutTaskInZen(string taskText)
         {
             SwitchToLastTab();
 
             switch (taskText)
             {
                 case "Поставьте лайк на пост":
-                    _yandexZenManager.PutLike(); //TODO:Под этим постом возникла ошибка https://zen.yandex.ru/media/id/5f5e5e155991983cbdd5c170/i-snova-o-liubvi-5f7439becdcd496427519fa9
+                    _yandexZenManager.PutLike();
                     break;
                 case "Подпишитесь на пользователя":
                     _yandexZenManager.Subscribe();
@@ -277,7 +305,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Проявить активность
         /// </summary>
-        protected void ShowActivity()
+        protected void ShowActivity() //TODO: Довести до ума метод
         {
             int randomSleep = GetRandomNumber(1, 3) * 5000;
 
@@ -316,7 +344,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     SwitchToTab();
                     break;
                 case 4:
-                    Thread.Sleep(randomSleep);
+                    Thread.Sleep(randomSleep); //TODO: Иногда мы должны засыпать минут на 5-25, 
+                                               //но при этом должны асинхронно мониторить задачи и выполнять. После выполнения опять
+                                               //проявлять активность и засыпать
                     break;
             }
 

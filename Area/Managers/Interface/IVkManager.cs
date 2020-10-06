@@ -69,7 +69,7 @@ namespace AutoBot.Area.Managers.Interface
         /// <summary>
         /// Заблокирован ли аккаунт
         /// </summary>
-        /// <returns>True если аккаунт не заблокирован, иначе false</returns>
+        /// <returns>True если аккаунт заблокирован, иначе false</returns>
         public bool IsBlockedAccount();
 
         /// <summary>
