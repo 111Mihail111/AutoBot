@@ -18,6 +18,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         private static bool _isAuthorization;
         private string _login;
         private string _password;
+        private string _typeSocialNetwork;
+        private string _task;
+        private string _urlPage;
+
 
         private IVkManager _vkManager;
         private IYouTubeManager _ytManager;
@@ -111,20 +115,20 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         {
             while (true)
             {
-                var task = GetTask();
-                switch (task[0])
+                GetTask();
+                switch (_typeSocialNetwork)
                 {
                     case "vk":
-                        CarryOutTaskInVk(task[1]);
+                        CarryOutTaskInVk(_task);
                         break;
                     case "youtube":
-                        CarryOutTaskInYouTube(task[1]);
+                        CarryOutTaskInYouTube(_task);
                         break;
                     case "odnoklassniki":
-                        CarryOutTaskInСlassmates(task[1]);
+                        CarryOutTaskInСlassmates(_task);
                         break;
                     case "zen":
-                        CarryOutTaskInZen(task[1]);
+                        CarryOutTaskInZen(_task);
                         break;
                     case "NoTasks":
                         ShowActivity();
@@ -132,6 +136,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     default:
                         break;
                 }
+
+                _typeSocialNetwork = string.Empty;
+                _task = string.Empty;
+                _urlPage = string.Empty;
 
                 UpdateModel(url);
             }
@@ -144,6 +152,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected void CarryOutTaskInVk(string taskText)
         {
             SwitchToLastTab();
+            _urlPage = GetUrlPage();
 
             bool isError = false;
             switch (taskText)
@@ -209,6 +218,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected void CarryOutTaskInYouTube(string taskText)
         {
             SwitchToLastTab();
+            _urlPage = GetUrlPage();
 
             bool isError = false;
             switch (taskText)
@@ -255,6 +265,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected void CarryOutTaskInСlassmates(string taskText) //Есть TODO
         {
             SwitchToLastTab();
+            _urlPage = GetUrlPage();
 
             switch (taskText)
             {
@@ -283,6 +294,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected void CarryOutTaskInZen(string taskText)
         {
             SwitchToLastTab();
+            _urlPage = GetUrlPage();
 
             switch (taskText)
             {
@@ -299,6 +311,57 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             CloseTab();
             SwitchToTab();
             CheckTask();
+        }
+
+
+        /// <summary>
+        /// Отменить задание
+        /// </summary>
+        protected void UndoTask()
+        {
+            switch (_typeSocialNetwork)
+            {
+                case "vk":
+                    
+                    break;
+                case "youtube":
+                    
+                    break;
+                case "odnoklassniki":
+                    
+                    break;
+                case "zen":
+                    
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Отменить задачу в вк
+        /// </summary>
+        protected void UndoTaskInVk()
+        {
+            switch (_task)
+            {
+                case "Вступите в сообщество":
+                    _vkManager.JoinToComunity();
+                    break;
+                case "Поставьте лайк на странице":
+                    _vkManager.PutLike();
+                    break;
+                case "Нажмите поделиться записью":
+                    _vkManager.MakeRepost();
+                    break;
+                case "Добавить в друзья":                    
+                    _vkManager.AddToFriends();
+                    break;
+                case "Расскажите о группе":                    
+                    _vkManager.ToTellAboutGroup();
+                    break;
+            }
+
+            CloseTab();
+            SwitchToTab();
         }
 
 
@@ -374,13 +437,39 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             string getAttribute = "return task.getAttribute('data-task-item');";
 
             var taksId = ExecuteScript(getTaskScript + clickButtonScript + getAttribute);
+            Thread.Sleep(1500);
+
+            int waitingСounter = 0;
 
             bool isCheked = true;
             while (isCheked)
             {
-                Thread.Sleep(1500);
+                var errorPanel = GetElementByClassName("is_error");
+                if (errorPanel != null)
+                {
+                    var dataId = errorPanel.GetDataId();
+                    if (dataId != taksId)
+                    {
+                        return;
+                    }
 
-                if (taksId != ExecuteScript(getTaskScript + getAttribute))
+                    var error = errorPanel.FindElements(SearchMethod.ClassName, "content").Last().GetInnerText();
+                    if (error == "Похоже, вы не выполнили задание. Подождите 15 секунд и повторите попытку") //Если ошибка типа повторите через 10-15 секунд
+                    {
+                        waitingСounter++;
+                        if (waitingСounter < 3)
+                        {
+                            Thread.Sleep(15000);
+                            ExecuteScript(getTaskScript + clickButtonScript);
+                            continue;
+                        }
+
+                        SkipTask();
+                        UndoTask();
+                        return;
+                    }
+                }
+                else if (taksId != ExecuteScript(getTaskScript + getAttribute))
                 {
                     isCheked = false;
                 }
@@ -389,37 +478,15 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     ShowActivity();
                 }
             }
-
-            //TODO:Нужно придумыть способ, как отменять проделанные действия, в случае не оплаты задания
-            //document.getElementsByClassName("is_error") Если null и нет строки с taskId, значит за задание уплотили
-
-            /*
-             * <div class="info__row__wrap  is_error" data-bind="info_row" data-id="12405457">
-                                <div class="info__padding__wrap">
-                                    <div class="tb__row info__row error" data-bind="row_state" data-row-state="12405457">
-                                        <div class="block info__block hide" data-info="info_block" data-bind="info__block">
-                                            <div class="article">Информация</div>
-                                            <hr class="info">
-                                            <div class="content" data-bind="info_content"><ul><li>Перейдите по ссылке, указанной в задании</li><li>Поставьте лайк под указанным постом/фото/видео</li><li>Нажмите на кнопку проверки рядом с заданием на Vktarget</li></ul></div>
-                                        </div>
-                                        <div class="block error__block" data-bind="error__block" data-info="error_block">
-                                            <div class="article">Ошибка</div>
-                                            <hr class="error">
-                                            <div class="content" data-bind="error_bind" data-error-id="12405457">Похоже, Вы не выполнили задание</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-             */
         }
 
         /// <summary>
         /// Получить задачу
         /// </summary>
         /// <returns></returns>
-        protected string[] GetTask()
+        protected void GetTask()
         {
-            return ExecuteScript(
+            var taskDetails = ExecuteScript(
                 "var taskEmpty = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>div.empty');" +
                 "if (taskEmpty.classList.length == 1)" +
                 "{" +
@@ -432,6 +499,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 "var task = document.getElementsByClassName('wrap')[1].innerText;" +
                 "button.click();" +
                 "return systemType + '|' + task;").Split("|");
+
+            _typeSocialNetwork = taskDetails[0];
+            _task = taskDetails[1];
         }
 
         /// <summary>

@@ -118,6 +118,17 @@ namespace AutoBot.Extentions
         }
 
         /// <summary>
+        /// Получить содержимое data-id атрибута
+        /// </summary>
+        /// <param name="webElement">Вэб-элемент</param>
+        /// <returns>Значение атрибута</returns>
+        public static string GetDataId (this IWebElement webElement)
+        {
+            return webElement.GetAttribute("data-id");
+        }
+
+
+        /// <summary>
         /// Найти элемент
         /// </summary>
         /// <param name="webElement">Веб-элемент</param>
