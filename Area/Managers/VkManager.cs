@@ -63,7 +63,6 @@ namespace AutoBot.Area.Managers
 
         public void RemoveLike(string url)
         {
-            RemoveWindowMessage();
             OpenPageInNewTab(url);
             PutLike();
         }
@@ -97,7 +96,7 @@ namespace AutoBot.Area.Managers
             Thread.Sleep(1500);
         }
 
-        public void RemoveFromFriends() //TODO: Не отлажен
+        public void RemoveFromFriends()
         {
             GetElementByClassName("button_wide").Click();
             Thread.Sleep(1500);
@@ -114,7 +113,7 @@ namespace AutoBot.Area.Managers
             }
         }
 
-        public bool IsBlockedAccount() //TODO: Не отлажен
+        public bool IsBlockedAccount()
         {
             return GetElementsByClassName("profile_blocked").Count() != 0;
         }

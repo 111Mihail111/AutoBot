@@ -67,6 +67,8 @@ namespace AutoBot.Area.Managers
 
         public void JoinGroup()
         {
+            ExecuteScript("document.getElementById('topPanel')?.remove();");
+
             var buttons = GetElementById("hook_Block_AltGroupMainMenu").FindElements(SearchMethod.Tag, "a");
             foreach (var item in buttons)
             {
@@ -91,13 +93,13 @@ namespace AutoBot.Area.Managers
 
         public void PutClass()
         {
-            ExecuteScript("document.getElementsByClassName('mlr_cnt')[0].remove();");
+            RemovePostDetails();
             GetElementByClassName("hook_Block_AltGroupTopicLayerBody").FindElement(SearchMethod.ClassName, "js-klass").Click();
         }
 
         public void RemoveClass()
         {
-            ExecuteScript("document.getElementsByClassName('mlr_cnt')[0].remove();");
+            RemovePostDetails();
             GetElementByClassName("hook_Block_AltGroupTopicLayerBody").FindElement(SearchMethod.ClassName, "js-klass").Click();
         }
 
@@ -106,6 +108,14 @@ namespace AutoBot.Area.Managers
             SetDriver(chromeDriver);
         }
 
+        /// <summary>
+        /// Удалить данные поста
+        /// </summary>
+        protected void RemovePostDetails()
+        {
+            Thread.Sleep(1500);
+            ExecuteScript("document.getElementsByClassName('mlr_cnt')[0].remove();");
+        }
         /// <summary>
         /// Авторизация под сохраненным профилем
         /// </summary>

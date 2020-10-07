@@ -392,6 +392,25 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
             //TODO:Нужно придумыть способ, как отменять проделанные действия, в случае не оплаты задания
             //document.getElementsByClassName("is_error") Если null и нет строки с taskId, значит за задание уплотили
+
+            /*
+             * <div class="info__row__wrap  is_error" data-bind="info_row" data-id="12405457">
+                                <div class="info__padding__wrap">
+                                    <div class="tb__row info__row error" data-bind="row_state" data-row-state="12405457">
+                                        <div class="block info__block hide" data-info="info_block" data-bind="info__block">
+                                            <div class="article">Информация</div>
+                                            <hr class="info">
+                                            <div class="content" data-bind="info_content"><ul><li>Перейдите по ссылке, указанной в задании</li><li>Поставьте лайк под указанным постом/фото/видео</li><li>Нажмите на кнопку проверки рядом с заданием на Vktarget</li></ul></div>
+                                        </div>
+                                        <div class="block error__block" data-bind="error__block" data-info="error_block">
+                                            <div class="article">Ошибка</div>
+                                            <hr class="error">
+                                            <div class="content" data-bind="error_bind" data-error-id="12405457">Похоже, Вы не выполнили задание</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+             */
         }
 
         /// <summary>
@@ -413,14 +432,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 "var task = document.getElementsByClassName('wrap')[1].innerText;" +
                 "button.click();" +
                 "return systemType + '|' + task;").Split("|");
-        }
-
-        protected void AddToFrend(IWebElement webElement) //Есть TODO
-        {
-            webElement.Click();
-
-            SwitchToLastTab();
-            GetElementByClassName("flat_button button_wide").Click(); //TODO:Вызов менеджера и добавление в друзья
         }
 
         /// <summary>
@@ -473,6 +484,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected int GetRandomNumber(int min, int max)
         {
             return new Random().Next(min, max);
+        }
+
+        protected ActionToBrowser GetAction()
+        {
+            return 0;
         }
 
     }
