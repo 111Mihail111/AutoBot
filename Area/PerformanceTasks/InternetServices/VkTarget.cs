@@ -322,16 +322,16 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (_typeSocialNetwork)
             {
                 case "vk":
-                    
+                    UndoTaskInVk();
                     break;
                 case "youtube":
-                    
+                    UndoTaskInYouTube();
                     break;
                 case "odnoklassniki":
-                    
+                    UndoTaskInСlassmates();
                     break;
                 case "zen":
-                    
+                    UndoTaskInZen();
                     break;
             }
         }
@@ -341,22 +341,85 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void UndoTaskInVk()
         {
+            OpenPageInNewTab(_urlPage);
+
             switch (_task)
             {
                 case "Вступите в сообщество":
-                    _vkManager.JoinToComunity();
+                    _vkManager.UnsubscribeToComunity();
                     break;
                 case "Поставьте лайк на странице":
-                    _vkManager.PutLike();
+                    _vkManager.RemoveLike();
                     break;
-                case "Нажмите поделиться записью":
-                    _vkManager.MakeRepost();
+                case "Добавить в друзья":
+                    _vkManager.RemoveFromFriends();
                     break;
-                case "Добавить в друзья":                    
-                    _vkManager.AddToFriends();
+            }
+
+            CloseTab();
+            SwitchToTab();
+        }
+
+        /// <summary>
+        /// Отменить задачу в Ютуб
+        /// </summary>
+        protected void UndoTaskInYouTube()
+        {
+            OpenPageInNewTab(_urlPage);
+
+            switch (_task)
+            {
+                case "Подпишитесь на канал":
+                    _ytManager.UnsubscribeFromChannel();
                     break;
-                case "Расскажите о группе":                    
-                    _vkManager.ToTellAboutGroup();
+                case "Поставьте 'Лайк' под видео":
+                    _ytManager.RemoveLike();
+                    break;
+                case "Поставьте 'Не нравится' под видео":
+                    _ytManager.RemoveDislike();
+                    break;
+            }
+
+            CloseTab();
+            SwitchToTab();
+        }
+
+        /// <summary>
+        /// Отменить задачу в одноклассниках
+        /// </summary>
+        protected void UndoTaskInСlassmates()
+        {
+            SwitchToLastTab();
+
+            switch (_task)
+            {
+                case "Вступить в группу":
+                    _classmatesManager.LeaveGroup();
+                    break;
+                case "Поставьте класс под записью":
+                case "Поставить 'Класс' на публикации":
+                    _classmatesManager.RemoveClass(); //TODO: Протестить https://ok.ru/vismarketru/topic/152066788526855
+                    break;
+            }
+
+            CloseTab();
+            SwitchToTab();
+        }
+
+        /// <summary>
+        /// Отменить задачу в Я.Дзене
+        /// </summary>
+        protected void UndoTaskInZen()
+        {
+            SwitchToLastTab();
+
+            switch (_task)
+            {
+                case "Поставьте лайк на пост":
+                    _yandexZenManager.RemoveLike();
+                    break;
+                case "Подпишитесь на пользователя":
+                    _yandexZenManager.Unsubscribe();
                     break;
             }
 
@@ -370,52 +433,36 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void ShowActivity() //TODO: Довести до ума метод
         {
-            int randomSleep = GetRandomNumber(1, 3) * 5000;
-
-            int randomAction = GetRandomNumber(1, 5);
-            switch (randomAction)
+            var action = GetAction();
+            switch (action)
             {
-                case 1:
-                    var liCollection = GetElementByXPath("//*[@id='list']/main/section[1]/div[2]/div/div/div/ul")
-                        .FindElements(SearchMethod.Tag, "li").ToList();
-                    var randomIndex = GetRandomNumber(0, liCollection.Count);
-                    var liElement = liCollection[randomIndex];
-
-                    FocusOnElement(liElement);
-
-                    if (liElement.GetInnerText().Contains("Доступные") && randomAction == 1)
-                    {
-                        liElement.Click();
-                        Thread.Sleep(randomSleep + 5000 / randomAction);
-                    }
+                case ActionToBrowser.FocusOnElement:
+                    FocusOnElementMenu();
                     break;
-                case 2:
-                    var logotype = GetElementByXPath("//*[@id='header']/div/div/div[1]/div/a");
-                    FocusOnElement(logotype);
-
-                    if (randomAction == 1)
-                    {
-                        logotype.Click();
-                        Thread.Sleep(randomSleep + 5000 / randomAction);
-                    }
+                case ActionToBrowser.FocusOnElements:
+                    FocusOnAllElementsMenu();
                     break;
-                case 3:
-                    //OpenPageInNewTab(string.Empty);
-                    Thread.Sleep(randomSleep + 5000 / randomAction);
-
-                    //CloseTab();
+                case ActionToBrowser.FocusOnTab:
                     SwitchToTab();
                     break;
-                case 4:
-                    Thread.Sleep(randomSleep); //TODO: Иногда мы должны засыпать минут на 5-25, 
-                                               //но при этом должны асинхронно мониторить задачи и выполнять. После выполнения опять
-                                               //проявлять активность и засыпать
+                case ActionToBrowser.RefreshPage:
+                    var randomNumber = GetRandomNumber(0, 3);
+                    if (randomNumber == 2)
+                    {
+                        Refresh();
+                    }
+                    break;
+                case ActionToBrowser.Inaction:
+                    //TODO: Вызов асинхронного метода, который бегает в бесконечном цикле и чекает задачи. Если появляется задача, 
+                    //он выдает true и ожидание заканчивается
+                    //Thread.Sleep(600000);
                     break;
             }
 
+            int randomMilliseconds = GetRandomNumber(1000, 5000);
+            int randomSleep = GetRandomNumber(2, 4) * randomMilliseconds;
             Thread.Sleep(randomSleep);
         }
-
         /// <summary>
         /// Пропуск задания
         /// </summary>
@@ -425,11 +472,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 "div.container-fluid.available__table').getElementsByClassName('row tb__row')" +
                 "task[0].children[5].getElementsByClassName('control__item close')[0].click();");
         }
-
         /// <summary>
         /// Проверить задание
         /// </summary>
-        protected void CheckTask() //Есть TODO
+        protected void CheckTask() //TODO: Переработать метод. Разбить на несколько
         {
             string getTaskScript = "var task = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>div" +
                 ".container-fluid.available__table').getElementsByClassName('row tb__row')[0];";
@@ -454,19 +500,21 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     }
 
                     var error = errorPanel.FindElements(SearchMethod.ClassName, "content").Last().GetInnerText();
-                    if (error == "Похоже, вы не выполнили задание. Подождите 15 секунд и повторите попытку") //Если ошибка типа повторите через 10-15 секунд
+                    switch (error)
                     {
-                        waitingСounter++;
-                        if (waitingСounter < 3)
-                        {
-                            Thread.Sleep(15000);
-                            ExecuteScript(getTaskScript + clickButtonScript);
-                            continue;
-                        }
+                        case "Похоже, вы не выполнили задание. Подождите 15 секунд и повторите попытку.":
+                        case "Проверка не пройдена. Попробуйте через 10 секунд.":
+                            waitingСounter++;
+                            if (waitingСounter < 3)
+                            {
+                                Thread.Sleep(15000);
+                                ExecuteScript(getTaskScript + clickButtonScript);
+                                continue;
+                            }
 
-                        SkipTask();
-                        UndoTask();
-                        return;
+                            SkipTask();
+                            UndoTask();
+                            return;
                     }
                 }
                 else if (taksId != ExecuteScript(getTaskScript + getAttribute))
@@ -479,7 +527,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 }
             }
         }
-
         /// <summary>
         /// Получить задачу
         /// </summary>
@@ -501,7 +548,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 "return systemType + '|' + task;").Split("|");
 
             _typeSocialNetwork = taskDetails[0];
-            _task = taskDetails[1];
+
+            if (taskDetails.Length == 2)
+            {
+                _task = taskDetails[1];
+            }
         }
 
         /// <summary>
@@ -530,7 +581,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             GetElementByXPath("//*[@id='login_form']/div[2]/div/div/div[1]/button").Click();
             Thread.Sleep(2000);
         }
-
         /// <summary>
         /// Получить баланс
         /// </summary>
@@ -538,7 +588,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         {
             return GetElementByXPath("//*[@id='header']/div/div/div[3]/div/div/div[2]/span[2]").GetInnerText() + "руб";
         }
-
         /// <summary>
         /// Обновить модель
         /// </summary>
@@ -551,15 +600,73 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             WebService.UpdateInternetService(internetService);
         }
 
+        /// <summary>
+        /// Получить случайное число
+        /// </summary>
+        /// <param name="min">Минимальное значение</param>
+        /// <param name="max">Максимальное значение</param>
+        /// <returns>Случайное числовое значение</returns>
         protected int GetRandomNumber(int min, int max)
         {
             return new Random().Next(min, max);
         }
+        /// <summary>
+        /// Фокус на элемент меню
+        /// </summary>
+        protected void FocusOnElementMenu()
+        {
+            var liCollection = GetElementByXPath("//*[@id='list']/main/section[1]/div[2]/div/div/div/ul")
+                        .FindElements(SearchMethod.Tag, "li").ToList();
 
+            FocusOnElement(liCollection[GetRandomNumber(0, liCollection.Count)]);
+        }
+        /// <summary>
+        /// Фокус на элементы меню
+        /// </summary>
+        protected void FocusOnAllElementsMenu()
+        {
+            var liCollection = GetElementByXPath("//*[@id='list']/main/section[1]/div[2]/div/div/div/ul")
+                        .FindElements(SearchMethod.Tag, "li").ToList();
+
+            foreach (var item in liCollection)
+            {
+                FocusOnElement(item);
+                Thread.Sleep(1000);
+            }
+        }
+        /// <summary>
+        /// Обновить страницу
+        /// </summary>
+        protected void Refresh()
+        {
+            var logotype = GetElementByXPath("//*[@id='header']/div/div/div[1]/div/a");
+            FocusOnElement(logotype);
+            
+            Thread.Sleep(1000);
+            logotype.Click();
+        }
+        /// <summary>
+        /// Получить действие
+        /// </summary>
+        /// <returns>Действие в браузере</returns>
         protected ActionToBrowser GetAction()
         {
-            return 0;
+            int randomAction = GetRandomNumber(0, 5);
+            switch (randomAction)
+            {
+                case 0:
+                    return ActionToBrowser.FocusOnElement;
+                case 1:
+                    return ActionToBrowser.FocusOnElements;
+                case 2:
+                    return ActionToBrowser.FocusOnTab;
+                case 3:
+                    return ActionToBrowser.RefreshPage;
+                case 4:
+                    return ActionToBrowser.Inaction;
+                default:
+                    return ActionToBrowser.FocusOnElement;
+            }
         }
-
     }
 }

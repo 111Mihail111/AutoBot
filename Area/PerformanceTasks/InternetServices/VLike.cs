@@ -163,8 +163,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
                 if (IsMaxLikes())
                 {
-                    _vkManager.RemoveLike(url);
+                    OpenPageInNewTab(url);
+                    _vkManager.RemoveLike();
                     SkipTask("vkLike");
+
                     perfomanse = GetElementByClassName("groups").GetInnerText();
                     continue;
                 }
@@ -172,7 +174,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 {
                     if (DelayPayments())
                     {
-                        _vkManager.RemoveLike(url);
+                        OpenPageInNewTab(url);
+                        _vkManager.RemoveLike();
+                        CloseTab();
+                        SwitchToTab();
+
                         GetElementByXPath("//*[@id='buttons']/a[1]").Click();
                         Thread.Sleep(1000);
                         GetElementByClassName("groups").FindElements(SearchMethod.ClassName, "group").First()

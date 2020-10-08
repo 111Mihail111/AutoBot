@@ -56,25 +56,45 @@ namespace AutoBot.Area.Managers
             SwitchToTab();
         }
 
-        public void SubscribeToChannel()
+        public void SubscribeToChannel() //TODO:1 Дублируется часть кода. Совместить в один метод
         {
-            GetElementById("channel-header-container")
-                .FindElement(SearchMethod.Id, "subscribe-button").FindElement(SearchMethod.Tag, "paper-button").Click();
+            GetElementByXPath("//*[@id='subscribe-button']/ytd-subscribe-button-renderer/paper-button").Click();
+            Thread.Sleep(1500);
+        }
+
+        public void UnsubscribeFromChannel() //TODO:1 Дублируется часть кода. Совместить в один метод
+        {
+            GetElementByXPath("//*[@id='subscribe-button']/ytd-subscribe-button-renderer/paper-button").Click();
+            Thread.Sleep(1500);
+
+            GetElementById("main").FindElements(SearchMethod.Tag, "paper-button").Last().Click();
             Thread.Sleep(2000);
         }
 
-        public void LikeUnderVideo()
+        public void LikeUnderVideo() //TODO:2 Дублируется код. Совместить в один метод
         {
             RemoveModalDialogs();
-            GetElementById("top-level-buttons").FindElements(SearchMethod.Tag, "button").First().Click();
+            GetElementByXPath("//*[@id='top-level-buttons']/ytd-toggle-button-renderer[1]/a").Click();
+            Thread.Sleep(2000);
+        }
+
+        public void RemoveLike() //TODO:2 Дублируется код. Совместить в один метод
+        {
+            RemoveModalDialogs();
+            GetElementByXPath("//*[@id='top-level-buttons']/ytd-toggle-button-renderer[1]/a").Click();
             Thread.Sleep(2000);
         }
 
         public void DislikeUnderVideo()
         {
-            GetElementById("top-level-buttons").FindElements(SearchMethod.Tag, "button")
-                .Where(w => w.GetAttribute("aria-pressed") == "false").Last().Click();
+            GetElementByXPath("//*[@id='top-level-buttons']/ytd-toggle-button-renderer[2]/a").Click();
             Thread.Sleep(2000);
+        }
+
+        public void RemoveDislike()
+        {
+            GetElementByXPath("//*[@id='top-level-buttons']/ytd-toggle-button-renderer[2]/a").Click();
+            Thread.Sleep(1500);
         }
 
         public bool IsVideoAvailable()

@@ -61,9 +61,8 @@ namespace AutoBot.Area.Managers
             Thread.Sleep(1500);
         }
 
-        public void RemoveLike(string url)
+        public void RemoveLike()
         {
-            OpenPageInNewTab(url);
             PutLike();
         }
 
@@ -156,10 +155,9 @@ namespace AutoBot.Area.Managers
         /// <summary>
         /// Удалить данные поста
         /// </summary>
-        protected void RemovePostDetails() //Есть TODO
+        protected void RemovePostDetails()
         {
-            string postId = GetUrlPage().Replace("https://vk.com/wall", "wpt");
-            ExecuteScript($"document.getElementById('{postId}')?.remove();"); //Если не null, то удаляем TODO:Придумать способ лучше
+            ExecuteScript("document.getElementsByClassName('wall_text')[0]?.remove();");
         }
         /// <summary>
         /// Удаление модальных окон vk

@@ -31,7 +31,7 @@ namespace AutoBot.Area.Managers.Interface
         /// Убрать лайк
         /// </summary>
         /// <param name="url">Url-адрес страницы с постом</param>
-        public void RemoveLike(string url);
+        public void RemoveLike();
 
         /// <summary>
         /// Заблокировано ли сообщество
