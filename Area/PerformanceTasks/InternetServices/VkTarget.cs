@@ -455,7 +455,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 case ActionToBrowser.Inaction:
                     //TODO: Вызов асинхронного метода, который бегает в бесконечном цикле и чекает задачи. Если появляется задача, 
                     //он выдает true и ожидание заканчивается
-                    //Thread.Sleep(600000);
+                    Thread.Sleep(60000);
                     break;
             }
 
@@ -512,6 +512,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                                 continue;
                             }
 
+                            SkipTask();
+                            UndoTask();
+                            return;
+                        case "Увы, но список заданий устарел! Скоро вы получите новые задания.":
                             SkipTask();
                             UndoTask();
                             return;
