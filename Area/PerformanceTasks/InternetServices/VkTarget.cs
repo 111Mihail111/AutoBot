@@ -8,6 +8,7 @@ using OpenQA.Selenium;
 using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace AutoBot.Area.PerformanceTasks.InternetServices
 {
@@ -455,7 +456,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 case ActionToBrowser.Inaction:
                     //TODO: Вызов асинхронного метода, который бегает в бесконечном цикле и чекает задачи. Если появляется задача, 
                     //он выдает true и ожидание заканчивается
-                    Thread.Sleep(60000);
+                    if (TaskExistsAsync().Result) //TODO: Не отлажен
+                    {
+                        return;
+                    }
+                    Thread.Sleep(60000); //TODO: Доработать. В первый раз ждем 10мин, потом 20, 30 ... + нельзя 
+                    //чтобы событие слишком часто падало. Проявляем активности на протяжении 40-60 минут, потом засыпаем
                     break;
             }
 
@@ -469,7 +475,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected void SkipTask()
         {
             ExecuteScript("var task = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>" +
-                "div.container-fluid.available__table').getElementsByClassName('row tb__row')" +
+                "div.container-fluid.available__table').getElementsByClassName('row tb__row');" +
                 "task[0].children[5].getElementsByClassName('control__item close')[0].click();");
         }
         /// <summary>
@@ -558,12 +564,30 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 _task = taskDetails[1];
             }
         }
+        /// <summary>
+        /// Существует ли задача
+        /// </summary>
+        /// <returns>True - существует, иначе false</returns>
+        protected async Task<bool> TaskExistsAsync() //Есть TODO
+        {
+            string getTaskScript = "var taskEmpty = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child" +
+                "(1)>div.empty');if (taskEmpty.classList.length == 1){return 'false'}else{return 'true'}";
+
+            while (true)
+            {
+                bool taskExists = Convert.ToBoolean(await ExecuteScriptAsync(getTaskScript)); //TODO: Вынести в библиотеку метод ExecuteScriptAsync()
+                if (taskExists)
+                {
+                    return true;
+                }
+            }
+        }
 
         /// <summary>
         /// Авторизация на сервисе
         /// </summary>
         /// <param name="url">Url-адрес сервиса</param>
-        protected void AuthorizationOnService(string url)
+        protected void AuthorizationOnService(string url) //Есть TODO
         {
             if (GetUrlPage() == url)
             {
@@ -582,8 +606,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 password.SendKeys(_password);
             }
 
-            GetElementByXPath("//*[@id='login_form']/div[2]/div/div/div[1]/button").Click();
-            Thread.Sleep(2000);
+            GetElementByXPath("//*[@id='login_form']/div[2]/div/div/div[1]/button").Click(); //TODO: Не нажимает на кнопку
+            Thread.Sleep(2500);
         }
         /// <summary>
         /// Получить баланс
