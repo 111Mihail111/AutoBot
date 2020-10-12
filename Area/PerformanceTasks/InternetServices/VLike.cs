@@ -159,7 +159,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 SwitchToTab();
 
                 GetElementByXPath("//*[@id='buttons']/a[2]").Click();
-                Thread.Sleep(1000);
+                Thread.Sleep(2000);
 
                 if (IsMaxLikes())
                 {
@@ -280,7 +280,20 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 while (modal.Displayed)
                 {
                     GetElementByXPath("//*[@id='buttons']/a[2]").Click();
-                    Thread.Sleep(5000);
+
+                    while (true)
+                    {
+                        string text = GetTextFromAlert();
+                        if (!string.IsNullOrWhiteSpace(text))
+                        {
+                            break;
+                        }
+                        else if (!modal.Displayed)
+                        {
+                            return false;
+                        }
+                    }
+
                     AlertAccept();
 
                     counter++;
@@ -288,6 +301,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     {
                         return true;
                     }
+
+                    Thread.Sleep(3000);
                 }
             }
             catch
@@ -314,7 +329,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     AlertAccept();
                     break;
                 case "instaSubscription":
-                case "instaLike":
+                //case "instaLike":
                     GetElementByXPath("//*[@id='content']/div[2]/div/a[1]").Click();
                     AlertAccept();
                     break;

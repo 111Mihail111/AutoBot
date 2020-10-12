@@ -454,15 +454,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     }
                     break;
                 case ActionToBrowser.Inaction:
-                    //TODO: Вызов асинхронного метода, который бегает в бесконечном цикле и чекает задачи. Если появляется задача, 
-                    //он выдает true и ожидание заканчивается
-                    if (TaskExistsAsync().Result) //TODO: Не отлажен
-                    {
-                        return;
-                    }
-                    Thread.Sleep(60000); //TODO: Доработать. В первый раз ждем 10мин, потом 20, 30 ... + нельзя 
-                    //чтобы событие слишком часто падало. Проявляем активности на протяжении 40-60 минут, потом засыпаем
-                    break;
+                    Inaction();
+                    return;
             }
 
             int randomMilliseconds = GetRandomNumber(1000, 5000);
@@ -508,7 +501,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     var error = errorPanel.FindElements(SearchMethod.ClassName, "content").Last().GetInnerText();
                     switch (error)
                     {
-                        case "Похоже, вы не выполнили задание. Подождите 15 секунд и повторите попытку.":
+                        case "Похоже, вы не выполнили задание. Подождите 15 секунд и повторите попытку":
                         case "Проверка не пройдена. Попробуйте через 10 секунд.":
                             waitingСounter++;
                             if (waitingСounter < 3)
@@ -565,29 +558,39 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             }
         }
         /// <summary>
-        /// Существует ли задача
+        /// Бездействие
         /// </summary>
-        /// <returns>True - существует, иначе false</returns>
-        protected async Task<bool> TaskExistsAsync() //Есть TODO
+        protected void Inaction()
         {
             string getTaskScript = "var taskEmpty = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child" +
                 "(1)>div.empty');if (taskEmpty.classList.length == 1){return 'false'}else{return 'true'}";
+            int randomTimerMinuts = GetRandomNumber(10, 61);
 
             while (true)
             {
-                bool taskExists = Convert.ToBoolean(await ExecuteScriptAsync(getTaskScript)); //TODO: Вынести в библиотеку метод ExecuteScriptAsync()
+                bool taskExists = Convert.ToBoolean(ExecuteScript(getTaskScript));
                 if (taskExists)
                 {
-                    return true;
+                    return;
+                }
+                else if (randomTimerMinuts == 0)
+                {
+                    return;
+                }
+                else
+                {
+                    Thread.Sleep(60000);
+                    randomTimerMinuts--;
                 }
             }
         }
+
 
         /// <summary>
         /// Авторизация на сервисе
         /// </summary>
         /// <param name="url">Url-адрес сервиса</param>
-        protected void AuthorizationOnService(string url) //Есть TODO
+        protected void AuthorizationOnService(string url)
         {
             if (GetUrlPage() == url)
             {
@@ -606,7 +609,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 password.SendKeys(_password);
             }
 
-            GetElementByXPath("//*[@id='login_form']/div[2]/div/div/div[1]/button").Click(); //TODO: Не нажимает на кнопку
+            ExecuteScript("document.getElementById('login_form').getElementsByTagName('button')[0].click()");
             Thread.Sleep(2500);
         }
         /// <summary>
@@ -627,6 +630,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
             WebService.UpdateInternetService(internetService);
         }
+
 
         /// <summary>
         /// Получить случайное число
@@ -669,7 +673,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         {
             var logotype = GetElementByXPath("//*[@id='header']/div/div/div[1]/div/a");
             FocusOnElement(logotype);
-            
+
             Thread.Sleep(1000);
             logotype.Click();
         }
