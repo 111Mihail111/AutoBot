@@ -19,10 +19,23 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         private static bool _isAuthorization;
         private string _login;
         private string _password;
-        private string _typeSocialNetwork;
-        private string _task;
-        private string _urlPage;
 
+        /// <summary>
+        /// Тип соц. сети
+        /// </summary>
+        private string _typeSocialNetwork;
+        /// <summary>
+        /// Задача
+        /// </summary>
+        private string _task;
+        /// <summary>
+        /// Url-страницы,
+        /// </summary>
+        private string _urlByTask;
+        /// <summary>
+        /// Количество действий
+        /// </summary>
+        private int _countAction;
 
         private IVkManager _vkManager;
         private IYouTubeManager _ytManager;
@@ -140,7 +153,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
                 _typeSocialNetwork = string.Empty;
                 _task = string.Empty;
-                _urlPage = string.Empty;
+                _urlByTask = string.Empty;
 
                 UpdateModel(url);
             }
@@ -153,7 +166,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected void CarryOutTaskInVk(string taskText)
         {
             SwitchToLastTab();
-            _urlPage = GetUrlPage();
+            _urlByTask = GetUrlPage();
 
             bool isError = false;
             switch (taskText)
@@ -219,7 +232,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected void CarryOutTaskInYouTube(string taskText)
         {
             SwitchToLastTab();
-            _urlPage = GetUrlPage();
+            _urlByTask = GetUrlPage();
 
             bool isError = false;
             switch (taskText)
@@ -266,7 +279,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected void CarryOutTaskInСlassmates(string taskText) //Есть TODO
         {
             SwitchToLastTab();
-            _urlPage = GetUrlPage();
+            _urlByTask = GetUrlPage();
 
             switch (taskText)
             {
@@ -295,7 +308,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected void CarryOutTaskInZen(string taskText)
         {
             SwitchToLastTab();
-            _urlPage = GetUrlPage();
+            _urlByTask = GetUrlPage();
 
             switch (taskText)
             {
@@ -342,7 +355,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void UndoTaskInVk()
         {
-            OpenPageInNewTab(_urlPage);
+            OpenPageInNewTab(_urlByTask);
 
             switch (_task)
             {
@@ -366,7 +379,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void UndoTaskInYouTube()
         {
-            OpenPageInNewTab(_urlPage);
+            OpenPageInNewTab(_urlByTask);
 
             switch (_task)
             {
@@ -432,8 +445,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Проявить активность
         /// </summary>
-        protected void ShowActivity() //TODO: Довести до ума метод
+        protected void ShowActivity(bool isRefresh = true) //TODO: Довести до ума метод
         {
+            _countAction++;
+
             var action = GetAction();
             switch (action)
             {
@@ -447,6 +462,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     SwitchToTab();
                     break;
                 case ActionToBrowser.RefreshPage:
+                    if (!isRefresh)
+                    {
+                        break;
+                    }
+
                     var randomNumber = GetRandomNumber(0, 3);
                     if (randomNumber == 2)
                     {
@@ -454,8 +474,13 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     }
                     break;
                 case ActionToBrowser.Inaction:
-                    Inaction();
-                    return;
+                    if (_countAction >= 45)
+                    {
+                        Inaction();
+                        _countAction = 0;
+                        return;
+                    }
+                    break;
             }
 
             int randomMilliseconds = GetRandomNumber(1000, 5000);
@@ -501,6 +526,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     var error = errorPanel.FindElements(SearchMethod.ClassName, "content").Last().GetInnerText();
                     switch (error)
                     {
+                        case "Ошибка при выполнении проверки, попробуйте снова":
                         case "Похоже, вы не выполнили задание. Подождите 15 секунд и повторите попытку":
                         case "Проверка не пройдена. Попробуйте через 10 секунд.":
                             waitingСounter++;
@@ -526,7 +552,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 }
                 else
                 {
-                    ShowActivity();
+                    ShowActivity(false);
                 }
             }
         }
