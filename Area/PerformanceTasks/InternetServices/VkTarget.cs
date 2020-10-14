@@ -41,6 +41,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         private IYouTubeManager _ytManager;
         private IClassmatesManager _classmatesManager;
         private IYandexZenManager _yandexZenManager;
+        private ITumblr _tumblr;
 
         protected void Init()
         {
@@ -62,12 +63,14 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _ytManager = new YouTubeManager();
             _classmatesManager = new ClassmatesManager();
             _yandexZenManager = new YandexZenManager();
+            _tumblr = new Tumblr();
 
             var driver = GetDriver();
             _vkManager.SetContextBrowserManager(driver);
             _ytManager.SetContextBrowserManager(driver);
             _classmatesManager.SetContextBrowserManager(driver);
             _yandexZenManager.SetContextBrowserManager(driver);
+            _tumblr.SetContextBrowserManager(driver);
         }
 
         /// <summary>

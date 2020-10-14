@@ -29,5 +29,9 @@
         /// Яндекс зен
         /// </summary>
         YandexZen = 5,
+        /// <summary>
+        /// Тамблер
+        /// </summary>
+        Tumblr = 6,
     }
 }
