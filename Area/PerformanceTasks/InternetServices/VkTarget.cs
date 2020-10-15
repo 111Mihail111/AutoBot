@@ -42,6 +42,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         private IClassmatesManager _classmatesManager;
         private IYandexZenManager _yandexZenManager;
         private ITumblr _tumblr;
+        private IReddit _reddit;
 
         protected void Init()
         {
@@ -64,6 +65,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _classmatesManager = new ClassmatesManager();
             _yandexZenManager = new YandexZenManager();
             _tumblr = new Tumblr();
+            _reddit = new Reddit();
 
             var driver = GetDriver();
             _vkManager.SetContextBrowserManager(driver);
@@ -71,6 +73,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _classmatesManager.SetContextBrowserManager(driver);
             _yandexZenManager.SetContextBrowserManager(driver);
             _tumblr.SetContextBrowserManager(driver);
+            _reddit.SetContextBrowserManager(driver);
         }
 
         /// <summary>

@@ -328,7 +328,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     GetElementByXPath("//*[@id='content']/div[3]/div/div[3]/span").Click();
                     AlertAccept();
                     break;
-                case "instaSubscription":
+                //case "instaSubscription":
                 //case "instaLike":
                     GetElementByXPath("//*[@id='content']/div[2]/div/a[1]").Click();
                     AlertAccept();
