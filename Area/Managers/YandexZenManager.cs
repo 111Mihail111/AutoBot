@@ -9,6 +9,7 @@ namespace AutoBot.Area.Managers
 {
     public class YandexZenManager : BrowserManager, IYandexZenManager
     {
+        /// <inheritdoc/>
         public void Authorization(string login, string password)
         {
             string url = "https://zen.yandex.ru/user/";
@@ -56,30 +57,65 @@ namespace AutoBot.Area.Managers
             SwitchToTab();
         }
 
+        /// <inheritdoc/>
         public void PutLike()
         {
-            GetElementByClassName("socials-left-block__likes").FindElements(SearchMethod.ClassName, "ui-lib-mitten").First().Click();
+            var panelButtons = GetElementByClassName("socials-left-block__likes");
+            var divBlock = panelButtons.FindElements(SearchMethod.ClassName, "mittens__mitten").First();
+            
+            var button = divBlock.FindElement(SearchMethod.ClassName, "ui-lib-mitten");
+            if (!button.GetClass().Contains("_state_passive"))
+            {
+                return;
+            }
+
+            button.Click();
             Thread.Sleep(2000);
         }
 
+        /// <inheritdoc/>
         public void RemoveLike()
         {
-            GetElementByClassName("socials-left-block__likes").FindElements(SearchMethod.ClassName, "ui-lib-mitten").Last().Click();
+            var panelButtons = GetElementByClassName("socials-left-block__likes");
+            var divBlock = panelButtons.FindElements(SearchMethod.ClassName, "mittens__mitten").First();
+
+            var button = divBlock.FindElement(SearchMethod.ClassName, "ui-lib-mitten");
+            if (!button.GetClass().Contains("_state_active"))
+            {
+                return;
+            }
+
+            button.Click();
             Thread.Sleep(2000);
         }
 
+        /// <inheritdoc/>
         public void Subscribe()
         {
-            GetElementByClassName("_view-type_rounded-yellow").Click();
+            var subscribeButton = GetElementByClassName("_view-type_rounded-yellow");
+            if (subscribeButton == null)
+            {
+                return;                
+            }
+
+            subscribeButton.Click();
             Thread.Sleep(2000);
         }
 
+        /// <inheritdoc/>
         public void Unsubscribe()
         {
-            GetElementByClassName("_view-type_rounded-white").Click();
+            var unsubscribeButton = GetElementByClassName("_view-type_rounded-white");
+            if (unsubscribeButton == null)
+            {
+                return;
+            }
+
+            unsubscribeButton.Click();
             Thread.Sleep(2000);
         }
 
+        /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
         {
             SetDriver(chromeDriver);
