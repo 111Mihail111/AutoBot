@@ -186,6 +186,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _vkManager.JoinToComunity();
                     break;
                 case "Поставьте лайк на странице":
+                    if (!_vkManager.IsPostFound())
+                    {
+                        isError = true;
+                        break;
+                    }
                     _vkManager.PutLike();
                     break;
                 case "Посмотреть пост":
