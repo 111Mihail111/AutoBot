@@ -444,10 +444,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Проявить активность
         /// </summary>
-        protected void ShowActivity(bool isRefresh = true) //TODO: Довести до ума метод
+        protected void ShowActivity(bool isRefresh = true)
         {
             _countAction++;
 
+            var randomNumber = GetRandomNumber(0, 3);
             var action = GetAction();
             switch (action)
             {
@@ -465,18 +466,28 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     {
                         break;
                     }
-
-                    var randomNumber = GetRandomNumber(0, 3);
-                    if (randomNumber == 2)
+                    else if (randomNumber == 2)
                     {
                         Refresh();
+                        break;
                     }
+                    FocusOnFirstElementMenu();
                     break;
                 case ActionToBrowser.ClickOnElement:
-                    ClickOnElementMenu();
+                    if (randomNumber == 2)
+                    {
+                        ClickOnElementMenu();
+                        break;
+                    }
+                    FocusOnFirstElementMenu();
                     break;
                 case ActionToBrowser.ClickOnElements:
-                    ClickOnElementsMenu();
+                    if (randomNumber == 2)
+                    {
+                        ClickOnElementsMenu();
+                        break;
+                    }
+                    FocusOnAllElementsMenu();
                     break;
                 case ActionToBrowser.Inaction:
                     if (_countAction >= 45)
