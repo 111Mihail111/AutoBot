@@ -25,5 +25,13 @@
         /// Бездействие
         /// </summary>
         Inaction = 4,
+        /// <summary>
+        /// Нажать на элемент
+        /// </summary>
+        ClickOnElement = 5,
+        /// <summary>
+        /// Нажать на элементы
+        /// </summary>
+        ClickOnElements = 6,
     }
 }

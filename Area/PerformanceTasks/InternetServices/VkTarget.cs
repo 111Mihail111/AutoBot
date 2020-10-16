@@ -230,7 +230,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
             CheckTask();
         }
-
         /// <summary>
         /// Выполнить задачу в ютуб
         /// </summary>
@@ -277,7 +276,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
             CheckTask();
         }
-
         /// <summary>
         /// Выполнить задачу в одноклассниках
         /// </summary>
@@ -306,7 +304,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToTab();
             CheckTask();
         }
-
         /// <summary>
         /// Выполнить задачу в Яндекс.Дзен
         /// </summary>
@@ -355,7 +352,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     break;
             }
         }
-
         /// <summary>
         /// Отменить задачу в вк
         /// </summary>
@@ -379,7 +375,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             CloseTab();
             SwitchToTab();
         }
-
         /// <summary>
         /// Отменить задачу в Ютуб
         /// </summary>
@@ -403,7 +398,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             CloseTab();
             SwitchToTab();
         }
-
         /// <summary>
         /// Отменить задачу в одноклассниках
         /// </summary>
@@ -425,7 +419,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             CloseTab();
             SwitchToTab();
         }
-
         /// <summary>
         /// Отменить задачу в Я.Дзене
         /// </summary>
@@ -459,7 +452,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (action)
             {
                 case ActionToBrowser.FocusOnElement:
-                    FocusOnElementMenu();
+                    FocusOnFirstElementMenu();
                     break;
                 case ActionToBrowser.FocusOnElements:
                     FocusOnAllElementsMenu();
@@ -478,6 +471,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     {
                         Refresh();
                     }
+                    break;
+                case ActionToBrowser.ClickOnElement:
+                    ClickOnElementMenu();
+                    break;
+                case ActionToBrowser.ClickOnElements:
+                    ClickOnElementsMenu();
                     break;
                 case ActionToBrowser.Inaction:
                     if (_countAction >= 45)
@@ -677,13 +676,39 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Фокус на элемент меню
         /// </summary>
-        protected void FocusOnElementMenu()
+        protected void FocusOnFirstElementMenu()
         {
             var liCollection = GetElementByXPath("//*[@id='list']/main/section[1]/div[2]/div/div/div/ul")
                         .FindElements(SearchMethod.Tag, "li").ToList();
 
             FocusOnElement(liCollection[GetRandomNumber(0, liCollection.Count)]);
         }
+
+        /// <summary>
+        /// Нажать на элемент меню
+        /// </summary>
+        protected void ClickOnElementMenu()
+        {
+            GetElementByXPath("//*[@id='list']/main/section[1]/div[2]/div/div/div/ul")
+                .FindElements(SearchMethod.Tag, "li").First().Click();
+        }
+        /// <summary>
+        /// Наждать на элементы меню
+        /// </summary>
+        protected void ClickOnElementsMenu()
+        {
+            var liCollection = GetElementByXPath("//*[@id='list']/main/section[1]/div[2]/div/div/div/ul")
+                        .FindElements(SearchMethod.Tag, "li").ToList();
+
+            foreach (var item in liCollection)
+            {
+                item.Click();
+                Thread.Sleep(1500);
+            }
+
+            liCollection.First().Click();
+        }
+
         /// <summary>
         /// Фокус на элементы меню
         /// </summary>
@@ -715,7 +740,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <returns>Действие в браузере</returns>
         protected ActionToBrowser GetAction()
         {
-            int randomAction = GetRandomNumber(0, 5);
+            int randomAction = GetRandomNumber(0, 7);
             switch (randomAction)
             {
                 case 0:
@@ -728,6 +753,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     return ActionToBrowser.RefreshPage;
                 case 4:
                     return ActionToBrowser.Inaction;
+                case 5:
+                    return ActionToBrowser.ClickOnElement;
+                case 6:
+                    return ActionToBrowser.ClickOnElements;
                 default:
                     return ActionToBrowser.FocusOnElement;
             }
