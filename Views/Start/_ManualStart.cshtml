@@ -59,12 +59,12 @@
 
     <div class="col-2">
         <div class="row">
-            @Html.DropDownList("StatusCrane", new SelectList(new string[] { "Work", "NoWork", "InWork" }, item.StatusService.ToString()), new
-            {
-                @class = "form-control",
-                @style = "background-color: rgb(222,243,202); border: 2px solid white; height: 44px; text-align-last: center;",
-                @onchange = "ChangeStatus(this)"
-            })
+            @Html.DropDownListFor(x => item.StatusService, new SelectList(new string[] { "Work", "NoWork", "InWork" }, item.StatusService), null, new
+                {
+                   @class = "form-control",
+                   @style = "background-color: rgb(222,243,202); border: 2px solid white; height: 44px; text-align-last: center;",
+                   @onchange = "ChangeStatus(this)",
+                })
         </div>
     </div>
 

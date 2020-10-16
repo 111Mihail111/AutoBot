@@ -21,7 +21,7 @@ namespace AutoBot.Controllers
         private IVLike _vLike;
         private IVkTarget _vkTarget;
 
-        public StartController(IFreeBitcoin freeBitcoin, IMoonBitcoin moonBitcoin, IBonusBitcoin bonusBitcoin, 
+        public StartController(IFreeBitcoin freeBitcoin, IMoonBitcoin moonBitcoin, IBonusBitcoin bonusBitcoin,
             IMoonDogecoin moonDogecoin, IMoonLitecoin moonLitecoin, IMoonDash moonDash, IVLike vLike, IVkTarget vkTarget)
         {
             _freeBitcoin = freeBitcoin;
@@ -70,10 +70,17 @@ namespace AutoBot.Controllers
         }
 
         [HttpGet]
-        public PartialViewResult UpdateStatusService(string url, Status statusService)
+        public PartialViewResult UpdateStatusService(string url, Status statusService, bool isManualStart)
         {
             WebService.UpdateStatusService(url, statusService);
-            return PartialView("_InternetService", WebService.GetInternetServices());
+
+            var internetServices = WebService.GetInternetServices();
+            if (isManualStart)
+            {
+                return PartialView("_ManualStart", internetServices);
+            }
+
+            return PartialView("_InternetService", internetServices);
         }
 
         [HttpGet]

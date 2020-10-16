@@ -125,16 +125,22 @@ function UpdatingStatusCrane(url, status) {
 }
 
 /*Обновить статус сервиса*/
-function UpdatingStatusService(url, status) {
+function UpdatingStatusService(url, status, isManualStart = false) {
     $.ajax({
         type: "GET",
         data: {
             url: url,
             statusService: status,
+            isManualStart: isManualStart,
         },
         contentType: "application/json; charset=utf-8",
         url: "/Start/UpdateStatusService/",
         success: function (data) {
+            debugger;
+            if (isManualStart) {
+                $('#ManualStart').html(data);
+                return;
+            }
             $('#InternetService').html(data);
         }
     });
@@ -218,7 +224,8 @@ function InternetServicesManualStart(button) {
     if (button.children[0].innerText === "Старт") {
         divContainer.insertAdjacentHTML('beforeend',
             '<button class="btn btn-warning btn-sm btn-block mt-1" onclick="InternetServicesManualStart(this)"><span>Стоп</span></button>');
-        UpdatingStatusService(data.URL, data.Status);
+        debugger;
+        UpdatingStatusService(data.URL, "InWork", true);
         GoToInternetServicesManualStart(data);
     }
     else {
