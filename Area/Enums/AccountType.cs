@@ -33,5 +33,9 @@
         /// Тамблер
         /// </summary>
         Tumblr = 6,
+        /// <summary>
+        /// Реддит
+        /// </summary>
+        Reddit = 7,
     }
 }

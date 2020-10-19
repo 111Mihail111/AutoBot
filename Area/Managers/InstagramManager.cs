@@ -9,6 +9,7 @@ namespace AutoBot.Area.Managers
 {
     public class InstagramManager : BrowserManager, IInstagramManager
     {
+        /// <inheritdoc/>
         public void Authorization(string login, string password)
         {
             OpenPageInNewTab("https://www.instagram.com/");
@@ -54,7 +55,7 @@ namespace AutoBot.Area.Managers
             CloseTab();
             SwitchToLastTab();
         }
-
+        /// <inheritdoc/>
         public void Subscribe()
         {
             var buttons = GetElementsByTagName("button");
@@ -68,7 +69,7 @@ namespace AutoBot.Area.Managers
                 }
             }
         }
-
+        /// <inheritdoc/>
         public void Unsubscribe()
         {
             string canselSubscribeButtonClickScript = "document.getElementsByClassName('aOOlW -Cab_   ')[0].click();";
@@ -100,7 +101,7 @@ namespace AutoBot.Area.Managers
 
             Thread.Sleep(2000);
         }
-
+        /// <inheritdoc/>
         public void PutLike()
         {
             var svgCollection = GetElementsByClassName("_8-yf5");
@@ -114,7 +115,7 @@ namespace AutoBot.Area.Managers
                 }
             }
         }
-
+        /// <inheritdoc/>
         public void RemoveLike()
         {
             var svgCollection = GetElementsByClassName("_8-yf5");
@@ -128,12 +129,12 @@ namespace AutoBot.Area.Managers
                 }
             }
         }
-
+        /// <inheritdoc/>
         public bool IsFoundPage()
         {
             return !GetTitlePage().Contains("Страница не найдена") != false;
         }
-
+        /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
         {
             SetDriver(chromeDriver);

@@ -35,7 +35,7 @@ namespace AutoBot
             services.AddScoped<IInstagramManager, InstagramManager>();
             services.AddScoped<IYandexZenManager, YandexZenManager>();
             services.AddScoped<ITumblr, Tumblr>();
-            services.AddScoped<IReddit, Reddit>();
+            services.AddScoped<IReddit, RedditManager>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

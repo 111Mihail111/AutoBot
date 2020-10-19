@@ -42,7 +42,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         private IClassmatesManager _classmatesManager;
         private IYandexZenManager _yandexZenManager;
         private ITumblr _tumblr;
-        private IReddit _reddit;
+        private IReddit _redditManager;
 
         protected void Init()
         {
@@ -65,7 +65,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _classmatesManager = new ClassmatesManager();
             _yandexZenManager = new YandexZenManager();
             _tumblr = new Tumblr();
-            _reddit = new Reddit();
+            _redditManager = new RedditManager();
 
             var driver = GetDriver();
             _vkManager.SetContextBrowserManager(driver);
@@ -73,7 +73,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _classmatesManager.SetContextBrowserManager(driver);
             _yandexZenManager.SetContextBrowserManager(driver);
             _tumblr.SetContextBrowserManager(driver);
-            _reddit.SetContextBrowserManager(driver);
+            _redditManager.SetContextBrowserManager(driver);
         }
 
         /// <summary>
@@ -109,6 +109,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             if (accountYandexZen != null)
             {
                 _yandexZenManager.Authorization(accountYandexZen.Login, accountYandexZen.Password);
+            }
+
+            var accountReddit = accounts.Where(w => w.AccountType == AccountType.Reddit).FirstOrDefault();
+            if (accountReddit != null)
+            {
+                _redditManager.Authorization(accountReddit.Login, accountReddit.Password);
             }
 
             _isAuthorization = true;
@@ -149,6 +155,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                         break;
                     case "zen":
                         CarryOutTaskInZen(_task);
+                        break;
+                    case "reddit":
+                        CarryOutTaskInReddit(_task);
                         break;
                     case "NoTasks":
                         ShowActivity();
@@ -312,7 +321,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Выполнить задачу в Яндекс.Дзен
         /// </summary>
-        /// <param name="taskText"></param>
+        /// <param name="taskText">Текст задачи</param>
         protected void CarryOutTaskInZen(string taskText)
         {
             SwitchToLastTab();
@@ -334,7 +343,28 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToTab();
             CheckTask();
         }
+        /// <summary>
+        /// Выполнить задачу в Реддит
+        /// </summary>
+        /// <param name="taskText">Текст задачи</param>
+        protected void CarryOutTaskInReddit(string taskText)
+        {
+            SwitchToLastTab();
+            _urlByTask = GetUrlPage();
 
+            switch (taskText)
+            {
+                case "Нажать стрелку вверх на Запись":
+                    //https://www.reddit.com/r/entropiauniverse/comments/jbwv7h/dear_reddit_community_after_waiting_for_the/g99v14v/
+                    break;
+                default:
+                    break;
+            }
+
+            CloseTab();
+            SwitchToTab();
+            CheckTask();
+        }
 
         /// <summary>
         /// Отменить задание
@@ -427,7 +457,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Отменить задачу в Я.Дзене
         /// </summary>
-        protected void UndoTaskInZen()
+        protected void UndoTaskInZen() //TODO отладить
         {
             SwitchToLastTab();
 
@@ -547,6 +577,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     var error = errorPanel.FindElements(SearchMethod.ClassName, "content").Last().GetInnerText();
                     switch (error)
                     {
+                        case "Произошла ошибка":
                         case "Ошибка при выполнении проверки, попробуйте снова":
                         case "Похоже, вы не выполнили задание. Подождите 15 секунд и повторите попытку":
                         case "Проверка не пройдена. Попробуйте через 10 секунд.":

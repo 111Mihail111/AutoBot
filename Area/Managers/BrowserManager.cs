@@ -115,6 +115,14 @@ namespace AutoBot.Area.Managers
         {
             return _browser.WindowHandles.Count;
         }
+        /// <summary>
+        /// Переключиться на фрейм
+        /// </summary>
+        /// <param name="frame">IFrame-элемент</param>
+        public void SwitchToFrame(IWebElement frame)
+        {
+            _browser.SwitchTo().Frame(frame);
+        }
 
         /// <summary>
         /// ОК - в алерт окне

@@ -8,6 +8,13 @@ namespace AutoBot.Area.Managers.Interface
     interface IReddit
     {
         /// <summary>
+        /// Авторизация
+        /// </summary>
+        /// <param name="login">Логин</param>
+        /// <param name="password">Пароль</param>
+        public void Authorization(string login, string password);
+
+        /// <summary>
         /// Считать контекст браузер менеджера
         /// </summary>
         /// <param name="chromeDriver">Хром драйвер</param>
