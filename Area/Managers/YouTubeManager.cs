@@ -10,6 +10,7 @@ namespace AutoBot.Area.Managers
 {
     public class YouTubeManager : BrowserManager, IYouTubeManager
     {
+        /// <inheritdoc/>
         public void Authorization(string login, string password)
         {
             string url = "https://www.youtube.com/";
@@ -55,14 +56,14 @@ namespace AutoBot.Area.Managers
             CloseTab();
             SwitchToTab();
         }
-
-        public void SubscribeToChannel() //TODO:1 Дублируется часть кода. Совместить в один метод
+        /// <inheritdoc/>
+        public void SubscribeToChannel()
         {
             GetElementByXPath("//*[@id='subscribe-button']/ytd-subscribe-button-renderer/paper-button").Click();
             Thread.Sleep(1500);
         }
-
-        public void UnsubscribeFromChannel() //TODO:1 Дублируется часть кода. Совместить в один метод
+        /// <inheritdoc/>
+        public void UnsubscribeFromChannel()
         {
             GetElementByXPath("//*[@id='subscribe-button']/ytd-subscribe-button-renderer/paper-button").Click();
             Thread.Sleep(1500);
@@ -70,42 +71,49 @@ namespace AutoBot.Area.Managers
             GetElementById("main").FindElements(SearchMethod.Tag, "paper-button").Last().Click();
             Thread.Sleep(2000);
         }
-
-        public void LikeUnderVideo() //TODO:2 Дублируется код. Совместить в один метод
+        /// <inheritdoc/>
+        public void LikeUnderVideo()
         {
+            StopVideoAsync();
             RemoveModalDialogs();
+
             GetElementByXPath("//*[@id='top-level-buttons']/ytd-toggle-button-renderer[1]/a").Click();
             Thread.Sleep(2000);
         }
-
-        public void RemoveLike() //TODO:2 Дублируется код. Совместить в один метод
+        /// <inheritdoc/>
+        public void RemoveLike()
         {
+            StopVideoAsync();
             RemoveModalDialogs();
+
             GetElementByXPath("//*[@id='top-level-buttons']/ytd-toggle-button-renderer[1]/a").Click();
             Thread.Sleep(2000);
         }
-
+        /// <inheritdoc/>
         public void DislikeUnderVideo()
         {
+            StopVideoAsync();
             GetElementByXPath("//*[@id='top-level-buttons']/ytd-toggle-button-renderer[2]/a").Click();
             Thread.Sleep(2000);
         }
-
+        /// <inheritdoc/>
         public void RemoveDislike()
         {
+            StopVideoAsync();
             GetElementByXPath("//*[@id='top-level-buttons']/ytd-toggle-button-renderer[2]/a").Click();
             Thread.Sleep(1500);
         }
-
+        /// <inheritdoc/>
         public bool IsVideoAvailable()
         {
             return GetElementById("reason") == null;
         }
-
+        /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
         {
             SetDriver(chromeDriver);
         }
+
 
         /// <summary>
         /// Авторизация под сохраненным профилем
@@ -150,6 +158,13 @@ namespace AutoBot.Area.Managers
                 "{" +
                     "modalDialog.remove();" +
                 "}");
+        }
+        /// <summary>
+        /// Остановить видео
+        /// </summary>
+        protected async void StopVideoAsync()
+        {
+            await ExecuteScriptAsync("document.getElementsByClassName('ytp-play-button')[0].click();");
         }
     }
 }
