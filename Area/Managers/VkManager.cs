@@ -79,7 +79,8 @@ namespace AutoBot.Area.Managers
 
         public bool IsPostFound()
         {
-            return GetTitlePage() != "Ошибка";
+            string materialBlockText = GetElementByXPath("/html/body/div").GetInnerText();
+            return GetTitlePage() != "Ошибка" && !materialBlockText.Contains("Данный материал заблокирован на");
         }
 
         public void ToTellAboutGroup()
