@@ -3,10 +3,17 @@
 namespace AutoBot.Area.Managers.Interface
 {
     /// <summary>
-    /// Тамблер менеджер
+    /// Тамблер
     /// </summary>
     interface ITumblr
     {
+        /// <summary>
+        /// Авторизация
+        /// </summary>
+        /// <param name="login">Логин</param>
+        /// <param name="password">Пароль</param>
+        public void Authorization(string login, string password);
+
         /// <summary>
         /// Считать контекст браузер менеджера
         /// </summary>

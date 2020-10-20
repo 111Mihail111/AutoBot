@@ -48,6 +48,23 @@ namespace AutoBot.Area.Managers
         }
 
         /// <inheritdoc/>
+        public void UpArrowForPost()
+        {
+            var postId = GetElementsByClassName("_1oQyIsiPHYt6nx7VOmd1sz").First().GetId();
+            GetElementById($"upvote-button-{postId}").Click();
+            Thread.Sleep(1500);
+        }
+
+        /// <inheritdoc/>
+        public void DownArrowUnderPost()
+        {
+            var postId = GetElementsByClassName("_1oQyIsiPHYt6nx7VOmd1sz").First().GetId();
+            GetElementById($"vote-arrows-{postId}")
+                .FindElements(SearchMethod.Tag, "button").Last().Click();
+            Thread.Sleep(1500);
+        }
+
+        /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
         {
             SetDriver(chromeDriver);

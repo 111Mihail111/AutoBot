@@ -34,7 +34,7 @@ namespace AutoBot
             services.AddScoped<IYouTubeManager, YouTubeManager>();
             services.AddScoped<IInstagramManager, InstagramManager>();
             services.AddScoped<IYandexZenManager, YandexZenManager>();
-            services.AddScoped<ITumblr, Tumblr>();
+            services.AddScoped<ITumblr, TumblrManager>();
             services.AddScoped<IReddit, RedditManager>();
         }
 

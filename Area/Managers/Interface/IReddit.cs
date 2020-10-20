@@ -15,6 +15,16 @@ namespace AutoBot.Area.Managers.Interface
         public void Authorization(string login, string password);
 
         /// <summary>
+        /// Стрелка вверх под постом
+        /// </summary>
+        public void UpArrowForPost();
+
+        /// <summary>
+        /// Стрелка вниз под постом
+        /// </summary>
+        public void DownArrowUnderPost();
+
+        /// <summary>
         /// Считать контекст браузер менеджера
         /// </summary>
         /// <param name="chromeDriver">Хром драйвер</param>

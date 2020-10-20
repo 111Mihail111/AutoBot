@@ -16,9 +16,18 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
     {
         const string BROWSER_PROFILE_SERVICE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\PerformanceTasks\\VkTarget\\";
 
-        private static bool _isAuthorization;
-        private string _login;
-        private string _password;
+        /// <summary>
+        /// Авторизация соц. сетей
+        /// </summary>
+        private static bool _isAuthorizationSocialNetworks;
+        /// <summary>
+        /// Логин для VkTarget
+        /// </summary>
+        private static string _loginVkTarget;
+        /// <summary>
+        /// Пароль для VkTarget
+        /// </summary>
+        private static string _passwordVkTarget;
 
         /// <summary>
         /// Тип соц. сети
@@ -49,7 +58,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             Initialization(BROWSER_PROFILE_SERVICE);
             SetContextForManagers();
 
-            if (!_isAuthorization)
+            if (!_isAuthorizationSocialNetworks)
             {
                 AuthorizationSocialNetworks();
             }
@@ -64,7 +73,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _ytManager = new YouTubeManager();
             _classmatesManager = new ClassmatesManager();
             _yandexZenManager = new YandexZenManager();
-            _tumblr = new Tumblr();
+            _tumblr = new TumblrManager();
             _redditManager = new RedditManager();
 
             var driver = GetDriver();
@@ -84,8 +93,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             var accounts = AccountService.GetAccount(TypeService.VkTarget);
 
             var accountMain = accounts.Where(w => w.AccountType == AccountType.Main).First();
-            _login = accountMain.Login;
-            _password = accountMain.Password;
+            _loginVkTarget = accountMain.Login;
+            _passwordVkTarget = accountMain.Password;
 
             var accountVK = accounts.Where(w => w.AccountType == AccountType.Vk).FirstOrDefault();
             if (accountVK != null)
@@ -117,7 +126,13 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 _redditManager.Authorization(accountReddit.Login, accountReddit.Password);
             }
 
-            _isAuthorization = true;
+            var accountTumblr = accounts.Where(w => w.AccountType == AccountType.Tumblr).FirstOrDefault();
+            if (accountTumblr != null)
+            {
+                _tumblr.Authorization(accountTumblr.Login, accountTumblr.Password);
+            }
+
+            _isAuthorizationSocialNetworks = true;
         }
 
         public void GoTo(string url)
@@ -355,7 +370,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (taskText)
             {
                 case "Нажать стрелку вверх на Запись":
-                    //https://www.reddit.com/r/entropiauniverse/comments/jbwv7h/dear_reddit_community_after_waiting_for_the/g99v14v/
+                    _redditManager.UpArrowForPost();
                     break;
                 default:
                     break;
@@ -384,6 +399,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     break;
                 case "zen":
                     UndoTaskInZen();
+                    break;
+                case "reddit":
+                    UndoTaskInReddit();
                     break;
             }
         }
@@ -474,7 +492,23 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             CloseTab();
             SwitchToTab();
         }
+        /// <summary>
+        /// Отменить задачу в Реддит
+        /// </summary>
+        protected void UndoTaskInReddit()
+        {
+            SwitchToLastTab();
 
+            switch (_task)
+            {
+                case "Нажать стрелку вверх на Запись":
+                    _redditManager.DownArrowUnderPost();
+                    break;
+            }
+
+            CloseTab();
+            SwitchToTab();
+        }
 
         /// <summary>
         /// Проявить активность
@@ -678,13 +712,13 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             var login = GetElementByXPath("//*[@id='login_form']/div[1]/div/div[2]/div[2]/input");
             if (string.IsNullOrWhiteSpace(login.Text))
             {
-                login.SendKeys(_login);
+                login.SendKeys(_loginVkTarget);
             }
 
             var password = GetElementByXPath("//*[@id='login_form']/div[1]/div/div[3]/div[2]/input");
             if (string.IsNullOrWhiteSpace(password.Text))
             {
-                password.SendKeys(_password);
+                password.SendKeys(_passwordVkTarget);
             }
 
             ExecuteScript("document.getElementById('login_form').getElementsByTagName('button')[0].click()");
