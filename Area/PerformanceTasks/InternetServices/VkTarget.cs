@@ -456,7 +456,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void UndoTaskInСlassmates()
         {
-            SwitchToLastTab();
+            OpenPageInNewTab(_urlByTask);
 
             switch (_task)
             {
@@ -465,7 +465,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     break;
                 case "Поставьте класс под записью":
                 case "Поставить 'Класс' на публикации":
-                    _classmatesManager.RemoveClass(); //TODO: Протестить https://ok.ru/vismarketru/topic/152066788526855
+                    _classmatesManager.RemoveClass();
                     break;
             }
 
@@ -477,7 +477,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void UndoTaskInZen() //TODO отладить
         {
-            SwitchToLastTab();
+            OpenPageInNewTab(_urlByTask);
 
             switch (_task)
             {
@@ -497,7 +497,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void UndoTaskInReddit()
         {
-            SwitchToLastTab();
+            OpenPageInNewTab(_urlByTask);
 
             switch (_task)
             {
@@ -509,6 +509,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             CloseTab();
             SwitchToTab();
         }
+
 
         /// <summary>
         /// Проявить активность
