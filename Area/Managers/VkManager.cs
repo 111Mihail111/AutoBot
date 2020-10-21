@@ -34,7 +34,7 @@ namespace AutoBot.Area.Managers
             RemoveWindowMessage();
 
             GetElementById("page_actions_btn").Click();
-            Thread.Sleep(400);
+            Thread.Sleep(600);
 
             GetElementsByClassName("page_actions_inner").First().FindElements(SearchMethod.Tag, "a").First().Click();
             Thread.Sleep(1500);

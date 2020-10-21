@@ -9,6 +9,7 @@ namespace AutoBot.Area.Managers
 {
     public class ClassmatesManager : BrowserManager, IClassmatesManager
     {
+        /// <inheritdoc/>
         public void AuthorizationThroughMail (string email, string password)
         {
             string url = "https://ok.ru/feed";
@@ -64,10 +65,11 @@ namespace AutoBot.Area.Managers
             CloseTab();
             SwitchToTab();
         }
-
+        /// <inheritdoc/>
         public void JoinGroup()
         {
-            ExecuteScript("document.getElementById('topPanel')?.remove();");
+            RemoveTooltipForGroupAsync();
+            RemoveTopPanel();
 
             var buttons = GetElementById("hook_Block_AltGroupMainMenu").FindElements(SearchMethod.Tag, "a");
             foreach (var item in buttons)
@@ -81,32 +83,60 @@ namespace AutoBot.Area.Managers
 
             Thread.Sleep(2000);
         }
-
+        /// <inheritdoc/>
         public void LeaveGroup()
         {
-            GetElementByClassName("dropdown").Click();
-            Thread.Sleep(300);
-            GetElementByClassName("dropdown_n").Click();
+            RemoveTopPanel();
 
+            var ddlCollections = GetElementsByClassName("dropdown");
+            if (ddlCollections.Count() == 1)
+            {
+                return;
+            }
+
+            var item = ddlCollections.First();
+            item.Click();
+            Thread.Sleep(500);
+
+            item.FindElements(SearchMethod.Tag, "a").First().Click();
             Thread.Sleep(1000);
         }
-
+        /// <inheritdoc/>
         public void PutClass()
         {
             RemovePostDetails();
-            GetElementByClassName("hook_Block_AltGroupTopicLayerBody").FindElement(SearchMethod.ClassName, "js-klass").Click();
-        }
 
+            var panel = GetElementByClassName("hook_Block_AltGroupTopicLayerBody")
+                .FindElement(SearchMethod.ClassName, "js-klass");
+
+            var text = panel.FindElement(SearchMethod.ClassName, "widget_tx").GetInnerText();
+            if (text != "Класс!")
+            {
+                panel.Click();
+                Thread.Sleep(1500);
+            }
+        }
+        /// <inheritdoc/>
         public void RemoveClass()
         {
             RemovePostDetails();
-            GetElementByClassName("hook_Block_AltGroupTopicLayerBody").FindElement(SearchMethod.ClassName, "js-klass").Click();
-        }
 
+            var panel = GetElementByClassName("hook_Block_AltGroupTopicLayerBody")
+                .FindElement(SearchMethod.ClassName, "js-klass");
+
+            var text = panel.FindElement(SearchMethod.ClassName, "widget_tx").GetInnerText();
+            if (text != "Класс")
+            {
+                panel.Click();
+                Thread.Sleep(1500);
+            }
+        }
+        /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
         {
             SetDriver(chromeDriver);
         }
+
 
         /// <summary>
         /// Удалить данные поста
@@ -133,6 +163,20 @@ namespace AutoBot.Area.Managers
 
             CloseTab();
             SwitchToTab();
+        }
+        /// <summary>
+        /// Удалить подсказку для группы
+        /// </summary>
+        protected async void RemoveTooltipForGroupAsync()
+        {
+            await ExecuteScriptAsync("document.getElementsByClassName('iblock-cloud')[0]?.remove()");
+        }
+        /// <summary>
+        /// Удалить верхнюю панель
+        /// </summary>
+        protected void RemoveTopPanel()
+        {
+            ExecuteScript("document.getElementById('topPanel')?.remove();");
         }
     }
 }

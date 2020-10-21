@@ -46,7 +46,6 @@ namespace AutoBot.Area.Managers
             CloseTab();
             SwitchToTab();
         }
-
         /// <inheritdoc/>
         public void UpArrowForPost()
         {
@@ -54,7 +53,6 @@ namespace AutoBot.Area.Managers
             GetElementById($"upvote-button-{postId}").Click();
             Thread.Sleep(1500);
         }
-
         /// <inheritdoc/>
         public void DownArrowUnderPost()
         {
@@ -63,7 +61,6 @@ namespace AutoBot.Area.Managers
                 .FindElements(SearchMethod.Tag, "button").Last().Click();
             Thread.Sleep(1500);
         }
-
         /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
         {

@@ -317,7 +317,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (taskText)
             {
                 case "Вступить в группу":
-                    _classmatesManager.JoinGroup();
+                    _classmatesManager.JoinGroup(); // https://ok.ru/group/54012520300672
                     break;
                 case "Поставьте класс под записью":
                     _classmatesManager.PutClass();
@@ -560,7 +560,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     FocusOnAllElementsMenu();
                     break;
                 case ActionToBrowser.Inaction:
-                    if (_countAction >= 45)
+                    if (_countAction >= 40)
                     {
                         Inaction();
                         _countAction = 0;

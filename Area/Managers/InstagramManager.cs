@@ -25,14 +25,15 @@ namespace AutoBot.Area.Managers
             var inputs = loginForm.FindElements(SearchMethod.Tag, "input");
             foreach (var item in inputs)
             {
-                if (item.GetName() == "username")
+                string nameAttribute = item.GetName();
+                if (nameAttribute == "username")
                 {
                     if (string.IsNullOrWhiteSpace(item.GetValue()))
                     {
                         item.SendKeys(login);
                     }
                 }
-                else if (item.GetName() == "password")
+                else if (nameAttribute == "password")
                 {
                     if (string.IsNullOrWhiteSpace(item.GetValue()))
                     {
@@ -58,19 +59,15 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void Subscribe()
         {
-            var buttons = GetElementsByTagName("button");
-            foreach (var item in buttons)
+            var button = GetElementByClassName("_6VtSN");
+            if (button.GetInnerText() == "Подписаться")
             {
-                if (item.GetInnerText() == "Подписаться")
-                {
-                    item.Click();
-                    Thread.Sleep(2000);
-                    return;
-                }
+                button.Click();
+                Thread.Sleep(2000);
             }
         }
         /// <inheritdoc/>
-        public void Unsubscribe()
+        public void Unsubscribe() //TODO:Рефакторить
         {
             string canselSubscribeButtonClickScript = "document.getElementsByClassName('aOOlW -Cab_   ')[0].click();";
 
@@ -102,7 +99,7 @@ namespace AutoBot.Area.Managers
             Thread.Sleep(2000);
         }
         /// <inheritdoc/>
-        public void PutLike()
+        public void PutLike() //TODO:Рефакторить
         {
             var svgCollection = GetElementsByClassName("_8-yf5");
             foreach (var item in svgCollection)
@@ -116,7 +113,7 @@ namespace AutoBot.Area.Managers
             }
         }
         /// <inheritdoc/>
-        public void RemoveLike()
+        public void RemoveLike() //TODO:Рефакторить
         {
             var svgCollection = GetElementsByClassName("_8-yf5");
             foreach (var item in svgCollection)

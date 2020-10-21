@@ -328,10 +328,14 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     GetElementByXPath("//*[@id='content']/div[3]/div/div[3]/span").Click();
                     AlertAccept();
                     break;
-                //case "instaSubscription":
-                //case "instaLike":
-                    GetElementByXPath("//*[@id='content']/div[2]/div/a[1]").Click();
-                    AlertAccept();
+                case "instaSubscription":
+                case "instaLike":
+                    var button = GetElementByXPath("//*[@id='content']/div[2]/div/a[1]");
+                    if (button != null)
+                    {
+                        button.Click();
+                        AlertAccept();
+                    }
                     break;
                 case "vkCommunity":
                     GetElementByXPath("//*[@id='content']/div[3]/div/a[1]").Click();
