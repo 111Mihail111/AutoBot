@@ -19,6 +19,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
         const string BROWSER_PROFILE_CRANE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\PerformanceTasks\\V_Like\\";
         private static bool _isAuthorization;
+        private string _taskId;
 
         protected void Init()
         {
@@ -200,6 +201,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             var groups = GetElementsByClassName("groups");
             while (groups.Count() != 0)
             {
+                _taskId = groups.First().FindElement(SearchMethod.ClassName, "group").GetId();
+
                 GetElementByXPath("//*[@id='content']/div[2]/div[1]/div[3]/a").Click();
                 SwitchToLastTab();
                 Thread.Sleep(1000);
@@ -237,6 +240,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             var groups = GetElementsByClassName("groups");
             while (groups.Count() != 0)
             {
+                _taskId = groups.First().FindElement(SearchMethod.ClassName, "group").GetId();
+
                 GetElementByXPath("//*[@id='content']/div[2]/div[1]/div[3]/a").Click();
                 SwitchToLastTab();
                 Thread.Sleep(2500);
@@ -330,10 +335,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     break;
                 case "instaSubscription":
                 case "instaLike":
-                    var button = GetElementByXPath("//*[@id='content']/div[2]/div/a[1]");
-                    if (button != null)
+                    string taskId = GetElementsByClassName("groups").First()
+                        .FindElement(SearchMethod.ClassName, "group").GetId();
+                    if (_taskId == taskId)
                     {
-                        button.Click();
+                        GetElementByXPath("//*[@id='content']/div[2]/div/a[1]").Click();
                         AlertAccept();
                     }
                     break;
@@ -342,6 +348,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     break;
             }
 
+            _taskId = string.Empty;
             Thread.Sleep(2000);
         }
 
