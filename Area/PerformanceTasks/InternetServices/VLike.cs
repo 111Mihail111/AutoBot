@@ -315,6 +315,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 //Alert'a нет, значит модал. окно закрылось
             }
 
+            Thread.Sleep(3000);
             return false;
         }
         /// <summary>
