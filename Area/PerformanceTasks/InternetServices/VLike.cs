@@ -285,17 +285,14 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 while (modal.Displayed)
                 {
                     GetElementByXPath("//*[@id='buttons']/a[2]").Click();
+                    Thread.Sleep(1500);
 
                     while (true)
                     {
                         string text = GetTextFromAlert();
-                        if (!string.IsNullOrWhiteSpace(text))
+                        if (!string.IsNullOrWhiteSpace(text) || !modal.Displayed)
                         {
                             break;
-                        }
-                        else if (!modal.Displayed)
-                        {
-                            return false;
                         }
                     }
 
@@ -307,7 +304,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                         return true;
                     }
 
-                    Thread.Sleep(3000);
+                    Thread.Sleep(2000);
                 }
             }
             catch

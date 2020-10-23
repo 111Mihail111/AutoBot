@@ -174,6 +174,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     case "reddit":
                         CarryOutTaskInReddit(_task);
                         break;
+                    case "tumblr": 
+                        CarryOutTaskInTumblr(_task);
+                        break;
                     case "NoTasks":
                         ShowActivity();
                         break;
@@ -371,6 +374,25 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 case "Нажать стрелку вверх на Запись":
                     _redditManager.UpArrowForPost();
+                    break;
+                default:
+                    break;
+            }
+
+            CloseTab();
+            SwitchToTab();
+            CheckTask();
+        }
+
+        protected void CarryOutTaskInTumblr(string taskText)
+        {
+            SwitchToLastTab();
+            _urlByTask = GetUrlPage();
+
+            switch (taskText)
+            {
+                case "Реблогните блог":
+                    //https://kabufxgoldsilveroil-sakimono.tumblr.com/post/632769571573710848/mt%EF%BC%95no-mt%EF%BC%94-mt%EF%BC%94-standard
                     break;
                 default:
                     break;
