@@ -177,6 +177,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     case "tumblr": 
                         CarryOutTaskInTumblr(_task);
                         break;
+                    case "soundcloud":
+                        CarryOutTaskInSoundCloud(_task);
+                        break;
+                    case "":
+                        break;
                     case "NoTasks":
                         ShowActivity();
                         break;
@@ -312,7 +317,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Выполнить задачу в одноклассниках
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInСlassmates(string taskText) //Есть TODO
+        protected void CarryOutTaskInСlassmates(string taskText)
         {
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
@@ -320,13 +325,13 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (taskText)
             {
                 case "Вступить в группу":
-                    _classmatesManager.JoinGroup(); // https://ok.ru/group/54012520300672
+                    _classmatesManager.JoinGroup();
                     break;
                 case "Поставьте класс под записью":
                     _classmatesManager.PutClass();
                     break;
                 case "Поставить 'Класс' на публикации":
-                    _classmatesManager.PutClass(); //TODO: Протестить https://ok.ru/vismarketru/topic/152066788526855
+                    _classmatesManager.PutClass();
                     break;
                 default:
                     break;
@@ -375,6 +380,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 case "Нажать стрелку вверх на Запись":
                     _redditManager.UpArrowForPost();
                     break;
+                case "Подпишитесь на пользователя":
+                    //https://www.reddit.com/user/WWWWWWWWWWWWWWWWVWVW >> Folow
+                    break;
                 default:
                     break;
             }
@@ -383,7 +391,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToTab();
             CheckTask();
         }
-
+        /// <summary>
+        /// Выполнить задачу в Тамблер
+        /// </summary>
+        /// <param name="taskText">Текст задачи</param>
         protected void CarryOutTaskInTumblr(string taskText)
         {
             SwitchToLastTab();
@@ -393,6 +404,31 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 case "Реблогните блог":
                     //https://kabufxgoldsilveroil-sakimono.tumblr.com/post/632769571573710848/mt%EF%BC%95no-mt%EF%BC%94-mt%EF%BC%94-standard
+                    break;
+                default:
+                    break;
+            }
+
+            CloseTab();
+            SwitchToTab();
+            CheckTask();
+        }
+        /// <summary>
+        /// Выполнить задачу в Саунд кладе
+        /// </summary>
+        /// <param name="taskText">Текст задачи</param>
+        protected void CarryOutTaskInSoundCloud(string taskText)
+        {
+            SwitchToLastTab();
+            _urlByTask = GetUrlPage();
+
+            switch (taskText)
+            {
+                case "подпишитесь на аккаунт":
+                    //https://soundcloud.com/sunxshine98 follow
+                    break;
+                case "Поставить лайк на трэк":
+                    //https://soundcloud.com/tyeon/they-know-im-famous like под трэком
                     break;
                 default:
                     break;
@@ -497,7 +533,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Отменить задачу в Я.Дзене
         /// </summary>
-        protected void UndoTaskInZen() //TODO отладить
+        protected void UndoTaskInZen()
         {
             OpenPageInNewTab(_urlByTask);
 
