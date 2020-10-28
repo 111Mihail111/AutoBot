@@ -50,8 +50,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         private IYouTubeManager _ytManager;
         private IClassmatesManager _classmatesManager;
         private IYandexZenManager _yandexZenManager;
-        private ITumblr _tumblr;
+        private ITumblr _tumblrManager;
         private IReddit _redditManager;
+        private IQuora _quoraManager;
+        private ISoundCloud _soundCloudManager;
 
         protected void Init()
         {
@@ -73,16 +75,20 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _ytManager = new YouTubeManager();
             _classmatesManager = new ClassmatesManager();
             _yandexZenManager = new YandexZenManager();
-            _tumblr = new TumblrManager();
+            _tumblrManager = new TumblrManager();
             _redditManager = new RedditManager();
+            _quoraManager = new QuoraManager();
+            _soundCloudManager = new SoundCloudManager();
 
             var driver = GetDriver();
             _vkManager.SetContextBrowserManager(driver);
             _ytManager.SetContextBrowserManager(driver);
             _classmatesManager.SetContextBrowserManager(driver);
             _yandexZenManager.SetContextBrowserManager(driver);
-            _tumblr.SetContextBrowserManager(driver);
+            _tumblrManager.SetContextBrowserManager(driver);
             _redditManager.SetContextBrowserManager(driver);
+            _quoraManager.SetContextBrowserManager(driver);
+            _soundCloudManager.SetContextBrowserManager(driver);
         }
 
         /// <summary>
@@ -129,7 +135,19 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             var accountTumblr = accounts.Where(w => w.AccountType == AccountType.Tumblr).FirstOrDefault();
             if (accountTumblr != null)
             {
-                _tumblr.Authorization(accountTumblr.Login, accountTumblr.Password);
+                _tumblrManager.Authorization(accountTumblr.Login, accountTumblr.Password);
+            }
+
+            var accountQuora = accounts.Where(w => w.AccountType == AccountType.Quora).FirstOrDefault();
+            if (accountQuora != null)
+            {
+                _quoraManager.Authorization(accountQuora.Login, accountQuora.Password);
+            }
+
+            var accountSoundCloud = accounts.Where(w => w.AccountType == AccountType.SoundCloud).FirstOrDefault();
+            if (accountSoundCloud != null)
+            {
+                _soundCloudManager.Authorization(accountSoundCloud.Login, accountSoundCloud.Password);
             }
 
             _isAuthorizationSocialNetworks = true;
@@ -180,7 +198,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     case "soundcloud":
                         CarryOutTaskInSoundCloud(_task);
                         break;
-                    case "":
+                    case "quora":
+                        CarryOutTaskInQuora(_task);
                         break;
                     case "NoTasks":
                         ShowActivity();
@@ -198,7 +217,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         }
 
         /// <summary>
-        /// Выполнить задачу в вк
+        /// Выполнить задачу в VK
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
         protected void CarryOutTaskInVk(string taskText)
@@ -268,7 +287,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             CheckTask();
         }
         /// <summary>
-        /// Выполнить задачу в ютуб
+        /// Выполнить задачу в YouTube
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
         protected void CarryOutTaskInYouTube(string taskText)
@@ -314,7 +333,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             CheckTask();
         }
         /// <summary>
-        /// Выполнить задачу в одноклассниках
+        /// Выполнить задачу в Сlassmates
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
         protected void CarryOutTaskInСlassmates(string taskText)
@@ -342,7 +361,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             CheckTask();
         }
         /// <summary>
-        /// Выполнить задачу в Яндекс.Дзен
+        /// Выполнить задачу в Yandex.Zen
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
         protected void CarryOutTaskInZen(string taskText)
@@ -367,7 +386,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             CheckTask();
         }
         /// <summary>
-        /// Выполнить задачу в Реддит
+        /// Выполнить задачу в Reddit
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
         protected void CarryOutTaskInReddit(string taskText)
@@ -381,7 +400,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _redditManager.UpArrowForPost();
                     break;
                 case "Подпишитесь на пользователя":
-                    //https://www.reddit.com/user/WWWWWWWWWWWWWWWWVWVW >> Folow
+                    _redditManager.Subscribe();
                     break;
                 default:
                     break;
@@ -392,7 +411,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             CheckTask();
         }
         /// <summary>
-        /// Выполнить задачу в Тамблер
+        /// Выполнить задачу в Tumblr
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
         protected void CarryOutTaskInTumblr(string taskText)
@@ -403,7 +422,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (taskText)
             {
                 case "Реблогните блог":
-                    //https://kabufxgoldsilveroil-sakimono.tumblr.com/post/632769571573710848/mt%EF%BC%95no-mt%EF%BC%94-mt%EF%BC%94-standard
+                    _tumblrManager.Reblog();
+                    break;
+                case "Поставить лайк на пост":
+                    //https://leafkim.tumblr.com/post/633206170837991424/hello-world-please-enjoy-a-piece-of-my-sketchbook На сердечко
                     break;
                 default:
                     break;
@@ -414,10 +436,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             CheckTask();
         }
         /// <summary>
-        /// Выполнить задачу в Саунд кладе
+        /// Выполнить задачу в SoundCloud
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInSoundCloud(string taskText)
+        protected void CarryOutTaskInSoundCloud(string taskText) //TODO
         {
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
@@ -425,9 +447,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (taskText)
             {
                 case "подпишитесь на аккаунт":
+                    _soundCloudManager.Subscribe();
                     //https://soundcloud.com/sunxshine98 follow
                     break;
                 case "Поставить лайк на трэк":
+                    _soundCloudManager.LikeTrack();
                     //https://soundcloud.com/tyeon/they-know-im-famous like под трэком
                     break;
                 default:
@@ -438,6 +462,34 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToTab();
             CheckTask();
         }
+        /// <summary>
+        /// Выполнить задачу в Quora
+        /// </summary>
+        /// <param name="taskText">Текст задачи</param>
+        protected void CarryOutTaskInQuora(string taskText) //TODO
+        {
+            SwitchToLastTab();
+            _urlByTask = GetUrlPage();
+
+            switch (taskText)
+            {
+                case "Подписаться на пользователя":
+                    _quoraManager.Subscribe();
+                    //https://www.quora.com/profile/Stealth-Agents follow
+                    break;
+                case "Поставьте лайк на ответ":
+                    _quoraManager.LikeAnswer();
+                    //https://www.quora.com/If-I-invest-5000-in-cryptocurrency-now-how-much-would-it-be-worth-ten-years-from-now/answer/Hassinger-Logan Upvote
+                    break;
+                default:
+                    break;
+            }
+
+            CloseTab();
+            SwitchToTab();
+            CheckTask();
+        }
+
 
         /// <summary>
         /// Отменить задание
@@ -461,10 +513,16 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 case "reddit":
                     UndoTaskInReddit();
                     break;
+                case "quora":
+                    UndoTaskInQuora();
+                    break;
+                case "soundcloud":
+                    UndoTaskInSoundCloud();
+                    break;
             }
         }
         /// <summary>
-        /// Отменить задачу в вк
+        /// Отменить задачу в Vk
         /// </summary>
         protected void UndoTaskInVk()
         {
@@ -487,7 +545,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToTab();
         }
         /// <summary>
-        /// Отменить задачу в Ютуб
+        /// Отменить задачу в YouTube
         /// </summary>
         protected void UndoTaskInYouTube()
         {
@@ -510,7 +568,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToTab();
         }
         /// <summary>
-        /// Отменить задачу в одноклассниках
+        /// Отменить задачу в Сlassmates
         /// </summary>
         protected void UndoTaskInСlassmates()
         {
@@ -531,7 +589,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToTab();
         }
         /// <summary>
-        /// Отменить задачу в Я.Дзене
+        /// Отменить задачу в Yandex.Zen
         /// </summary>
         protected void UndoTaskInZen()
         {
@@ -551,9 +609,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToTab();
         }
         /// <summary>
-        /// Отменить задачу в Реддит
+        /// Отменить задачу в Reddit
         /// </summary>
-        protected void UndoTaskInReddit()
+        protected void UndoTaskInReddit() //TODO
         {
             OpenPageInNewTab(_urlByTask);
 
@@ -561,6 +619,49 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 case "Нажать стрелку вверх на Запись":
                     _redditManager.DownArrowUnderPost();
+                    break;
+                case "Подпишитесь на пользователя":
+                    _redditManager.Unsubscribe();
+                    break;
+            }
+
+            CloseTab();
+            SwitchToTab();
+        }
+        /// <summary>
+        /// Отменить задачу в Quora
+        /// </summary>
+        protected void UndoTaskInQuora() //TODO
+        {
+            OpenPageInNewTab(_urlByTask);
+
+            switch (_task)
+            {
+                case "Подписаться на пользователя":
+                    _quoraManager.Unsubscribe();
+                    break;
+                case "Поставьте лайк на ответ":
+                    _quoraManager.RemoveLike();
+                    break;
+            }
+
+            CloseTab();
+            SwitchToTab();
+        }
+        /// <summary>
+        /// Отменить задачу в SoundCloud
+        /// </summary>
+        protected void UndoTaskInSoundCloud() //TODO
+        {
+            OpenPageInNewTab(_urlByTask);
+
+            switch (_task)
+            {
+                case "подпишитесь на аккаунт":
+                    _soundCloudManager.Unsubscribe();
+                    break;
+                case "Поставить лайк на трэк":
+                    _soundCloudManager.RemoveLike();
                     break;
             }
 
@@ -632,7 +733,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             Thread.Sleep(randomSleep);
         }
         /// <summary>
-        /// Пропуск задания
+        /// Пропуск задачу
         /// </summary>
         protected void SkipTask()
         {
@@ -641,7 +742,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 "task[0].children[5].getElementsByClassName('control__item close')[0].click();");
         }
         /// <summary>
-        /// Проверить задание
+        /// Проверить задачу
         /// </summary>
         protected void CheckTask() //TODO: Переработать метод. Разбить на несколько
         {
@@ -823,7 +924,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
             FocusOnElement(liCollection[GetRandomNumber(0, liCollection.Count)]);
         }
-
         /// <summary>
         /// Нажать на элемент меню
         /// </summary>
@@ -848,7 +948,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
             liCollection.First().Click();
         }
-
         /// <summary>
         /// Фокус на элементы меню
         /// </summary>

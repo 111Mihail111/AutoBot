@@ -16,7 +16,6 @@ namespace AutoBot.Extentions
         {
             return webElement.GetAttribute("value");
         }
-
         /// <summary>
         /// Получить содержимое src атрибута
         /// </summary>
@@ -26,7 +25,6 @@ namespace AutoBot.Extentions
         {
             return webElement.GetAttribute("src");
         }
-
         /// <summary>
         /// Получить содержимое data-sitekey атрибута
         /// </summary>
@@ -36,7 +34,6 @@ namespace AutoBot.Extentions
         {
             return webElement.GetAttribute("data-sitekey");
         }
-
         /// <summary>
         /// Получить содержимое data-fv-addons-recaptcha2-sitekey атрибута
         /// </summary>
@@ -46,7 +43,6 @@ namespace AutoBot.Extentions
         {
             return webElement.GetAttribute("data-fv-addons-recaptcha2-sitekey");
         }
-
         /// <summary>
         /// Получить содержимое innerText атрибута
         /// </summary>
@@ -56,7 +52,6 @@ namespace AutoBot.Extentions
         {
             return webElement.GetAttribute("innerText");
         }
-
         /// <summary>
         /// Получить содержимое title атрибута
         /// </summary>
@@ -66,7 +61,6 @@ namespace AutoBot.Extentions
         {
             return webElement.GetAttribute("title");
         }
-
         /// <summary>
         /// Получить содержимое class атрибута
         /// </summary>
@@ -76,17 +70,6 @@ namespace AutoBot.Extentions
         {
             return webElement.GetAttribute("class");
         }
-
-        /// <summary>
-        /// Получить содержимое href атрибута
-        /// </summary>
-        /// <param name="webElement">Вэб-элемент</param>
-        /// <returns>Значение атрибута</returns>
-        public static string GetHref(this IWebElement webElement)
-        {
-            return webElement.GetAttribute("href");
-        }
-
         /// <summary>
         /// Получить содержимое name атрибута
         /// </summary>
@@ -96,7 +79,6 @@ namespace AutoBot.Extentions
         {
             return webElement.GetAttribute("name");
         }
-
         /// <summary>
         /// Получить содержимое aria-label атрибута
         /// </summary>
@@ -106,7 +88,6 @@ namespace AutoBot.Extentions
         {
             return webElement.GetAttribute("aria-label");
         }
-
         /// <summary>
         /// Получить содержимое id атрибута
         /// </summary>
@@ -116,7 +97,6 @@ namespace AutoBot.Extentions
         {
             return webElement.GetAttribute("id");
         }
-
         /// <summary>
         /// Получить содержимое data-id атрибута
         /// </summary>
@@ -126,6 +106,16 @@ namespace AutoBot.Extentions
         {
             return webElement.GetAttribute("data-id");
         }
+        /// <summary>
+        /// Получить содержимое aria-pressed атрибута
+        /// </summary>
+        /// <param name="webElement">Вэб-элемент</param>
+        /// <returns>Значение атрибута</returns>
+        public static string GetAriaPressed(this IWebElement webElement)
+        {
+            return webElement.GetAttribute("aria-pressed");
+        }
+
 
 
         /// <summary>
@@ -149,7 +139,6 @@ namespace AutoBot.Extentions
                     return null;
             }
         }
-
         /// <summary>
         /// Найти элементы
         /// </summary>
@@ -171,6 +160,5 @@ namespace AutoBot.Extentions
                     return null;
             }
         }
-
     }
 }

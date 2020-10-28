@@ -62,6 +62,30 @@ namespace AutoBot.Area.Managers
             Thread.Sleep(1500);
         }
         /// <inheritdoc/>
+        public void Subscribe()
+        {
+            var button = GetElementsByClassName("_2q1wcTx60QKM_bQ1Maev7b").First();
+            if (button.GetInnerText() != "FOLLOW")
+            {
+                return;
+            }
+
+            button.Click();
+            Thread.Sleep(2000);
+        }
+        /// <inheritdoc/>
+        public void Unsubscribe()
+        {
+            var button = GetElementsByClassName("_2q1wcTx60QKM_bQ1Maev7b").First();
+            if (button.GetInnerText() != "UNFOLLOW")
+            {
+                return;
+            }
+
+            button.Click();
+            Thread.Sleep(2000);
+        }
+        /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
         {
             SetDriver(chromeDriver);

@@ -36,6 +36,8 @@ namespace AutoBot
             services.AddScoped<IYandexZenManager, YandexZenManager>();
             services.AddScoped<ITumblr, TumblrManager>();
             services.AddScoped<IReddit, RedditManager>();
+            services.AddScoped<IQuora, QuoraManager>();
+            services.AddScoped<ISoundCloud, SoundCloudManager>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -2,10 +2,7 @@
 
 namespace AutoBot.Area.Managers.Interface
 {
-    /// <summary>
-    /// Тамблер
-    /// </summary>
-    interface ITumblr
+    public interface ISoundCloud
     {
         /// <summary>
         /// Авторизация
@@ -14,9 +11,21 @@ namespace AutoBot.Area.Managers.Interface
         /// <param name="password">Пароль</param>
         public void Authorization(string login, string password);
         /// <summary>
-        /// Реблог
+        /// Подписаться
         /// </summary>
-        public void Reblog();
+        public void Subscribe();
+        /// <summary>
+        /// Отписаться
+        /// </summary>
+        public void Unsubscribe();
+        /// <summary>
+        /// Лайкнуть трэк
+        /// </summary>
+        public void LikeTrack();
+        /// <summary>
+        /// Удалить лайк
+        /// </summary>
+        public void RemoveLike();
         /// <summary>
         /// Считать контекст браузер менеджера
         /// </summary>

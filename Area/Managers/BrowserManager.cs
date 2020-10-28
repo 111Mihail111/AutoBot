@@ -123,6 +123,13 @@ namespace AutoBot.Area.Managers
         {
             _browser.SwitchTo().Frame(frame);
         }
+        /// <summary>
+        /// Переключиться на основной контент страницы
+        /// </summary>
+        public void SwitchToDefaultContent()
+        {
+            _browser.SwitchTo().DefaultContent();
+        }
 
         /// <summary>
         /// ОК - в алерт окне

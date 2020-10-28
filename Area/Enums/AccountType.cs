@@ -37,5 +37,13 @@
         /// Реддит
         /// </summary>
         Reddit = 7,
+        /// <summary>
+        /// Саунд клауд
+        /// </summary>
+        SoundCloud = 8,
+        /// <summary>
+        /// Куора
+        /// </summary>
+        Quora = 9,
     }
 }

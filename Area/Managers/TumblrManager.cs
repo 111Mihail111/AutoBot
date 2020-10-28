@@ -47,7 +47,21 @@ namespace AutoBot.Area.Managers
             CloseTab();
             SwitchToTab();
         }
+        /// <inheritdoc/>
+        public void Reblog()
+        {
+            var frame = GetElementByXPath("/html/body/iframe[1]");
+            SwitchToFrame(frame);
 
+            GetElementByClassName("reblog-button").Click();
+            Thread.Sleep(1500);
+
+            ExecuteScript("document.getElementsByClassName('post-form--form')[0].remove();");
+
+            GetElementByClassName("create_post_button").Click();
+            Thread.Sleep(1500);
+
+        }
         /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
         {
