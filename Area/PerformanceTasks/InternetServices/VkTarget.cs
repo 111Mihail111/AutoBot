@@ -108,6 +108,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 _vkManager.Authorization(accountVK.Login, accountVK.Password);
             }
 
+            var accountReddit = accounts.Where(w => w.AccountType == AccountType.Reddit).FirstOrDefault();
+            if (accountReddit != null)
+            {
+                _redditManager.Authorization(accountReddit.Login, accountReddit.Password);
+            }
+
             var accountYouTube = accounts.Where(w => w.AccountType == AccountType.YouTube).FirstOrDefault();
             if (accountYouTube != null)
             {
@@ -125,13 +131,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 _yandexZenManager.Authorization(accountYandexZen.Login, accountYandexZen.Password);
             }
-
-            var accountReddit = accounts.Where(w => w.AccountType == AccountType.Reddit).FirstOrDefault();
-            if (accountReddit != null)
-            {
-                _redditManager.Authorization(accountReddit.Login, accountReddit.Password);
-            }
-
+            
             var accountTumblr = accounts.Where(w => w.AccountType == AccountType.Tumblr).FirstOrDefault();
             if (accountTumblr != null)
             {
@@ -454,6 +454,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _soundCloudManager.LikeTrack();
                     //https://soundcloud.com/tyeon/they-know-im-famous like под трэком
                     break;
+                case "Поделиться трэком":
+                    //https://soundcloud.com/elite-records-2020/king-g-simz-same-now
+                    break;
                 default:
                     break;
             }
@@ -475,7 +478,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 case "Подписаться на пользователя":
                     _quoraManager.Subscribe();
-                    //https://www.quora.com/profile/Stealth-Agents follow
+                    //https://www.quora.com/profile/Stealth-Agents follow // https://www.quora.com/profile/Fx-Anne-Vince - ошибка
                     break;
                 case "Поставьте лайк на ответ":
                     _quoraManager.LikeAnswer();

@@ -41,7 +41,7 @@ namespace AutoBot.Area.Managers
             }
 
             GetElementByClassName("m-full-width").Click();
-            Thread.Sleep(2500);
+            Thread.Sleep(3000);
 
             CloseTab();
             SwitchToTab();

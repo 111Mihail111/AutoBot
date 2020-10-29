@@ -1,4 +1,5 @@
-﻿using AutoBot.Area.Managers.Interface;
+﻿using AutoBot.Area.Enums;
+using AutoBot.Area.Managers.Interface;
 using AutoBot.Extentions;
 using OpenQA.Selenium.Chrome;
 using System.Linq;
@@ -27,28 +28,30 @@ namespace AutoBot.Area.Managers
             var frame = GetElementByClassName("webAuthContainer__iframe");
             SwitchToFrame(frame);
 
-            var inputLogin = GetElementById("sign_in_up_email");
-            if (string.IsNullOrEmpty(inputLogin.GetValue()))
+            ExecuteScript("document.getElementsByClassName('sc-button-google')[0].click();");
+            SwitchToLastTab();
+
+            var savedAccountDiv = GetElementById("profileIdentifier");
+            if (savedAccountDiv != null)
             {
-                inputLogin.SendKeys(login);
+                savedAccountDiv.Click();
+                AuthorizationUnderSavedProfile(password);
+                return;
             }
 
-            GetElementById("sign_in_up_submit").Click();
-            Thread.Sleep(2500);
-
-            SwitchToDefaultContent();
-
-            frame = GetElementByClassName("webAuthContainer__iframe");
-            SwitchToFrame(frame);
-
-            var inputPassword = GetElementById("enter_password_field");
-            if (string.IsNullOrEmpty(inputPassword.GetValue()))
+            CloseTab();
+            SwitchToTab();
+        }
+        protected void AuthorizationUnderSavedProfile(string password)
+        {
+            var inputPass = GetElementById("password").FindElement(SearchMethod.Tag, "input");
+            if (string.IsNullOrWhiteSpace(inputPass.GetValue()))
             {
-                inputPassword.SendKeys(password);
+                inputPass.SendKeys(password);
             }
 
-            GetElementById("enter_password_submit").Click();
-            Thread.Sleep(2500);
+            GetElementById("passwordNext").FindElement(SearchMethod.Tag, "button").Click();
+            Thread.Sleep(2000);
 
             CloseTab();
             SwitchToTab();
@@ -104,7 +107,7 @@ namespace AutoBot.Area.Managers
                     Thread.Sleep(1500);
                     return;
                 }
-                else if (attribute  == "Unlike")
+                else if (attribute == "Unlike")
                 {
                     return;
                 }

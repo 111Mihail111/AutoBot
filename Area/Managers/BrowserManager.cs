@@ -17,31 +17,25 @@ namespace AutoBot.Area.Managers
         /// <summary>
         /// Ошибка, капча неразрешима
         /// </summary>
-        public const string ERROR_CAPTCHA_UNSOLVABLE = "ERROR_CAPTCHA_UNSOLVABLE";
+        public const string ERROR_CAPTCHA_UNSOLVABLE = "ERROR_CAPTCHA_UNSOLVABLE"; //TODO:Убрать отсюда
         /// <summary>
         /// Ошибка, плохие совпадения
         /// </summary>
-        public const string ERROR_BAD_DUPLICATES = "ERROR_BAD_DUPLICATES";
+        public const string ERROR_BAD_DUPLICATES = "ERROR_BAD_DUPLICATES"; //TODO:Убрать отсюда
         /// <summary>
         /// Ошибка, нулевой остаток (на расшифровку капчи)
         /// </summary>
-        public const string ERROR_ZERO_BALANCE = "ERROR_ZERO_BALANCE";
+        public const string ERROR_ZERO_BALANCE = "ERROR_ZERO_BALANCE"; //TODO:Убрать отсюда
 
-        #region Path for driver
-        //"/Project/AutoBot/bin/Debug/netcoreapp2.0" - на работе
-        //"/_VS_Project/Mihail/AutoBot/BrowserSettings/netcoreapp2.0" - дома
-        #endregion Path for driver
-
-
-        public void Initialization(string pathToProfile) //Есть TODO
+        public void Initialization(string pathToProfile)
         {
             ChromeOptions options = new ChromeOptions();
             options.AddArgument($"--user-data-dir={pathToProfile}"); //Путь к папке с профилем
             options.AddArgument("--profile-directory=AutoBot"); //Профиль
             options.AddArgument("--start-maximized"); //Полностью открывает браузер
+            options.AddArgument("--disable-notifications"); //Блокировка уведомлений
             options.AddAdditionalCapability("useAutomationExtension", false); //Скрывает расширение
             options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
-            //TODO: Запускать браузер в свернутом режиме. Попробовать через это kWindowSize
 
             _browser = new ChromeDriver("./BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
         }
@@ -182,9 +176,9 @@ namespace AutoBot.Area.Managers
         /// </summary>
         /// <param name="jsScript">Скрипт</param>
         /// <returns>Возвращаемое значение скрипта</returns>
-        public string ExecuteScript(string jsScript) //Есть TODO
+        public string ExecuteScript(string jsScript)
         {
-            return _browser.ExecuteScript(jsScript)?.ToString(); //TODO: unknown error: session deleted because of page crash from unknown error: cannot determine loading status from tab crashed
+            return _browser.ExecuteScript(jsScript)?.ToString();
         }
         /// <summary>
         /// Асинхронно выполнить скрипт
