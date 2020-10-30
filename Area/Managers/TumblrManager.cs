@@ -63,6 +63,36 @@ namespace AutoBot.Area.Managers
 
         }
         /// <inheritdoc/>
+        public void LikePost()
+        {
+            var frame = GetElementByXPath("/html/body/iframe[1]");
+            SwitchToFrame(frame);
+
+            var button = GetElementByClassName("like-button");
+            if (!button.Displayed)
+            {
+                return;
+            }
+
+            button.Click();
+            Thread.Sleep(1500);
+        }
+        /// <inheritdoc/>
+        public void RemoveLike()
+        {
+            var frame = GetElementByXPath("/html/body/iframe[1]");
+            SwitchToFrame(frame);
+
+            var button = GetElementByClassName("unlike-button");
+            if (!button.Displayed)
+            {
+                return;
+            }
+
+            button.Click();
+            Thread.Sleep(1500);
+        }
+        /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
         {
             SetDriver(chromeDriver);

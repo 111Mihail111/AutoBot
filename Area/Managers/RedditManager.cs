@@ -1,6 +1,7 @@
 ﻿using AutoBot.Area.Enums;
 using AutoBot.Area.Managers.Interface;
 using AutoBot.Extentions;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System.Linq;
 using System.Threading;
@@ -64,10 +65,24 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void Subscribe()
         {
-            var button = GetElementsByClassName("_2q1wcTx60QKM_bQ1Maev7b").First();
-            if (button.GetInnerText() != "FOLLOW")
+            var buttons = GetElementsByClassName("_2q1wcTx60QKM_bQ1Maev7b");
+
+            IWebElement button;
+            if (buttons.Count() == 0)
             {
-                return;
+                button = GetElementByClassName("_3VgTjAJVNNV7jzlnwY-OFY");
+                if (button == null)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                button = buttons.First();
+                if (button.GetInnerText() != "FOLLOW")
+                {
+                    return;
+                }
             }
 
             button.Click();
@@ -76,10 +91,24 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void Unsubscribe()
         {
-            var button = GetElementsByClassName("_2q1wcTx60QKM_bQ1Maev7b").First();
-            if (button.GetInnerText() != "UNFOLLOW")
+            var buttons = GetElementsByClassName("_2q1wcTx60QKM_bQ1Maev7b");
+
+            IWebElement button;
+            if (buttons.Count() == 0)
             {
-                return;
+                button = GetElementByClassName("_2QmHYFeMADTpuXJtd36LQs");
+                if (button == null)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                button = buttons.First();
+                if (button.GetInnerText() != "UNFOLLOW")
+                {
+                    return;
+                }
             }
 
             button.Click();

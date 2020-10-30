@@ -425,7 +425,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _tumblrManager.Reblog();
                     break;
                 case "Поставить лайк на пост":
-                    //https://leafkim.tumblr.com/post/633206170837991424/hello-world-please-enjoy-a-piece-of-my-sketchbook На сердечко
+                    _tumblrManager.LikePost();
                     break;
                 default:
                     break;
@@ -439,7 +439,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Выполнить задачу в SoundCloud
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInSoundCloud(string taskText) //TODO
+        protected void CarryOutTaskInSoundCloud(string taskText)
         {
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
@@ -448,14 +448,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 case "подпишитесь на аккаунт":
                     _soundCloudManager.Subscribe();
-                    //https://soundcloud.com/sunxshine98 follow
                     break;
                 case "Поставить лайк на трэк":
                     _soundCloudManager.LikeTrack();
-                    //https://soundcloud.com/tyeon/they-know-im-famous like под трэком
                     break;
                 case "Поделиться трэком":
-                    //https://soundcloud.com/elite-records-2020/king-g-simz-same-now
+                    _soundCloudManager.RepostTrack();
                     break;
                 default:
                     break;
@@ -477,12 +475,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (taskText)
             {
                 case "Подписаться на пользователя":
-                    _quoraManager.Subscribe();
-                    //https://www.quora.com/profile/Stealth-Agents follow // https://www.quora.com/profile/Fx-Anne-Vince - ошибка
+                    _quoraManager.Subscribe(); //https://www.quora.com/profile/Brajesh-Kumar-Singh-4
                     break;
                 case "Поставьте лайк на ответ":
                     _quoraManager.LikeAnswer();
-                    //https://www.quora.com/If-I-invest-5000-in-cryptocurrency-now-how-much-would-it-be-worth-ten-years-from-now/answer/Hassinger-Logan Upvote
                     break;
                 default:
                     break;
@@ -521,6 +517,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     break;
                 case "soundcloud":
                     UndoTaskInSoundCloud();
+                    break;
+                case "tumblr":
+                    UndoTaskInTumblr();
                     break;
             }
         }
@@ -614,7 +613,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Отменить задачу в Reddit
         /// </summary>
-        protected void UndoTaskInReddit() //TODO
+        protected void UndoTaskInReddit()
         {
             OpenPageInNewTab(_urlByTask);
 
@@ -634,7 +633,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Отменить задачу в Quora
         /// </summary>
-        protected void UndoTaskInQuora() //TODO
+        protected void UndoTaskInQuora()
         {
             OpenPageInNewTab(_urlByTask);
 
@@ -654,7 +653,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Отменить задачу в SoundCloud
         /// </summary>
-        protected void UndoTaskInSoundCloud() //TODO
+        protected void UndoTaskInSoundCloud()
         {
             OpenPageInNewTab(_urlByTask);
 
@@ -665,6 +664,26 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     break;
                 case "Поставить лайк на трэк":
                     _soundCloudManager.RemoveLike();
+                    break;
+                case "Поделиться трэком":
+                    _soundCloudManager.RemoveRepost();
+                    break;
+            }
+
+            CloseTab();
+            SwitchToTab();
+        }
+        /// <summary>
+        /// Отменить задачу в Tumblr
+        /// </summary>
+        protected void UndoTaskInTumblr()
+        {
+            OpenPageInNewTab(_urlByTask);
+
+            switch (_task)
+            {
+                case "Поставить лайк на пост":
+                    _tumblrManager.RemoveLike();
                     break;
             }
 

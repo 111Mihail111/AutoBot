@@ -1,4 +1,5 @@
-﻿using AutoBot.Area.Managers.Interface;
+﻿using AutoBot.Area.Enums;
+using AutoBot.Area.Managers.Interface;
 using AutoBot.Extentions;
 using OpenQA.Selenium.Chrome;
 using System.Linq;
@@ -52,8 +53,8 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void Subscribe()
         {
-            var button = GetElementByClassName("qu-bg--blue");
-            if (button == null)
+            var button = GetElementByClassName("qu-justifyContent--space-between").FindElements(SearchMethod.Tag, "button").First();            
+            if (button.GetInnerText().Contains("Following"))
             {
                 return;
             }
@@ -77,7 +78,7 @@ namespace AutoBot.Area.Managers
         public void LikeAnswer()
         {
             var button = GetElementByClassName("puppeteer_test_answer_upvote_button");
-            if (!bool.Parse(button.GetAriaPressed()) == true)
+            if (bool.Parse(button.GetAriaPressed()) == true)
             {
                 return;
             }
@@ -89,7 +90,7 @@ namespace AutoBot.Area.Managers
         public void RemoveLike()
         {
             var button = GetElementByClassName("puppeteer_test_answer_upvote_button");
-            if (!bool.Parse(button.GetAriaPressed()) == false)
+            if (bool.Parse(button.GetAriaPressed()) == false)
             {
                 return;
             }

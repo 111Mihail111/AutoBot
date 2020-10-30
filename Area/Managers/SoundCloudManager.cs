@@ -29,6 +29,7 @@ namespace AutoBot.Area.Managers
             SwitchToFrame(frame);
 
             ExecuteScript("document.getElementsByClassName('sc-button-google')[0].click();");
+            Thread.Sleep(2500);
             SwitchToLastTab();
 
             var savedAccountDiv = GetElementById("profileIdentifier");
@@ -131,6 +132,30 @@ namespace AutoBot.Area.Managers
                     return;
                 }
             }
+        }
+        /// <inheritdoc/>
+        public void RepostTrack()
+        {
+            var button = GetElementByClassName("sc-button-repost");
+            if (button.GetInnerText() != "Repost")
+            {
+                return;
+            }
+
+            button.Click();
+            Thread.Sleep(1500);
+        }
+        /// <inheritdoc/>
+        public void RemoveRepost()
+        {
+            var button = GetElementByClassName("sc-button-repost");
+            if (button.GetInnerText() != "Reposted")
+            {
+                return;
+            }
+
+            button.Click();
+            Thread.Sleep(1500);
         }
         /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
