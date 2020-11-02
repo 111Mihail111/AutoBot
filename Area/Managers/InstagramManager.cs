@@ -59,7 +59,14 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void Subscribe()
         {
+            ExecuteScript("document.getElementsByClassName('EcJQs')[0]?.remove()");
+
             var button = GetElementByClassName("_6VtSN");
+            if (button == null)
+            {
+                button = GetElementByClassName("sqdOP");
+            }
+
             if (button.GetInnerText() == "Подписаться")
             {
                 button.Click();
