@@ -136,7 +136,7 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public bool IsFoundPage()
         {
-            return !GetTitlePage().Contains("Страница не найдена") != false;
+            return GetTitlePage().Contains("Страница не найдена") || GetTitlePage().Contains("Контент недоступен");
         }
         /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)

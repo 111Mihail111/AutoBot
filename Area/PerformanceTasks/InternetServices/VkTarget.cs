@@ -245,7 +245,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _vkManager.PutLike();
                     break;
                 case "Посмотреть пост":
-                    Thread.Sleep(1500);
+                    Thread.Sleep(500);
                     break;
                 case "Нажмите поделиться записью":
                     if (!_vkManager.IsPostFound())
@@ -454,6 +454,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     break;
                 case "Поделиться трэком":
                     _soundCloudManager.RepostTrack();
+                    break;
+                case "Воспроизвести трэк":
+                    Thread.Sleep(500);
                     break;
                 default:
                     break;
