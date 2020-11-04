@@ -88,6 +88,8 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void LikeTrack()
         {
+            RemoveModalWindow();
+
             var buttons = GetElementsByClassName("sc-button-like");
             foreach (var button in buttons)
             {
@@ -107,6 +109,8 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void RemoveLike()
         {
+            RemoveModalWindow();
+
             var buttons = GetElementsByClassName("sc-button-like");
             foreach (var button in buttons)
             {
@@ -126,6 +130,8 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void RepostTrack()
         {
+            RemoveModalWindow();
+
             var button = GetElementByClassName("sc-button-repost");
             if (button.GetInnerText() != "Repost")
             {
@@ -138,6 +144,8 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void RemoveRepost()
         {
+            RemoveModalWindow();
+
             var button = GetElementByClassName("sc-button-repost");
             if (button.GetInnerText() != "Reposted")
             {
