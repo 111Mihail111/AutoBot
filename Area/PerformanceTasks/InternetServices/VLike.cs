@@ -246,7 +246,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 SwitchToLastTab();
                 Thread.Sleep(2500);
 
-                if (!_instaManager.IsFoundPage())
+                if (_instaManager.IsFoundPage())
                 {
                     SkipTask("instaLike");
                     groups = GetElementsByClassName("groups");
