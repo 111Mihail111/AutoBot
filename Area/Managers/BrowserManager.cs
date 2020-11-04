@@ -36,6 +36,7 @@ namespace AutoBot.Area.Managers
             options.AddArgument("--disable-notifications"); //Блокировка уведомлений
             options.AddAdditionalCapability("useAutomationExtension", false); //Скрывает расширение
             options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
+            options.BinaryLocation = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
 
             _browser = new ChromeDriver("./BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
         }
