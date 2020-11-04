@@ -38,6 +38,7 @@ namespace AutoBot
             services.AddScoped<IReddit, RedditManager>();
             services.AddScoped<IQuora, QuoraManager>();
             services.AddScoped<ISoundCloud, SoundCloudManager>();
+            services.AddScoped<IVimeoManager, VimeoManager>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

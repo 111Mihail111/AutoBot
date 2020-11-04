@@ -54,6 +54,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         private IReddit _redditManager;
         private IQuora _quoraManager;
         private ISoundCloud _soundCloudManager;
+        private IVimeoManager _vimeoManager;
 
         protected void Init()
         {
@@ -79,6 +80,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _redditManager = new RedditManager();
             _quoraManager = new QuoraManager();
             _soundCloudManager = new SoundCloudManager();
+            _vimeoManager = new VimeoManager();
 
             var driver = GetDriver();
             _vkManager.SetContextBrowserManager(driver);
@@ -89,6 +91,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _redditManager.SetContextBrowserManager(driver);
             _quoraManager.SetContextBrowserManager(driver);
             _soundCloudManager.SetContextBrowserManager(driver);
+            _vimeoManager.SetContextBrowserManager(driver);
         }
 
         /// <summary>
@@ -131,7 +134,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 _yandexZenManager.Authorization(accountYandexZen.Login, accountYandexZen.Password);
             }
-            
+
             var accountTumblr = accounts.Where(w => w.AccountType == AccountType.Tumblr).FirstOrDefault();
             if (accountTumblr != null)
             {
@@ -148,6 +151,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             if (accountSoundCloud != null)
             {
                 _soundCloudManager.Authorization(accountSoundCloud.Login, accountSoundCloud.Password);
+            }
+
+            var accountVimeo = accounts.Where(w => w.AccountType == AccountType.Vimeo).FirstOrDefault();
+            if (accountVimeo != null)
+            {
+                _vimeoManager.Authorization(accountVimeo.Login, accountVimeo.Password);
             }
 
             _isAuthorizationSocialNetworks = true;
@@ -192,7 +201,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     case "reddit":
                         CarryOutTaskInReddit(_task);
                         break;
-                    case "tumblr": 
+                    case "tumblr":
                         CarryOutTaskInTumblr(_task);
                         break;
                     case "soundcloud":
@@ -200,6 +209,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                         break;
                     case "quora":
                         CarryOutTaskInQuora(_task);
+                        break;
+                    case "vimeo":
+                        CarryOutTaskInVimeo(_task);
                         break;
                     case "NoTasks":
                         ShowActivity();
@@ -482,6 +494,28 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     break;
                 case "Поставьте лайк на ответ":
                     _quoraManager.LikeAnswer();
+                    break;
+                default:
+                    break;
+            }
+
+            CloseTab();
+            SwitchToTab();
+            CheckTask();
+        }
+        /// <summary>
+        /// Выполнить задачу в Vimeo
+        /// </summary>
+        /// <param name="taskText">Текст задачи</param>
+        protected void CarryOutTaskInVimeo(string taskText)
+        {
+            SwitchToLastTab();
+            _urlByTask = GetUrlPage();
+
+            switch (taskText)
+            {
+                case "Поставить лайк на видео":
+                    //https://vimeo.com/473520867
                     break;
                 default:
                     break;
@@ -893,6 +927,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 return;
             }
+
+            GetElementsByClassName("mdl-js-button").Last().Click();
+            Thread.Sleep(1500);
 
             var login = GetElementByXPath("//*[@id='login_form']/div[1]/div/div[2]/div[2]/input");
             if (string.IsNullOrWhiteSpace(login.Text))

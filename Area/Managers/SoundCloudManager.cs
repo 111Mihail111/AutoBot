@@ -43,20 +43,6 @@ namespace AutoBot.Area.Managers
             CloseTab();
             SwitchToTab();
         }
-        protected void AuthorizationUnderSavedProfile(string password)
-        {
-            var inputPass = GetElementById("password").FindElement(SearchMethod.Tag, "input");
-            if (string.IsNullOrWhiteSpace(inputPass.GetValue()))
-            {
-                inputPass.SendKeys(password);
-            }
-
-            GetElementById("passwordNext").FindElement(SearchMethod.Tag, "button").Click();
-            Thread.Sleep(2000);
-
-            CloseTab();
-            SwitchToTab();
-        }
         /// <inheritdoc/>
         public void Subscribe()
         {
@@ -161,7 +147,25 @@ namespace AutoBot.Area.Managers
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
         {
             SetDriver(chromeDriver);
+        }
 
+        /// <summary>
+        /// Аторизация под сохраненным профилем
+        /// </summary>
+        /// <param name="password">Пароль к учетной записи</param>
+        protected void AuthorizationUnderSavedProfile(string password)
+        {
+            var inputPass = GetElementById("password").FindElement(SearchMethod.Tag, "input");
+            if (string.IsNullOrWhiteSpace(inputPass.GetValue()))
+            {
+                inputPass.SendKeys(password);
+            }
+
+            GetElementById("passwordNext").FindElement(SearchMethod.Tag, "button").Click();
+            Thread.Sleep(2000);
+
+            CloseTab();
+            SwitchToTab();
         }
     }
 }

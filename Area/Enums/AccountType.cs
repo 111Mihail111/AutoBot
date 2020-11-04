@@ -45,5 +45,9 @@
         /// Куора
         /// </summary>
         Quora = 9,
+        /// <summary>
+        /// Вимео
+        /// </summary>
+        Vimeo = 10,
     }
 }
