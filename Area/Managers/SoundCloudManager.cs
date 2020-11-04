@@ -46,6 +46,8 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void Subscribe()
         {
+            RemoveModalWindow();
+
             var buttons = GetElementsByClassName("sc-button-cta");
             if (buttons.Count() <= 1)
             {
@@ -65,6 +67,8 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void Unsubscribe()
         {
+            RemoveModalWindow();
+
             var buttons = GetElementsByClassName("sc-button-selected");
             if (buttons.Count() <= 1)
             {
@@ -166,6 +170,10 @@ namespace AutoBot.Area.Managers
 
             CloseTab();
             SwitchToTab();
+        }
+        protected void RemoveModalWindow()
+        {
+            ExecuteScript("document.getElementsByClassName('callout g-z-index-callout m-active')[0]?.remove();");
         }
     }
 }

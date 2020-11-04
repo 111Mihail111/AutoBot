@@ -166,7 +166,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         {
             Init();
             GoToUrl(url);
-            AuthorizationOnService(url);
+            AuthorizationOnService();
             BeginCollecting(url);
         }
 
@@ -921,9 +921,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Авторизация на сервисе
         /// </summary>
         /// <param name="url">Url-адрес сервиса</param>
-        protected void AuthorizationOnService(string url)
+        protected void AuthorizationOnService()
         {
-            if (GetUrlPage() == url)
+            if (GetUrlPage() == "https://vktarget.ru/list/")
             {
                 return;
             }
