@@ -152,7 +152,7 @@ namespace AutoBot.Area.Managers
         /// </summary>
         protected void RemoveModalDialogs()
         {
-            ExecuteScript("document.getElementsByTagName('paper-dialog')[0]?.remove();"
+            ExecuteScript("document.getElementsByTagName('paper-dialog')[0]?.remove();");
         }
         /// <summary>
         /// Остановить видео
