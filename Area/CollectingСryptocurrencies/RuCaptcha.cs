@@ -195,13 +195,13 @@ namespace AutoBot.Area.CollectingСryptocurrencies
         /// </summary>
         protected async void InsertLoginAndPassword()
         {
-            var emailInput = await Task.Run(() => GetAsyncElementById("password"));
+            var emailInput = await Task.Run(() => GetElementByIdAsync("password"));
             if (emailInput != null && string.IsNullOrEmpty(emailInput.GetValue()))
             {
                 emailInput.SendKeys(_password);
             }
 
-            var passwordInput = Task.Run(() => GetAsyncElementById("email")).Result;
+            var passwordInput = Task.Run(() => GetElementByIdAsync("email")).Result;
             if (passwordInput != null && string.IsNullOrEmpty(passwordInput.GetValue()))
             {
                 passwordInput.SendKeys(_login);

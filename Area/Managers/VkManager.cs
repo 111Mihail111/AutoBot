@@ -53,7 +53,7 @@ namespace AutoBot.Area.Managers
         public void MakeRepost()
         {
             RemovePostDetailsAsync();
-            RemoveWindowMessage();
+            RemoveWindowMessage(true);
 
             var buttons = GetElementByClassName("like_btns").FindElements(SearchMethod.Tag, "a");
             buttons.Where(w => w.GetInnerText().Contains("Поделиться")).FirstOrDefault().Click();
@@ -166,10 +166,18 @@ namespace AutoBot.Area.Managers
         /// <summary>
         /// Удаление модальных окон vk
         /// </summary>
-        protected void RemoveWindowMessage()
+        protected void RemoveWindowMessage(bool isRepost = false)
         {
-            ExecuteScript("document.querySelector('#box_layer_bg').remove();" +
-                "document.querySelector('#stl_left').remove();" +
+            string removeDivScript = string.Empty;
+
+            if (!isRepost)
+            {
+                removeDivScript = "document.getElementById('box_layer_wrap')?.remove();";
+            }
+
+            ExecuteScript("document.getElementById('box_layer_bg')?.remove();" +
+                "document.getElementById('stl_left')?.remove();" +
+                $"{removeDivScript}" +
                 "document.getElementsByClassName('popup_box_container')[0]?.remove();");
         }
     }

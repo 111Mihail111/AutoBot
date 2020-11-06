@@ -220,7 +220,7 @@ namespace AutoBot.Area.Managers
         {
             return _browser.FindElementsById(elementId);
         }
-        public async Task<IWebElement> GetAsyncElementById(string elementId, int waitingTimeSecond = 5)
+        public async Task<IWebElement> GetElementByIdAsync(string elementId, int waitingTimeSecond = 5)
         {
             return await Task.Run(() => ExpectationElement(elementId, waitingTimeSecond));
         }

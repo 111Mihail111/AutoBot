@@ -73,7 +73,7 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
             GetElementByXPath("//*[@id='PageContent_UnauthorisedButtons']/button").Click();
             Thread.Sleep(600);
 
-            var signInEmailInput = GetAsyncElementById("SignInEmailInput").Result;
+            var signInEmailInput = GetElementByIdAsync("SignInEmailInput").Result;
             if (string.IsNullOrEmpty(signInEmailInput.GetValue()))
             {
                 signInEmailInput.SendKeys(_login);
