@@ -205,7 +205,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
                 GetElementByXPath("//*[@id='content']/div[2]/div[1]/div[3]/a").Click();
                 SwitchToLastTab();
-                Thread.Sleep(1000);
+                Thread.Sleep(2000);
 
                 if (_instaManager.IsFoundPage())
                 {

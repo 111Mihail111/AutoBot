@@ -1,7 +1,6 @@
 ﻿using AutoBot.Area.Enums;
 using AutoBot.Area.Managers.Interface;
 using AutoBot.Extentions;
-using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System.Linq;
 using System.Threading;
@@ -153,11 +152,7 @@ namespace AutoBot.Area.Managers
         /// </summary>
         protected void RemoveModalDialogs()
         {
-            ExecuteScript("var modalDialog = document.getElementsByTagName('paper-dialog')[0];" +
-                "if (modalDialog != undefined)" +
-                "{" +
-                    "modalDialog.remove();" +
-                "}");
+            ExecuteScript("document.getElementsByTagName('paper-dialog')[0]?.remove();"
         }
         /// <summary>
         /// Остановить видео

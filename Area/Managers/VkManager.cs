@@ -9,6 +9,7 @@ namespace AutoBot.Area.Managers
 {
     public class VkManager : BrowserManager, IVkManager
     {
+        /// <inheritdoc/>
         public void JoinToComunity()
         {
             RemoveWindowMessage();
@@ -28,7 +29,7 @@ namespace AutoBot.Area.Managers
                 Thread.Sleep(1500);
             }
         }
-
+        /// <inheritdoc/>
         public void UnsubscribeToComunity()
         {
             RemoveWindowMessage();
@@ -39,63 +40,64 @@ namespace AutoBot.Area.Managers
             GetElementsByClassName("page_actions_inner").First().FindElements(SearchMethod.Tag, "a").First().Click();
             Thread.Sleep(1500);
         }
-
+        /// <inheritdoc/>
         public void PutLike()
         {
-            RemovePostDetails();
+            RemovePostDetailsAsync();
             RemoveWindowMessage();
 
             var button = GetElementByClassName("like_btns").FindElements(SearchMethod.Tag, "a");
             button.Where(w => w.GetTitle() == "Нравится").FirstOrDefault().Click();
         }
-
+        /// <inheritdoc/>
         public void MakeRepost()
         {
-            RemovePostDetails();
+            RemovePostDetailsAsync();
+            RemoveWindowMessage();
 
-            var button = GetElementByClassName("like_btns").FindElements(SearchMethod.Tag, "a");
-            button.Where(w => w.GetTitle() == "Поделиться").FirstOrDefault().Click();
+            var buttons = GetElementByClassName("like_btns").FindElements(SearchMethod.Tag, "a");
+            buttons.Where(w => w.GetInnerText().Contains("Поделиться")).FirstOrDefault().Click();
 
             GetElementById("like_share_my").Click();
             GetElementById("like_share_send").Click();
             Thread.Sleep(1500);
         }
-
+        /// <inheritdoc/>
         public void RemoveLike()
         {
             PutLike();
         }
-
+        /// <inheritdoc/>
         public bool IsBlockedCommunity()
         {
             return GetElementByXPath("/html/body/div").GetInnerText()
                 .Contains("Данный материал заблокирован на территории Российской Федерации");
         }
-
+        /// <inheritdoc/>
         public bool IsPrivateGroup()
         {
             return GetTitlePage() == "Частная группа";
         }
-
+        /// <inheritdoc/>
         public bool IsPostFound()
         {
             string materialBlockText = GetElementByXPath("/html/body/div").GetInnerText();
             return GetTitlePage() != "Ошибка" && !materialBlockText.Contains("Данный материал заблокирован на");
         }
-
+        /// <inheritdoc/>
         public void ToTellAboutGroup()
         {
             GetElementById("page_menu_group_share").Click();
             GetElementById("like_share_send").Click();
             Thread.Sleep(1500);
         }
-
+        /// <inheritdoc/>
         public void AddToFriends()
         {
             GetElementByClassName("button_wide").Click();
             Thread.Sleep(1500);
         }
-
+        /// <inheritdoc/>
         public void RemoveFromFriends()
         {
             GetElementByClassName("button_wide").Click();
@@ -112,12 +114,12 @@ namespace AutoBot.Area.Managers
                 }
             }
         }
-
+        /// <inheritdoc/>
         public bool IsBlockedAccount()
         {
             return GetElementsByClassName("profile_blocked").Count() != 0;
         }
-
+        /// <inheritdoc/>
         public void Authorization(string loginVK, string passwordVK)
         {
             OpenPageInNewTab("https://vk.com/");
@@ -147,27 +149,28 @@ namespace AutoBot.Area.Managers
             CloseTab();
             SwitchToTab();
         }
-
+        /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
         {
             SetDriver(chromeDriver);
         }
 
+
         /// <summary>
         /// Удалить данные поста
         /// </summary>
-        protected void RemovePostDetails()
+        protected async void RemovePostDetailsAsync()
         {
-            ExecuteScript("document.getElementsByClassName('wall_text')[0]?.remove();");
+            await ExecuteScriptAsync("document.getElementsByClassName('wall_text')[0]?.remove();");
         }
         /// <summary>
         /// Удаление модальных окон vk
         /// </summary>
         protected void RemoveWindowMessage()
         {
-            ExecuteScript("document.querySelector('#box_layer_bg').remove();");
-            ExecuteScript("document.querySelector('#stl_left').remove();");
-            ExecuteScript("document.querySelector('#box_layer_wrap').remove();");
+            ExecuteScript("document.querySelector('#box_layer_bg').remove();" +
+                "document.querySelector('#stl_left').remove();" +
+                "document.getElementsByClassName('popup_box_container')[0]?.remove();");
         }
     }
 }
