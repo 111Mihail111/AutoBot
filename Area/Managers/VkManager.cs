@@ -43,7 +43,7 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void PutLike()
         {
-            RemovePostDetailsAsync();
+            RemovePostDetails();
             RemoveWindowMessage();
 
             var button = GetElementByClassName("like_btns").FindElements(SearchMethod.Tag, "a");
@@ -52,7 +52,7 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void MakeRepost()
         {
-            RemovePostDetailsAsync();
+            RemovePostDetails();
             RemoveWindowMessage(true);
 
             var buttons = GetElementByClassName("like_btns").FindElements(SearchMethod.Tag, "a");
@@ -155,13 +155,12 @@ namespace AutoBot.Area.Managers
             SetDriver(chromeDriver);
         }
 
-
         /// <summary>
         /// Удалить данные поста
         /// </summary>
-        protected async void RemovePostDetailsAsync()
+        protected void RemovePostDetails()
         {
-            await ExecuteScriptAsync("document.getElementsByClassName('wall_text')[0]?.remove();");
+            ExecuteScript("document.getElementsByClassName('wall_text')[0]?.remove();");
         }
         /// <summary>
         /// Удаление модальных окон vk
