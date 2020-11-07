@@ -294,6 +294,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                         {
                             break;
                         }
+                        //TODO:Еще может быть такое условие: Список участников скрыт, проверить выполнение нет возможности. Пожалуйста, пропустите это задание.
                     }
 
                     AlertAccept();
