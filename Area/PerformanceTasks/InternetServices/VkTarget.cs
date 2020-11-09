@@ -153,12 +153,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 _soundCloudManager.Authorization(accountSoundCloud.Login, accountSoundCloud.Password);
             }
 
-            var accountVimeo = accounts.Where(w => w.AccountType == AccountType.Vimeo).FirstOrDefault();
-            if (accountVimeo != null)
-            {
-                _vimeoManager.Authorization(accountVimeo.Login, accountVimeo.Password);
-            }
-
             _isAuthorizationSocialNetworks = true;
         }
 
@@ -209,9 +203,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                         break;
                     case "quora":
                         CarryOutTaskInQuora(_task);
-                        break;
-                    case "vimeo":
-                        CarryOutTaskInVimeo(_task);
                         break;
                     case "NoTasks":
                         ShowActivity();
@@ -512,29 +503,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToTab();
             CheckTask();
         }
-        /// <summary>
-        /// Выполнить задачу в Vimeo
-        /// </summary>
-        /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInVimeo(string taskText) //TODO
-        {
-            SwitchToLastTab();
-            _urlByTask = GetUrlPage();
-
-            switch (taskText)
-            {
-                case "Поставить лайк на видео":
-                    //https://vimeo.com/473520867 https://vimeo.com/293175455
-                    break;
-                default:
-                    break;
-            }
-
-            CloseTab();
-            SwitchToTab();
-            CheckTask();
-        }
-
+        
 
         /// <summary>
         /// Отменить задание

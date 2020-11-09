@@ -31,7 +31,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 AuthorizationSocialNetworks();
             }
         }
-
         /// <summary>
         /// Установить контекст для менеджеров
         /// </summary>
@@ -44,25 +43,34 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _vkManager.SetContextBrowserManager(driver);
             _instaManager.SetContextBrowserManager(driver);
         }
-
         /// <summary>
         /// Авторизация в соц. сетях
         /// </summary>
         protected void AuthorizationSocialNetworks()
         {
             var accounts = AccountService.GetAccount(TypeService.VLike);
-            var accountVK = accounts.First();
-            var accountInstagram = accounts.Where(w => w.AccountType == AccountType.Instagram).First();
 
-            _vkManager.Authorization(accountVK.Login, accountVK.Password);
-            _instaManager.Authorization(accountInstagram.Login, accountInstagram.Password);
+            var accountVK = accounts.Where(w => w.AccountType == AccountType.Vk).FirstOrDefault();
+            if (accountVK != null)
+            {
+                _vkManager.Authorization(accountVK.Login, accountVK.Password);
+            }
+
+            var accountInstagram = accounts.Where(w => w.AccountType == AccountType.Instagram).FirstOrDefault();
+            if (accountInstagram != null)
+            {
+                _instaManager.Authorization(accountInstagram.Login, accountInstagram.Password);
+            }
+
             _isAuthorization = true;
         }
+
 
         public InternetService GoTo(InternetService service)
         {
             Init();
             GoToUrl(service.URL);
+            AuthorizationOnService();
             BeginCollecting();
 
             return GetDetailsWithService(service);
@@ -73,13 +81,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         private void BeginCollecting() //ЕСТЬ TODO
         {
-            var login = GetElementByXPath("//*[@id='uLogin']/div");
-            if (login != null)
-            {
-                login.Click();
-                Thread.Sleep(1500);
-            }
-
             JoinInCommunityVK();
             WorkWithLikesAndRepostVK();
             //AddToFriendsVK();
@@ -88,12 +89,13 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             WorkWithLikeInstagram();
         }
 
+
         /// <summary>
         /// Вступить в сообщество ВК
         /// </summary>
         protected void JoinInCommunityVK()
         {
-            GetElementByXPath("//*[@id='vk1']/a").Click();
+            GetElementById("vk1").Click();
 
             var message = GetElementByXPath("//*[@id='content']/div[3]/div/p[1]/b");
             while (message == null)
@@ -130,7 +132,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void WorkWithLikesAndRepostVK()
         {
-            GetElementByXPath("//*[@id='vk2']/a").Click();
+            GetElementById("vk2").Click();
 
             var perfomanse = GetElementByClassName("groups")?.GetInnerText();
             while (!string.IsNullOrEmpty(perfomanse) && perfomanse != "Нет доступных заданий. Заходите позже!")
@@ -196,7 +198,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void SubscriptionsInInstagram()
         {
-            GetElementByXPath("//*[@id='in0']/a").Click();
+            GetElementById("in0").Click();
 
             var groups = GetElementsByClassName("groups");
             while (groups.Count() != 0)
@@ -235,7 +237,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void WorkWithLikeInstagram()
         {
-            GetElementByXPath("//*[@id='in1']/a").Click();
+            GetElementById("in1").Click();
 
             var groups = GetElementsByClassName("groups");
             while (groups.Count() != 0)
@@ -350,7 +352,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _taskId = string.Empty;
             Thread.Sleep(2000);
         }
-
         /// <summary>
         /// Максимум лайков
         /// </summary>
@@ -367,67 +368,19 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             return false;
         }
 
-        protected void WorkWithYouTube() //ЕСТЬ TODO
-        {
-            GetElementByXPath("//*[@id='yt0']/a").Click();
-
-            var groups = GetElementByClassName("groups");
-            while (true) //TODO:Проверка на отсутствие заданий
-            {
-                GetElementByXPath("//*[@id='content']/div[3]/div[1]/div[3]/a").Click();
-                SwitchToLastTab();
-
-                if (IsVideoAvailable())
-                {
-                    SkipTask("");
-                    groups = GetElementByClassName("groups");
-                    continue;
-                }
-
-                GetElementById("button").Click();
-                CloseTab();
-                SwitchToTab();
-                GetElementByXPath("//*[@id='buttons']/a[2]").Click();
-                DelayPayments();
-
-                groups = GetElementByClassName("groups");
-            }
-        }
 
         /// <summary>
-        /// Доступно ли видео
+        /// Авторизация
         /// </summary>
-        /// <returns>True - не доступно, иначе false</returns>
-        protected bool IsVideoAvailable()
+        protected void AuthorizationOnService()
         {
-            return GetElementById("reason") != null;
-        }
-
-        /// <summary>
-        /// Добавить в друзья
-        /// </summary>
-        protected void AddToFriendsVK()
-        {
-            GetElementByXPath("//*[@id='vk3']/a").Click();
-
-            var message = GetElementByXPath("//*[@id='content']/div[2]/h3").GetInnerText(); ////*[@id="content"]/div[2]
-            while (message != "Никто не ищет друзей :-(")
+            var login = GetElementByXPath("//*[@id='uLogin']/div");
+            if (login != null)
             {
-                ButtonsVisible();
-                GetElementByXPath("//*[@id='content']/div[2]/div[2]/div[3]/a").Click();
-                SwitchToLastTab();
-
-                //RemoveWindowMessage();
-
-                GetElementByXPath("//*[@id='friend_status']/div/button").Click();
-                CloseTab();
-                SwitchToTab();
-                GetElementByXPath("//*[@id='buttons']/a[2]");
-
-                message = GetElementByXPath("//*[@id='content']/div[2]/h3").GetInnerText();
+                login.Click();
+                Thread.Sleep(1500);
             }
         }
-
         /// <summary>
         /// Кнопки видимы
         /// </summary>

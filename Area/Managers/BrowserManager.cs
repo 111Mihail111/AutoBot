@@ -190,103 +190,21 @@ namespace AutoBot.Area.Managers
             return await Task.Run(() => ExecuteScript(jsScript)?.ToString());
         }
 
-        public IWebElement GetElementByXPath(string xPath, int waitingTimeSecond = 5)
-        {
-            return ExpectationElement(xPath, waitingTimeSecond);
-        }
-        public IEnumerable<IWebElement> GetElementsByXPath(string xPath)
-        {
-            //TODO:Найти код ошибки и воткнуть в кэч. Он не может адекватно искать из-за классов с нижним подчеркиванием
-            try
-            {
-                return _browser.FindElementsByXPath(xPath);
-            }
-            catch
-            {
-                return new List<IWebElement>();
-            }
-        }
-        protected async Task<IWebElement> GetAsyncElementByXPath(string xPath, int waitingTimeSecond = 5)
-        {
-            return await Task.Run(() => ExpectationElement(xPath, waitingTimeSecond));
-        }
-
-
-        public IWebElement GetElementById(string elementId, int waitingTimeSecond = 5)
-        {
-            return ExpectationElement(elementId, waitingTimeSecond);
-        }
-        public IEnumerable<IWebElement> GetElementsById(string elementId)
-        {
-            return _browser.FindElementsById(elementId);
-        }
-        public async Task<IWebElement> GetElementByIdAsync(string elementId, int waitingTimeSecond = 5)
-        {
-            return await Task.Run(() => ExpectationElement(elementId, waitingTimeSecond));
-        }
-
-
-        public IWebElement GetElementByClassName(string className, int waitingTimeSecond = 5)
-        {
-            return ExpectationElement(className, waitingTimeSecond);
-        }
-        public IEnumerable<IWebElement> GetElementsByClassName(string className)
-        {
-            //TODO:Найти код ошибки и воткнуть в кэч. Он не может адекватно искать из-за символом xPath
-            try
-            {
-                return _browser.FindElementsByClassName(className);
-            }
-            catch
-            {
-                return new List<IWebElement>();
-            }
-
-        }
-
-        public IWebElement GetElementByTagName(string tagName, int waitingTimeSecond = 5)
-        {
-            return ExpectationElement(tagName, waitingTimeSecond);
-        }
-        public IEnumerable<IWebElement> GetElementsByTagName(string tagName)
-        {
-            return _browser.FindElementsByTagName(tagName);
-        }
-
-
 
         /// <summary>
-        /// Ожидание элемента на странице
+        /// Получить элемент по XPath
         /// </summary>
-        /// <param name="attributeElement">Атрибут, по которому искать элемент</param>
-        /// <param name="waitingTimeSecond">Время ожидания элемента</param>
-        /// <returns>Веб-элемент</returns>
-        protected IWebElement ExpectationElement(string attributeElement, int waitingTimeSecond) //TODO: Переделать. Замедляет работу
+        /// <param name="xPath">Путь к элементу в DOM</param>
+        /// <param name="waitingTimeSecond">Время ожидания</param>
+        /// <returns>Вэб-элемент</returns>
+        public IWebElement GetElementByXPath(string xPath, int waitingTimeSecond = 5)
         {
             while (waitingTimeSecond != 0)
             {
-                var webElementId = GetElementsById(attributeElement);
-                if (webElementId.Any())
+                var webElement = GetElementsByXPath(xPath);
+                if (webElement.Any())
                 {
-                    return webElementId.First();
-                }
-
-                var webElementXPath = GetElementsByXPath(attributeElement);
-                if (webElementXPath.Any())
-                {
-                    return webElementXPath.First();
-                }
-
-                var webElementClassName = GetElementsByClassName(attributeElement);
-                if (webElementClassName.Any())
-                {
-                    return webElementClassName.First();
-                }
-
-                var webElementTagName = GetElementsByTagName(attributeElement);
-                if (webElementTagName.Any())
-                {
-                    return webElementTagName.First();
+                    return webElement.First();
                 }
 
                 Thread.Sleep(1000);
@@ -294,6 +212,123 @@ namespace AutoBot.Area.Managers
             }
 
             return null;
+        }
+        /// <summary>
+        /// Получить элемент по Id
+        /// </summary>
+        /// <param name="elementId">Наименование Id</param>
+        /// <param name="waitingTimeSecond">Время ожидания</param>
+        /// <returns>Вэб-элемент</returns>
+        public IWebElement GetElementById(string elementId, int waitingTimeSecond = 5)
+        {
+            while (waitingTimeSecond != 0)
+            {
+                var webElement = _browser.FindElementById(elementId);
+                if (webElement != null)
+                {
+                    return webElement;
+                }
+
+                Thread.Sleep(1000);
+                waitingTimeSecond--;
+            }
+
+            return null;
+        }
+        /// <summary>
+        /// Получить элемент по классу
+        /// </summary>
+        /// <param name="className">Наименование класса</param>
+        /// <param name="waitingTimeSecond">Время ожидания</param>
+        /// <returns>Вэб-элемент</returns>
+        public IWebElement GetElementByClassName(string className, int waitingTimeSecond = 5)
+        {
+            while (waitingTimeSecond != 0)
+            {
+                var webElement = GetElementsByClassName(className);
+                if (webElement.Any())
+                {
+                    return webElement.First();
+                }
+
+                Thread.Sleep(1000);
+                waitingTimeSecond--;
+            }
+
+            return null;
+        }        
+        /// <summary>
+        /// Получить элемент по тэгу
+        /// </summary>
+        /// <param name="tagName">Наименование тэга</param>
+        /// <param name="waitingTimeSecond">Время ожидания</param>
+        /// <returns>Вэб-элемент</returns>
+        public IWebElement GetElementByTagName(string tagName, int waitingTimeSecond = 5)
+        {
+            while (waitingTimeSecond != 0)
+            {
+                var webElement = GetElementsByTagName(tagName);
+                if (webElement.Any())
+                {
+                    return webElement.First();
+                }
+
+                Thread.Sleep(1000);
+                waitingTimeSecond--;
+            }
+
+            return null;
+        }
+
+
+        /// <summary>
+        /// Асинхронно получить элемент по Id
+        /// </summary>
+        /// <param name="elementId">Наименование Id</param>
+        /// <param name="waitingTimeSecond">Время ожидания</param>
+        /// <returns>Вэб-элемент</returns>
+        public async Task<IWebElement> GetElementByIdAsync(string elementId, int waitingTimeSecond = 5)
+        {
+            return await Task.Run(() => GetElementById(elementId, waitingTimeSecond));
+        }
+        /// <summary>
+        /// Асинхронно получить элемент по XPath
+        /// </summary>
+        /// <param name="xPath">Путь к элементу в DOM</param>
+        /// <param name="waitingTimeSecond">Время ожидания</param>
+        /// <returns>Вэб-элемент</returns>
+        protected async Task<IWebElement> GetAsyncElementByXPath(string xPath, int waitingTimeSecond = 5)
+        {
+            return await Task.Run(() => GetElementByXPath(xPath, waitingTimeSecond));
+        }
+
+
+        /// <summary>
+        /// Получить элементы по XPath
+        /// </summary>
+        /// <param name="xPath">Путь к коллекции в DOM</param>
+        /// <returns>Коллекция вэб-элементов</returns>
+        public IEnumerable<IWebElement> GetElementsByXPath(string xPath)
+        {
+            return _browser.FindElementsByXPath(xPath);
+        }
+        /// <summary>
+        /// Получить элементы по классу
+        /// </summary>
+        /// <param name="className">Наименование класса</param>
+        /// <returns>Коллекция вэб-элементов</returns>
+        public IEnumerable<IWebElement> GetElementsByClassName(string className)
+        {
+            return _browser.FindElementsByClassName(className);
+        }
+        /// <summary>
+        /// Получить элементы по тэгу
+        /// </summary>
+        /// <param name="tagName">Наименование тэга</param>
+        /// <returns>Коллекция вэб-элементов</returns>
+        public IEnumerable<IWebElement> GetElementsByTagName(string tagName)
+        {
+            return _browser.FindElementsByTagName(tagName);
         }
 
 
