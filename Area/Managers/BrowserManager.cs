@@ -261,7 +261,7 @@ namespace AutoBot.Area.Managers
         /// <param name="attributeElement">Атрибут, по которому искать элемент</param>
         /// <param name="waitingTimeSecond">Время ожидания элемента</param>
         /// <returns>Веб-элемент</returns>
-        protected IWebElement ExpectationElement(string attributeElement, int waitingTimeSecond)
+        protected IWebElement ExpectationElement(string attributeElement, int waitingTimeSecond) //TODO: Переделать. Замедляет работу
         {
             while (waitingTimeSecond != 0)
             {

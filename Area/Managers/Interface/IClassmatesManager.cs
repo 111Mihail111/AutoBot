@@ -13,27 +13,26 @@ namespace AutoBot.Area.Managers.Interface
         /// <param name="email">Email-адрес</param>
         /// <param name="password">Пароль к почте</param>
         public void AuthorizationThroughMail(string email, string password);
-
         /// <summary>
         /// Вступить в группу
         /// </summary>
         public void JoinGroup();
-
         /// <summary>
         /// Покинуть группу
         /// </summary>
         public void LeaveGroup();
-
         /// <summary>
         /// Поставить класс
         /// </summary>
         public void PutClass();
-
         /// <summary>
         /// Удалить класс
         /// </summary>
         public void RemoveClass();
-
+        /// <summary>
+        /// Сделать репост
+        /// </summary>
+        public void MakeRepost();
         /// <summary>
         /// Считать контекст браузер менеджера
         /// </summary>

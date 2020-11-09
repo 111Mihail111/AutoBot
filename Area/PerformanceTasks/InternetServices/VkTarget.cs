@@ -364,6 +364,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 case "Поставить 'Класс' на публикации":
                     _classmatesManager.PutClass();
                     break;
+                case "Поделиться записью":
+                    _classmatesManager.MakeRepost();
+                    break;
                 default:
                     break;
             }
@@ -412,6 +415,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _redditManager.UpArrowForPost();
                     break;
                 case "Подпишитесь на пользователя":
+                    var panel = GetElementByClassName("bDDEX4BSkswHAG_45VkFB");
+                    if (panel != null)
+                    {
+                        panel.FindElement(SearchMethod.Tag, "button").Click();
+                        Thread.Sleep(2500);
+                    }
                     _redditManager.Subscribe();
                     break;
                 default:
@@ -507,7 +516,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Выполнить задачу в Vimeo
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInVimeo(string taskText)
+        protected void CarryOutTaskInVimeo(string taskText) //TODO
         {
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
@@ -515,7 +524,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (taskText)
             {
                 case "Поставить лайк на видео":
-                    //https://vimeo.com/473520867
+                    //https://vimeo.com/473520867 https://vimeo.com/293175455
                     break;
                 default:
                     break;

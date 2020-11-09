@@ -10,7 +10,7 @@ namespace AutoBot.Area.Managers
     public class ClassmatesManager : BrowserManager, IClassmatesManager
     {
         /// <inheritdoc/>
-        public void AuthorizationThroughMail (string email, string password)
+        public void AuthorizationThroughMail(string email, string password)
         {
             string url = "https://ok.ru/feed";
             OpenPageInNewTab(url);
@@ -29,7 +29,7 @@ namespace AutoBot.Area.Managers
             if (savedAccountDiv != null)
             {
                 int tabsCount = GetTabsCount();
-                
+
                 savedAccountDiv.Click();
                 Thread.Sleep(1500);
 
@@ -106,30 +106,56 @@ namespace AutoBot.Area.Managers
         {
             RemovePostDetails();
 
-            var panel = GetElementByClassName("hook_Block_AltGroupTopicLayerBody")
-                .FindElement(SearchMethod.ClassName, "js-klass");
+            var vidget = GetElementByClassName("mlr_bot")
+                .FindElements(SearchMethod.ClassName, "widget_cnt").Last();
 
-            var text = panel.FindElement(SearchMethod.ClassName, "widget_tx").GetInnerText();
-            if (text != "Класс!")
+            string vigetName = vidget.FindElement(SearchMethod.ClassName, "widget_tx").GetInnerText();
+            if (vigetName == "Класс!")
             {
-                panel.Click();
-                Thread.Sleep(1500);
+                return;
             }
+
+            vidget.Click();
+            Thread.Sleep(1500);
         }
         /// <inheritdoc/>
         public void RemoveClass()
         {
             RemovePostDetails();
 
-            var panel = GetElementByClassName("hook_Block_AltGroupTopicLayerBody")
-                .FindElement(SearchMethod.ClassName, "js-klass");
+            var vidget = GetElementByClassName("mlr_bot")
+                .FindElements(SearchMethod.ClassName, "widget_cnt").Last();
 
-            var text = panel.FindElement(SearchMethod.ClassName, "widget_tx").GetInnerText();
-            if (text != "Класс")
+            string vigetName = vidget.FindElement(SearchMethod.ClassName, "widget_tx").GetInnerText();
+            if (vigetName == "Класс")
             {
-                panel.Click();
-                Thread.Sleep(1500);
+                return;
             }
+
+            vidget.Click();
+            Thread.Sleep(1500);
+        }
+        /// <inheritdoc/>
+        public void MakeRepost()
+        {
+            RemovePostDetails();
+
+            var bottom = GetElementByClassName("mlr_bot");
+            var vidget = bottom.FindElements(SearchMethod.ClassName, "widget_cnt")
+                .Where(w => w.FindElement(SearchMethod.ClassName, "widget_tx").GetInnerText() == "Поделиться")
+                .FirstOrDefault();
+
+            vidget.Click();
+            Thread.Sleep(1500);
+
+            var button = bottom.FindElement(SearchMethod.ClassName, "js-doNotHide");
+            if (button == null)
+            {
+                return;
+            }
+
+            button.Click();
+            Thread.Sleep(1500);
         }
         /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
