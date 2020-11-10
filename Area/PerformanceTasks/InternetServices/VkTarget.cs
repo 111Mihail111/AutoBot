@@ -901,7 +901,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <param name="url">Url-адрес сервиса</param>
         protected void AuthorizationOnService()
         {
-            if (GetUrlPage() == "https://vktarget.ru/list/")
+            if (GetUrlPage() == "https://users.vktarget.ru/list/")
             {
                 return;
             }
