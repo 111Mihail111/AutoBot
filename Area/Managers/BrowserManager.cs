@@ -223,10 +223,10 @@ namespace AutoBot.Area.Managers
         {
             while (waitingTimeSecond != 0)
             {
-                var webElement = _browser.FindElementById(elementId);
-                if (webElement != null)
+                var webElement = GetElementsById(elementId);
+                if (webElement.Any())
                 {
-                    return webElement;
+                    return webElement.First();
                 }
 
                 Thread.Sleep(1000);
@@ -303,6 +303,15 @@ namespace AutoBot.Area.Managers
         }
 
 
+        /// <summary>
+        /// Получить элементы по Id
+        /// </summary>
+        /// <param name="elementId">Наименование Id</param>
+        /// <returns>Коллекция вэб-элементов</returns>
+        public IEnumerable<IWebElement> GetElementsById(string elementId)
+        {
+            return _browser.FindElementsById(elementId);
+        }
         /// <summary>
         /// Получить элементы по XPath
         /// </summary>
