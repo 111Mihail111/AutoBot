@@ -852,7 +852,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 "{" +
                 "return 'NoTasks'" +
                 "}" +
-                "var tasks = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>div.container-fluid" +
+                "var tasks = document.querySelector('#list>main>section:nth-child(2)>div>div>div>div:nth-child(1)>div.container-fluid" +
                 ".available__table').getElementsByClassName('row tb__row');" +
                 "var systemType = tasks[0].getElementsByClassName('social__img')[0].class.toString().replace('social__img ', '');" +
                 "var button = tasks[0].children[2].getElementsByTagName('a')[0];" +
