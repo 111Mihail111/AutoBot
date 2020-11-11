@@ -784,7 +784,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void CheckTask() //TODO: Переработать метод. Разбить на несколько
         {
-            string getTaskScript = "var task = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>div" +
+            string getTaskScript = "var task = document.querySelector('#list>main>section:nth-child(2)>div>div>div>div:nth-child(1)>div" +
                 ".container-fluid.available__table').getElementsByClassName('row tb__row')[0];";
             string clickButtonScript = "task.children[3].getElementsByClassName('default__small__btn check__btn')[0].click();";
             string getAttribute = "return task.getAttribute('data-task-item');";
