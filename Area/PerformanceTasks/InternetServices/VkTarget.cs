@@ -350,6 +350,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _classmatesManager.JoinGroup();
                     break;
                 case "Поставьте класс под записью":
+                    //TODO: Объект может быть блокирован https://ok.ru/group/49779642269757/topic/152379496667944
                     _classmatesManager.PutClass();
                     break;
                 case "Поставить 'Класс' на публикации":
@@ -846,7 +847,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected void GetTask()
         {
             var taskDetails = ExecuteScript(
-                "var taskEmpty = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>div.empty');" +
+                "var taskEmpty = document.querySelector('#list>main>section:nth-child(2)>div>div>div>div:nth-child(1)>div.empty');" +
                 "if (taskEmpty.classList.length == 1)" +
                 "{" +
                 "return 'NoTasks'" +
