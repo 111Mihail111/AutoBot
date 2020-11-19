@@ -153,6 +153,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 _soundCloudManager.Authorization(accountSoundCloud.Login, accountSoundCloud.Password);
             }
 
+            var accountVimeo = accounts.Where(w => w.AccountType == AccountType.Vimeo).FirstOrDefault();
+            if (accountVimeo != null)
+            {
+                _vimeoManager.Authorization(accountVimeo.Login, accountVimeo.Password);
+            }
+
             _isAuthorizationSocialNetworks = true;
         }
 
@@ -203,6 +209,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                         break;
                     case "quora":
                         CarryOutTaskInQuora(_task);
+                        break;
+                    case "tiktok":
+                        CarryOutTaskInTikTok(_task);
+                        break;
+                    case "vimeo":
+                        CarryOutTaskInVimeo(_task);
                         break;
                     case "NoTasks":
                         ShowActivity();
@@ -495,7 +507,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Выполнить задачу в Quora
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInQuora(string taskText) //TODO
+        protected void CarryOutTaskInQuora(string taskText) //TODO: Отладить
         {
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
@@ -516,7 +528,54 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToTab();
             CheckTask();
         }
-        
+        /// <summary>
+        /// Выполнить задачу в TikTok
+        /// </summary>
+        /// <param name="taskText">Текст задачи</param>
+        protected void CarryOutTaskInTikTok(string taskText) //TODO: Разработать
+        {
+            SwitchToLastTab();
+            _urlByTask = GetUrlPage();
+
+            switch (taskText)
+            {
+                case "Подпишитесь на пользователя":
+                    //https://www.tiktok.com/@grishechkinevgeniy
+                    break;
+                case "Поставьте лайк на видео":
+                    //https://www.tiktok.com/@windows92.com/video/6895782360894278918
+                    break;
+                default:
+                    break;
+            }
+
+            CloseTab();
+            SwitchToTab();
+            CheckTask();
+        }
+        /// <summary>
+        /// Выполнить задачу в Vimeo
+        /// </summary>
+        /// <param name="taskText">Текст задачи</param>
+        protected void CarryOutTaskInVimeo(string taskText) //TODO Разработать
+        {
+            SwitchToLastTab();
+            _urlByTask = GetUrlPage();
+
+            switch (taskText)
+            {
+                case "Поставить лайк на видео":
+                    //https://vimeo.com/473520867 https://vimeo.com/293175455
+                    break;
+                default:
+                    break;
+            }
+
+            CloseTab();
+            SwitchToTab();
+            CheckTask();
+        }
+
 
         /// <summary>
         /// Отменить задание
@@ -548,6 +607,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     break;
                 case "tumblr":
                     UndoTaskInTumblr();
+                    break;
+                case "tiktok":
+                    UndoTaskInTikTok();
+                    break;
+                case "vimeo":
+                    UndoTaskInVimeo();
                     break;
             }
         }
@@ -718,7 +783,40 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             CloseTab();
             SwitchToTab();
         }
+        /// <summary>
+        /// Отменить задачу в TikTok
+        /// </summary>
+        protected void UndoTaskInTikTok() //TODO Разработать
+        {
+            OpenPageInNewTab(_urlByTask);
 
+            switch (_task)
+            {
+                case "Подпишитесь на пользователя":
+                    break;
+                case "Поставьте лайк на видео":
+                    break;
+            }
+
+            CloseTab();
+            SwitchToTab();
+        }
+        /// <summary>
+        /// Отменить задачу в Vimeo
+        /// </summary>
+        protected void UndoTaskInVimeo() // TODO Разработать
+        {
+            OpenPageInNewTab(_urlByTask);
+
+            switch (_task)
+            {
+                case "Поставить лайк на видео":
+                    break;
+            }
+
+            CloseTab();
+            SwitchToTab();
+        }
 
         /// <summary>
         /// Проявить активность

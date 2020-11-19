@@ -278,7 +278,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Задержка платежа
         /// </summary>
-        public bool DelayPayments()
+        public bool DelayPayments() //TODO
         {
             try
             {
