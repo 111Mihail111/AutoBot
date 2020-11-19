@@ -38,5 +38,10 @@ namespace AutoBot.Area.Managers.Interface
         /// </summary>
         /// <param name="chromeDriver">Хром драйвер</param>
         public void SetContextBrowserManager(ChromeDriver chromeDriver);
+        /// <summary>
+        /// Заблокирован ли контент
+        /// </summary>
+        /// <returns>True - заблокирован, иначе false</returns>
+        public bool IsBlokedContent();
     }
 }

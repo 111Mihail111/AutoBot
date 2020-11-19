@@ -20,9 +20,11 @@ namespace AutoBot.Controllers
         private IMoonDash _moonDash;
         private IVLike _vLike;
         private IVkTarget _vkTarget;
+        private IVkMyMarket _vkMyMarket;
 
         public StartController(IFreeBitcoin freeBitcoin, IMoonBitcoin moonBitcoin, IBonusBitcoin bonusBitcoin,
-            IMoonDogecoin moonDogecoin, IMoonLitecoin moonLitecoin, IMoonDash moonDash, IVLike vLike, IVkTarget vkTarget)
+            IMoonDogecoin moonDogecoin, IMoonLitecoin moonLitecoin, IMoonDash moonDash, IVLike vLike, IVkTarget vkTarget,
+            IVkMyMarket vkMyMarket)
         {
             _freeBitcoin = freeBitcoin;
             _moonBitcoin = moonBitcoin;
@@ -32,6 +34,7 @@ namespace AutoBot.Controllers
             _moonDash = moonDash;
             _vLike = vLike;
             _vkTarget = vkTarget;
+            _vkMyMarket = vkMyMarket;
         }
 
         public ActionResult Index() => View(WebService.GetAllData());
@@ -146,6 +149,9 @@ namespace AutoBot.Controllers
             {
                 case TypeService.VkTarget:
                     _vkTarget.GoTo(url);
+                    break;
+                case TypeService.VkMyMarket:
+                    _vkMyMarket.GoTo(url);
                     break;
             }
         }

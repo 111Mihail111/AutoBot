@@ -17,5 +17,9 @@
         /// Наименование id
         /// </summary>
         Id = 2,
+        /// <summary>
+        /// XPath путь к элементу
+        /// </summary>
+        XPath = 3,
     }
 }

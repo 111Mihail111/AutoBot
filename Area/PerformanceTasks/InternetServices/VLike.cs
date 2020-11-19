@@ -50,7 +50,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         {
             var accounts = AccountService.GetAccount(TypeService.VLike);
 
-            var accountVK = accounts.Where(w => w.AccountType == AccountType.Vk).FirstOrDefault();
+            var accountVK = accounts.Where(w => w.AccountType == AccountType.Main).FirstOrDefault();
             if (accountVK != null)
             {
                 _vkManager.Authorization(accountVK.Login, accountVK.Password);

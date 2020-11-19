@@ -344,13 +344,18 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
 
+            bool isError = false;
             switch (taskText)
             {
                 case "Вступить в группу":
                     _classmatesManager.JoinGroup();
                     break;
                 case "Поставьте класс под записью":
-                    //TODO: Объект может быть блокирован https://ok.ru/group/49779642269757/topic/152379496667944
+                    if (_classmatesManager.IsBlokedContent())
+                    {
+                        isError = true;
+                        break;
+                    }
                     _classmatesManager.PutClass();
                     break;
                 case "Поставить 'Класс' на публикации":
@@ -365,6 +370,13 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
             CloseTab();
             SwitchToTab();
+
+            if (isError)
+            {
+                SkipTask();
+                return;
+            }
+
             CheckTask();
         }
         /// <summary>
@@ -775,7 +787,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void SkipTask()
         {
-            ExecuteScript("var task = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child(1)>" +
+            ExecuteScript("var task = document.querySelector('#list>main>section:nth-child(2)>div>div>div>div:nth-child(1)>" +
                 "div.container-fluid.available__table').getElementsByClassName('row tb__row');" +
                 "task[0].children[5].getElementsByClassName('control__item close')[0].click();");
         }

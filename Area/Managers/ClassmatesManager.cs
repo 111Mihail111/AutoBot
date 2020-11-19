@@ -162,7 +162,11 @@ namespace AutoBot.Area.Managers
         {
             SetDriver(chromeDriver);
         }
-
+        /// <inheritdoc/>
+        public bool IsBlokedContent()
+        {
+            return GetElementById("notifyPanel_msg")?.Displayed ?? false;
+        }
 
         /// <summary>
         /// Удалить данные поста

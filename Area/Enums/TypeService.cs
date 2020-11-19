@@ -13,5 +13,9 @@
         /// https://vktarget.ru/
         /// </summary>
         VkTarget = 1,
+        /// <summary>
+        /// http://vkmymarket.ru/
+        /// </summary>
+        VkMyMarket = 2,
     }
 }

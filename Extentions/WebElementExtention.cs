@@ -135,6 +135,8 @@ namespace AutoBot.Extentions
                     return webElement.FindElement(By.ClassName(attribute));
                 case SearchMethod.Id:
                     return webElement.FindElement(By.Id(attribute));
+                case SearchMethod.XPath:
+                    return webElement.FindElement(By.XPath(attribute));
                 default:
                     return null;
             }
