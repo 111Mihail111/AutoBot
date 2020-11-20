@@ -55,6 +55,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         private IQuora _quoraManager;
         private ISoundCloud _soundCloudManager;
         private IVimeoManager _vimeoManager;
+        private ITikTokManager _tikTokManager;
 
         protected void Init()
         {
@@ -81,6 +82,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _quoraManager = new QuoraManager();
             _soundCloudManager = new SoundCloudManager();
             _vimeoManager = new VimeoManager();
+            _tikTokManager = new TikTokManager();
 
             var driver = GetDriver();
             _vkManager.SetContextBrowserManager(driver);
@@ -92,6 +94,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _quoraManager.SetContextBrowserManager(driver);
             _soundCloudManager.SetContextBrowserManager(driver);
             _vimeoManager.SetContextBrowserManager(driver);
+            _tikTokManager.SetContextBrowserManager(driver);
         }
 
         /// <summary>
@@ -109,6 +112,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             if (accountVK != null)
             {
                 _vkManager.Authorization(accountVK.Login, accountVK.Password);
+                _tikTokManager.Authorization(accountVK.Login, accountVK.Password);
             }
 
             var accountReddit = accounts.Where(w => w.AccountType == AccountType.Reddit).FirstOrDefault();
@@ -540,9 +544,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (taskText)
             {
                 case "Подпишитесь на пользователя":
-                    //https://www.tiktok.com/@grishechkinevgeniy
+                    _tikTokManager.Subscribe(); //https://www.tiktok.com/@grishechkinevgeniy
                     break;
                 case "Поставьте лайк на видео":
+                    _tikTokManager.PutLike();
                     //https://www.tiktok.com/@windows92.com/video/6895782360894278918
                     break;
                 default:
@@ -793,6 +798,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (_task)
             {
                 case "Подпишитесь на пользователя":
+                    _tikTokManager.Unsubscribe();
                     break;
                 case "Поставьте лайк на видео":
                     break;

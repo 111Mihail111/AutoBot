@@ -40,6 +40,7 @@ namespace AutoBot
             services.AddScoped<ISoundCloud, SoundCloudManager>();
             services.AddScoped<IVimeoManager, VimeoManager>();
             services.AddScoped<IVkMyMarket, VkMyMarket>();
+            services.AddScoped<ITikTokManager, TikTokManager>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

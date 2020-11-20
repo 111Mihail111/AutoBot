@@ -64,7 +64,7 @@ namespace AutoBot.Area.Managers
         /// <param name="url">Адрес</param>
         public void GoToUrl(string url)
         {
-            _browser.Navigate().GoToUrl(url); //The HTTP request to the remote WebDriver server for URL http://localhost:60218/session/157ce980ef266ec318973dab5b7a044d/url timed out after 200 seconds."
+            _browser.Navigate().GoToUrl(url);
         }
         /// <summary>
         /// Открыть страницу в новой вкладке

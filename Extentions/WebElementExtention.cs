@@ -115,7 +115,15 @@ namespace AutoBot.Extentions
         {
             return webElement.GetAttribute("aria-pressed");
         }
-
+        /// <summary>
+        /// Получить содержимое fill атрибута
+        /// </summary>
+        /// <param name="webElement">Вэб-элемент</param>
+        /// <returns>Значение атрибута</returns>
+        public static string GetFill(this IWebElement webElement)
+        {
+            return webElement.GetAttribute("fill");
+        }
 
 
         /// <summary>
