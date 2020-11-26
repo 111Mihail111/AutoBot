@@ -22,9 +22,7 @@ namespace AutoBot.Area.Managers
                 return;
             }
 
-            GetElementByClassName("_1JBkpB_FOZMZ7IPr3FyNfH")
-                .FindElements(SearchMethod.Tag, "a").First().Click();
-            Thread.Sleep(1000);
+            GetElementByClassName("_1JBkpB_FOZMZ7IPr3FyNfH").FindElements(SearchMethod.Tag, "a").First().ToClick(1000);
 
             var frame = GetElementByClassName("_25r3t_lrPF3M6zD2YkWvZU");
             SwitchToFrame(frame);
@@ -41,8 +39,7 @@ namespace AutoBot.Area.Managers
                 passwordInput.SendKeys(password);
             }
 
-            GetElementByClassName("m-full-width").Click();
-            Thread.Sleep(3000);
+            GetElementByClassName("m-full-width").ToClick(3000);
 
             CloseTab();
             SwitchToTab();
@@ -51,16 +48,13 @@ namespace AutoBot.Area.Managers
         public void UpArrowForPost()
         {
             var postId = GetElementsByClassName("_1oQyIsiPHYt6nx7VOmd1sz").First().GetId();
-            GetElementById($"upvote-button-{postId}").Click();
-            Thread.Sleep(1500);
+            GetElementById($"upvote-button-{postId}").ToClick(1500);
         }
         /// <inheritdoc/>
         public void DownArrowUnderPost()
         {
             var postId = GetElementsByClassName("_1oQyIsiPHYt6nx7VOmd1sz").First().GetId();
-            GetElementById($"vote-arrows-{postId}")
-                .FindElements(SearchMethod.Tag, "button").Last().Click();
-            Thread.Sleep(1500);
+            GetElementById($"vote-arrows-{postId}").FindElements(SearchMethod.Tag, "button").Last().ToClick(1500);
         }
         /// <inheritdoc/>
         public void Subscribe()
@@ -85,8 +79,7 @@ namespace AutoBot.Area.Managers
                 }
             }
 
-            button.Click();
-            Thread.Sleep(2000);
+            button.ToClick(2000);
         }
         /// <inheritdoc/>
         public void Unsubscribe()
@@ -111,8 +104,7 @@ namespace AutoBot.Area.Managers
                 }
             }
 
-            button.Click();
-            Thread.Sleep(2000);
+            button.ToClick(2000);
         }
         /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)

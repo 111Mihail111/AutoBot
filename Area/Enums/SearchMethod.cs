@@ -21,5 +21,9 @@
         /// XPath путь к элементу
         /// </summary>
         XPath = 3,
+        /// <summary>
+        /// CssSelector-путь к элементу
+        /// </summary>
+        Selector = 4,
     }
 }

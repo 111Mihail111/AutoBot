@@ -20,7 +20,7 @@ namespace AutoBot.Area.Managers
             }
 
 
-            GetElementById("nav-cta-login").Click();
+            GetElementById("nav-cta-login").ToClick();
 
             var inputLogin = GetElementById("signup_email");
             if (string.IsNullOrWhiteSpace(inputLogin.GetValue()))
@@ -34,11 +34,32 @@ namespace AutoBot.Area.Managers
                 inputPassword.SendKeys(password);
             }
 
-            GetElementByClassName("js-email-submit").Click();
-            Thread.Sleep(1500);
+            GetElementByClassName("js-email-submit").ToClick(1500);
 
             CloseTab();
             SwitchToTab();
+        }
+        /// <inheritdoc/>
+        public void LikeUnderVideo()
+        {
+            var button = GetElementByClassName("like-button");
+            if (button.GetAriaLabel() != "Like")
+            {
+                return;
+            }
+
+            button.ToClick();
+        }
+        /// <inheritdoc/>
+        public void RemoveLike()
+        {
+            var button = GetElementByClassName("like-button");
+            if (button.GetAriaLabel() != "Unlike")
+            {
+                return;
+            }
+
+            button.ToClick();
         }
         /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)

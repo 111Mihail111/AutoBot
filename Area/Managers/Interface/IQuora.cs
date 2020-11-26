@@ -27,6 +27,15 @@ namespace AutoBot.Area.Managers.Interface
         /// </summary>
         public void RemoveLike();
         /// <summary>
+        /// Сделать репост
+        /// </summary>
+        public void MakeRepost();
+        /// <summary>
+        /// Является ли страница профилем пользователя
+        /// </summary>
+        /// <returns>True - да, иначе False</returns>
+        public bool IsUserPageProfile();
+        /// <summary>
         /// Считать контекст браузер менеджера
         /// </summary>
         /// <param name="chromeDriver">Хром драйвер</param>

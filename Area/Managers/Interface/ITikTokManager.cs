@@ -23,6 +23,10 @@ namespace AutoBot.Area.Managers.Interface
         /// </summary>
         public void PutLike();
         /// <summary>
+        /// Удалить лайк
+        /// </summary>
+        public void RemoveLike();
+        /// <summary>
         /// Считать контекст браузер менеджера
         /// </summary>
         /// <param name="chromeDriver">Хром драйвер</param>

@@ -15,7 +15,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 {
     public class VkMyMarket : BrowserManager, IVkMyMarket
     {
-        const string BROWSER_PROFILE_SERVICE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\PerformanceTasks\\VkMyMarket\\";
+        const string BROWSER_PROFILE_SERVICE = "C:\\_AutoBot\\Profiles\\PerformanceTasks\\VkMyMarket\\";
 
         /// <summary>
         /// Авторизация соц. сетей

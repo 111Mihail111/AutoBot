@@ -17,7 +17,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         private IVkManager _vkManager;
         private IInstagramManager _instaManager;
 
-        const string BROWSER_PROFILE_CRANE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\PerformanceTasks\\V_Like\\";
+        const string BROWSER_PROFILE_CRANE = "C:\\_AutoBot\\Profiles\\PerformanceTasks\\V_Like\\";
         private static bool _isAuthorization;
         private string _taskId;
 
@@ -326,7 +326,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             CloseTab();
             SwitchToTab();
             GetElementByXPath("//*[@id='buttons']/a[1]").Click();
-            Thread.Sleep(1000);
+            Thread.Sleep(1500);
 
             switch (typeTask)
             {

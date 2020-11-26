@@ -21,7 +21,7 @@ namespace AutoBot.Area.Managers
                 SwitchToTab();
                 return;
             }
-            button.Click();
+            button.ToClick();
 
             SwitchToFrame(GetElementByTagName("iframe"));
             
@@ -34,8 +34,7 @@ namespace AutoBot.Area.Managers
                     continue;
                 }
 
-                div.Click();
-                Thread.Sleep(3000);
+                div.ToClick(3000);
                 break;
             }
             
@@ -45,19 +44,17 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void Subscribe()
         {
-            GetElementsByClassName("follow-button").Where(w => w.GetInnerText() == "Подписаться").FirstOrDefault().Click();
-            Thread.Sleep(2500);
+            GetElementsByClassName("follow-button").Where(w => w.GetInnerText() == "Подписаться").FirstOrDefault().ToClick(2500);
         }
         /// <inheritdoc/>
         public void Unsubscribe()
         {
-            GetElementsByClassName("follow-button").Where(w => w.GetInnerText() == "Подписки").FirstOrDefault().Click();
-            Thread.Sleep(2500);
+            GetElementsByClassName("follow-button").Where(w => w.GetInnerText() == "Подписки").FirstOrDefault().ToClick(2500);
         }
         /// <inheritdoc/>
         public void PutLike()
         {
-            var divElement = GetElementByClassName("video-feed-container").FindElement(SearchMethod.XPath, "/div/div[1]");
+            var divElement = GetElementByClassName("video-feed-container").FindElement(SearchMethod.XPath, "span/div/div[1]");
             var divLikeElement = divElement.FindElement(SearchMethod.ClassName, "engagement-icon");
             var fillColor = divLikeElement.FindElement(SearchMethod.Tag, "svg").GetFill();
 
@@ -66,8 +63,21 @@ namespace AutoBot.Area.Managers
                 return;
             }
 
-            divLikeElement.Click();
-            Thread.Sleep(2500);
+            divLikeElement.ToClick(2500);
+        }
+        /// <inheritdoc/>
+        public void RemoveLike()
+        {
+            var divElement = GetElementByClassName("video-feed-container").FindElement(SearchMethod.XPath, "span/div/div[1]");
+            var divLikeElement = divElement.FindElement(SearchMethod.ClassName, "engagement-icon");
+            var fillColor = divLikeElement.FindElement(SearchMethod.Tag, "svg").GetFill();
+
+            if (fillColor == "currentColor")
+            {
+                return;
+            }
+
+            divLikeElement.ToClick(2500);
         }
         /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)

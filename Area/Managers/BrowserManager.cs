@@ -34,6 +34,8 @@ namespace AutoBot.Area.Managers
             options.AddArgument("--profile-directory=AutoBot"); //Профиль
             options.AddArgument("--start-maximized"); //Полностью открывает браузер
             options.AddArgument("--disable-notifications"); //Блокировка уведомлений
+            options.AddArgument("--mute-audio"); //Отключает звук в браузере
+            //options.AddArgument("--headless"); //Запуск в фоновом режиме (без отображения бразуера)
             options.AddAdditionalCapability("useAutomationExtension", false); //Скрывает расширение
             options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
 
@@ -279,6 +281,26 @@ namespace AutoBot.Area.Managers
 
             return null;
         }
+        /// <summary>
+        /// Получить элемент по CssSelecor'y
+        /// </summary>
+        /// <returns></returns>
+        public IWebElement GetElementByCssSelector(string cssSelector, int waitingTimeSecond = 5)
+        {
+            while (waitingTimeSecond != 0)
+            {
+                var webElement = GetElementsByCssSelector(cssSelector);
+                if (webElement.Any())
+                {
+                    return webElement.First();
+                }
+
+                Thread.Sleep(1000);
+                waitingTimeSecond--;
+            }
+
+            return null;
+        }
 
 
         /// <summary>
@@ -338,6 +360,15 @@ namespace AutoBot.Area.Managers
         public IEnumerable<IWebElement> GetElementsByTagName(string tagName)
         {
             return _browser.FindElementsByTagName(tagName);
+        }
+        /// <summary>
+        /// Получить элементу по селектору
+        /// </summary>
+        /// <param name="cssSelector">Наименование селектора</param>
+        /// <returns>Коллекция вэб-элементов</returns>
+        public IEnumerable<IWebElement> GetElementsByCssSelector(string cssSelector)
+        {
+            return _browser.FindElementsByCssSelector(cssSelector);
         }
 
 

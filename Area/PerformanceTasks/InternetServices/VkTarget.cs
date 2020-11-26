@@ -14,7 +14,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 {
     public class VkTarget : BrowserManager, IVkTarget
     {
-        const string BROWSER_PROFILE_SERVICE = "C:\\_VS_Project\\Mihail\\AutoBot\\BrowserSettings\\Profiles\\PerformanceTasks\\VkTarget\\";
+        const string BROWSER_PROFILE_SERVICE = "C:\\_AutoBot\\Profiles\\PerformanceTasks\\VkTarget\\";
 
         /// <summary>
         /// Авторизация соц. сетей
@@ -61,6 +61,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         {
             Initialization(BROWSER_PROFILE_SERVICE);
             SetContextForManagers();
+
+            OpenPageInNewTab("https://vimeo.com/481741004");
+            _vimeoManager.LikeUnderVideo();
+            _vimeoManager.RemoveLike();
 
             if (!_isAuthorizationSocialNetworks)
             {
@@ -378,6 +382,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _classmatesManager.PutClass();
                     break;
                 case "Поделиться записью":
+                    if (_classmatesManager.IsBlokedContent())
+                    {
+                        isError = true;
+                        break;
+                    }
                     _classmatesManager.MakeRepost();
                     break;
                 default:
@@ -438,8 +447,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     var panel = GetElementByClassName("bDDEX4BSkswHAG_45VkFB");
                     if (panel != null)
                     {
-                        panel.FindElement(SearchMethod.Tag, "button").Click();
-                        Thread.Sleep(2500);
+                        panel.FindElement(SearchMethod.Tag, "button").ToClick(2500);
                     }
                     _redditManager.Subscribe();
                     break;
@@ -511,18 +519,27 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Выполнить задачу в Quora
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInQuora(string taskText) //TODO: Отладить
+        protected void CarryOutTaskInQuora(string taskText)
         {
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
 
+            bool isError = false;
             switch (taskText)
             {
                 case "Подписаться на пользователя":
-                    _quoraManager.Subscribe(); //https://www.quora.com/profile/Brajesh-Kumar-Singh-4
+                    if (!_quoraManager.IsUserPageProfile())
+                    {
+                        isError = true;
+                        break;
+                    }
+                    _quoraManager.Subscribe();
                     break;
                 case "Поставьте лайк на ответ":
                     _quoraManager.LikeAnswer();
+                    break;
+                case "Поделиться ответом":
+                    _quoraManager.MakeRepost();
                     break;
                 default:
                     break;
@@ -530,13 +547,20 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
             CloseTab();
             SwitchToTab();
+
+            if (isError)
+            {
+                SkipTask();
+                return;
+            }
+
             CheckTask();
         }
         /// <summary>
         /// Выполнить задачу в TikTok
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInTikTok(string taskText) //TODO: Разработать
+        protected void CarryOutTaskInTikTok(string taskText)
         {
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
@@ -544,11 +568,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (taskText)
             {
                 case "Подпишитесь на пользователя":
-                    _tikTokManager.Subscribe(); //https://www.tiktok.com/@grishechkinevgeniy
+                    _tikTokManager.Subscribe();
                     break;
                 case "Поставьте лайк на видео":
                     _tikTokManager.PutLike();
-                    //https://www.tiktok.com/@windows92.com/video/6895782360894278918
                     break;
                 default:
                     break;
@@ -570,7 +593,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (taskText)
             {
                 case "Поставить лайк на видео":
-                    //https://vimeo.com/473520867 https://vimeo.com/293175455
+                    //https://vimeo.com/473520867 https://vimeo.com/293175455 https://vimeo.com/481741004
                     break;
                 default:
                     break;
@@ -791,7 +814,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Отменить задачу в TikTok
         /// </summary>
-        protected void UndoTaskInTikTok() //TODO Разработать
+        protected void UndoTaskInTikTok()
         {
             OpenPageInNewTab(_urlByTask);
 
@@ -801,6 +824,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _tikTokManager.Unsubscribe();
                     break;
                 case "Поставьте лайк на видео":
+                    _tikTokManager.RemoveLike();
                     break;
             }
 
@@ -823,6 +847,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             CloseTab();
             SwitchToTab();
         }
+
 
         /// <summary>
         /// Проявить активность
@@ -887,7 +912,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             Thread.Sleep(randomSleep);
         }
         /// <summary>
-        /// Пропуск задачу
+        /// Пропустить задачу
         /// </summary>
         protected void SkipTask()
         {
@@ -932,7 +957,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                             waitingСounter++;
                             if (waitingСounter < 3)
                             {
-                                Thread.Sleep(15000);
+                                Thread.Sleep(12000);
                                 ExecuteScript(getTaskScript + clickButtonScript);
                                 continue;
                             }
@@ -1023,8 +1048,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 return;
             }
 
-            GetElementsByClassName("mdl-js-button").Last().Click();
-            Thread.Sleep(1500);
+            GetElementsByClassName("mdl-js-button").Last().ToClick(1500);
 
             var login = GetElementByXPath("//*[@id='login_form']/div[1]/div/div[2]/div[2]/input");
             if (string.IsNullOrWhiteSpace(login.Text))

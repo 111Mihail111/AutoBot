@@ -53,26 +53,33 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void Subscribe()
         {
-            var button = GetElementByClassName("qu-justifyContent--space-between").FindElements(SearchMethod.Tag, "button").First();            
-            if (button.GetInnerText().Contains("Following"))
-            {
-                return;
-            }
+            var bottomPanelForPost = GetElementsByCssSelector(".qu-alignItems--center.qu-flexWrap--nowrap").First();
+            var buttons = bottomPanelForPost.FindElements(SearchMethod.Tag, "button");
 
-            button.Click();
-            Thread.Sleep(1500);
+            foreach (var item in buttons)
+            {
+                var buttonName = item.GetInnerText();
+                if (buttonName.Contains("Following"))
+                {
+                    return;
+                }
+                else if (buttonName.Contains("Follow"))
+                {
+                    item.ToClick();
+                    return;
+                }
+            }
         }
         /// <inheritdoc/>
         public void Unsubscribe()
         {
-            var buttonCollection = GetElementsByClassName("puppeteer_test_pressed");
-            if (!buttonCollection.Any())
+            var button = GetElementByCssSelector(".qu-alignItems--center.qu-flexWrap--nowrap .puppeteer_test_pressed");
+            if (button == null)
             {
                 return;
             }
 
-            buttonCollection.First().Click();
-            Thread.Sleep(1500);
+            button.ToClick();
         }
         /// <inheritdoc/>
         public void LikeAnswer()
@@ -97,6 +104,32 @@ namespace AutoBot.Area.Managers
 
             button.Click();
             Thread.Sleep(1500);
+        }
+        /// <inheritdoc/>
+        public void MakeRepost()
+        {
+            var bottomPanelForPost = GetElementByClassName("qu-justifyContent--space-between");
+            var leftButtonsPanel = bottomPanelForPost.FindElement(SearchMethod.XPath, "div[1]");
+            var divRepostContainer = leftButtonsPanel.FindElement(SearchMethod.XPath, "div[2]");
+
+            divRepostContainer.FindElement(SearchMethod.Tag, "button").ToClick();
+
+            string xPathToButton = "//button[contains(@class, 'qu-bg--gray_ultralight')]";
+            GetElementsByXPath(xPathToButton).Where(w => w.GetInnerText() == "Choose a space").First().ToClick();
+
+            GetElementByCssSelector(".qu-py--small.qu-borderBottom").ToClick();
+            GetElementByClassName("puppeteer_test_modal_submit").ToClick();
+        }
+        /// <inheritdoc/>
+        public bool IsUserPageProfile()
+        {
+            var urlSection = GetUrlPage().Split('/')[3];
+            if (urlSection == "profile")
+            {
+                return true;
+            }
+
+            return false;
         }
         /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)

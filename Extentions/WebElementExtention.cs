@@ -2,6 +2,7 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace AutoBot.Extentions
 {
@@ -145,6 +146,8 @@ namespace AutoBot.Extentions
                     return webElement.FindElement(By.Id(attribute));
                 case SearchMethod.XPath:
                     return webElement.FindElement(By.XPath(attribute));
+                case SearchMethod.Selector:
+                    return webElement.FindElement(By.CssSelector(attribute));
                 default:
                     return null;
             }
@@ -166,9 +169,25 @@ namespace AutoBot.Extentions
                     return webElement.FindElements(By.ClassName(attribute));
                 case SearchMethod.Id:
                     return webElement.FindElements(By.Id(attribute));
+                case SearchMethod.XPath:
+                    return webElement.FindElements(By.XPath(attribute));
+                case SearchMethod.Selector:
+                    return webElement.FindElements(By.CssSelector(attribute));
                 default:
                     return null;
             }
+        }
+
+
+        /// <summary>
+        /// Нажать на элемент
+        /// </summary>
+        /// <param name="webElement">Веб-элемент</param>
+        /// <param name="timeout">Время ожидания после нажатия</param>
+        public static void ToClick(this IWebElement webElement, int timeout = 1000)
+        {
+            webElement.Click();
+            Thread.Sleep(timeout);
         }
     }
 }
