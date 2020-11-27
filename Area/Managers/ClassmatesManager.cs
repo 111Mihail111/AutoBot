@@ -167,6 +167,16 @@ namespace AutoBot.Area.Managers
         {
             return GetElementById("notifyPanel_msg")?.Displayed ?? false;
         }
+        /// <inheritdoc/>
+        public void AddToFriends()
+        {
+            GetElementsByClassName("view_lvl1").Where(w => w.GetInnerText() == "Добавить в друзья").First().ToClick(1500);
+        }
+        /// <inheritdoc/>
+        public void RemoveToFriends()
+        {
+
+        }
 
         /// <summary>
         /// Удалить данные поста

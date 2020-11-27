@@ -22,7 +22,7 @@ namespace AutoBot.Area.Managers
                 AccountService.RemoveAccounts();
             }
 
-            AccountService.Save(accounts);
+            AccountService.SaveAccounts(accounts);
         }
 
         /// <summary>

@@ -22,7 +22,7 @@ namespace AutoBot.Area.CollectingСryptocurrencies
 
         protected void Init()
         {
-            var accounts = AccountService.GetAccount(Etc.RuCaptcha).First();
+            var accounts = AccountService.GetAccountsByType(Etc.RuCaptcha).First();
             _login = accounts.Login;
             _password = accounts.Password;
 

@@ -62,10 +62,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             Initialization(BROWSER_PROFILE_SERVICE);
             SetContextForManagers();
 
-            OpenPageInNewTab("https://vimeo.com/481741004");
-            _vimeoManager.LikeUnderVideo();
-            _vimeoManager.RemoveLike();
-
             if (!_isAuthorizationSocialNetworks)
             {
                 AuthorizationSocialNetworks();
@@ -106,7 +102,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void AuthorizationSocialNetworks()
         {
-            var accounts = AccountService.GetAccount(TypeService.VkTarget);
+            var accounts = AccountService.GetAccountsByType(TypeService.VkTarget);
 
             var accountMain = accounts.Where(w => w.AccountType == AccountType.Main).First();
             _loginVkTarget = accountMain.Login;
@@ -389,6 +385,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     }
                     _classmatesManager.MakeRepost();
                     break;
+                case "Добавить в друзья":                    
+                    //https://ok.ru/profile/585729807776
+                    break;
                 default:
                     break;
             }
@@ -560,7 +559,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Выполнить задачу в TikTok
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInTikTok(string taskText)
+        protected void CarryOutTaskInTikTok(string taskText) //TODO
         {
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
@@ -571,7 +570,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _tikTokManager.Subscribe();
                     break;
                 case "Поставьте лайк на видео":
-                    _tikTokManager.PutLike();
+                    _tikTokManager.PutLike(); //https://www.tiktok.com/@ageofclonesofficial/video/6898252422603345157
                     break;
                 default:
                     break;
@@ -585,7 +584,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Выполнить задачу в Vimeo
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInVimeo(string taskText) //TODO Разработать
+        protected void CarryOutTaskInVimeo(string taskText)
         {
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
@@ -593,7 +592,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (taskText)
             {
                 case "Поставить лайк на видео":
-                    //https://vimeo.com/473520867 https://vimeo.com/293175455 https://vimeo.com/481741004
+                    _vimeoManager.LikeUnderVideo();
                     break;
                 default:
                     break;
@@ -834,13 +833,14 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Отменить задачу в Vimeo
         /// </summary>
-        protected void UndoTaskInVimeo() // TODO Разработать
+        protected void UndoTaskInVimeo()
         {
             OpenPageInNewTab(_urlByTask);
 
             switch (_task)
             {
                 case "Поставить лайк на видео":
+                    _vimeoManager.RemoveLike();
                     break;
             }
 

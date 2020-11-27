@@ -59,7 +59,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
         public void AuthorizationSocialNetworks()
         {
-            var accounts = AccountService.GetAccount(TypeService.VkMyMarket);
+            var accounts = AccountService.GetAccountsByType(TypeService.VkMyMarket);
 
             var accountVK = accounts.Where(w => w.AccountType == AccountType.Vk).FirstOrDefault();
             if (accountVK != null)

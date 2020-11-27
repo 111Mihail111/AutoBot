@@ -16,6 +16,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
     {
         private IVkManager _vkManager;
         private IInstagramManager _instaManager;
+        private ILogManager _logManager;
 
         const string BROWSER_PROFILE_CRANE = "C:\\_AutoBot\\Profiles\\PerformanceTasks\\V_Like\\";
         private static bool _isAuthorization;
@@ -38,6 +39,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         {
             _vkManager = new VkManager();
             _instaManager = new InstagramManager();
+            _logManager = new LogManager();
 
             var driver = GetDriver();
             _vkManager.SetContextBrowserManager(driver);
@@ -48,7 +50,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void AuthorizationSocialNetworks()
         {
-            var accounts = AccountService.GetAccount(TypeService.VLike);
+            var accounts = AccountService.GetAccountsByType(TypeService.VLike);
 
             var accountVK = accounts.Where(w => w.AccountType == AccountType.Main).FirstOrDefault();
             if (accountVK != null)
@@ -68,12 +70,21 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
         public InternetService GoTo(InternetService service)
         {
-            Init();
-            GoToUrl(service.URL);
-            AuthorizationOnService();
-            BeginCollecting();
+            //try
+            //{
+                Init();
+                GoToUrl(service.URL);
+                AuthorizationOnService();
+                BeginCollecting();
 
-            return GetDetailsWithService(service);
+                return GetDetailsWithService(service);
+            //}
+            //catch (NullReferenceException nullReferenceException)
+            //{
+            //    _logManager.SaveDetailsException(nullReferenceException);
+            //}
+
+            //return service;
         }
 
         /// <summary>

@@ -34,6 +34,10 @@ namespace AutoBot.Area.Managers.Interface
         /// </summary>
         public void MakeRepost();
         /// <summary>
+        /// Добавить в друзья
+        /// </summary>
+        public void AddToFriends();
+        /// <summary>
         /// Считать контекст браузер менеджера
         /// </summary>
         /// <param name="chromeDriver">Хром драйвер</param>

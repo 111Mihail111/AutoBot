@@ -44,12 +44,12 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void Subscribe()
         {
-            GetElementsByClassName("follow-button").Where(w => w.GetInnerText() == "Подписаться").FirstOrDefault().ToClick(2500);
+            GetElementsByClassName("follow-button").Where(w => w.GetInnerText() == "Подписаться").FirstOrDefault().ToClick(5000);
         }
         /// <inheritdoc/>
         public void Unsubscribe()
         {
-            GetElementsByClassName("follow-button").Where(w => w.GetInnerText() == "Подписки").FirstOrDefault().ToClick(2500);
+            GetElementsByClassName("follow-button").Where(w => w.GetInnerText() == "Подписки").FirstOrDefault().ToClick(5000);
         }
         /// <inheritdoc/>
         public void PutLike()
@@ -63,7 +63,7 @@ namespace AutoBot.Area.Managers
                 return;
             }
 
-            divLikeElement.ToClick(2500);
+            divLikeElement.ToClick(5000);
         }
         /// <inheritdoc/>
         public void RemoveLike()
@@ -77,7 +77,7 @@ namespace AutoBot.Area.Managers
                 return;
             }
 
-            divLikeElement.ToClick(2500);
+            divLikeElement.ToClick(5000);
         }
         /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)

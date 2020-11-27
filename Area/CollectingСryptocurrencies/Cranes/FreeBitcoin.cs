@@ -26,7 +26,7 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
 
         protected void Init()
         {
-            var account = AccountService.GetAccount(TypeCrane.FreeBitcoin).First();
+            var account = AccountService.GetAccountsByType(TypeCrane.FreeBitcoin).First();
             _login = account.Login;
             _password = account.Password;
 

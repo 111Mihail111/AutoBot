@@ -41,6 +41,7 @@ namespace AutoBot
             services.AddScoped<IVimeoManager, VimeoManager>();
             services.AddScoped<IVkMyMarket, VkMyMarket>();
             services.AddScoped<ITikTokManager, TikTokManager>();
+            services.AddScoped<ILogManager, LogManager>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

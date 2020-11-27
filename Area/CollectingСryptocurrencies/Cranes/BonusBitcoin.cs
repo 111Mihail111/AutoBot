@@ -26,7 +26,7 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
 
         protected void Init()
         {
-            var account = AccountService.GetAccount(TypeCrane.BonusBitcoin).First();
+            var account = AccountService.GetAccountsByType(TypeCrane.BonusBitcoin).First();
             _login = account.Login;
             _password = account.Password;
 

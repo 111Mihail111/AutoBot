@@ -25,7 +25,7 @@ namespace AutoBot.Area.CollectingСryptocurrencies.Cranes
 
         protected void Init()
         {
-            _login = AccountService.GetAccount(TypeCrane.MoonDogecoin).First().Login;
+            _login = AccountService.GetAccountsByType(TypeCrane.MoonDogecoin).First().Login;
 
             Initialization(BROWSER_PROFILE_CRANE);
         }
