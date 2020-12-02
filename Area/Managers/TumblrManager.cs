@@ -93,6 +93,18 @@ namespace AutoBot.Area.Managers
             Thread.Sleep(1500);
         }
         /// <inheritdoc/>
+        public void SubscribeToBlog()
+        {
+            GetElementByTagName("form").FindElements(SearchMethod.Tag, "button")
+                .Where(w => w.GetInnerText() == "Читать").FirstOrDefault()?.ToClick(2000);
+        }
+        /// <inheritdoc/>
+        public void UnsubscribeToBlog()
+        {
+            GetElementByTagName("form").FindElements(SearchMethod.Tag, "button")
+                .Where(w => w.GetInnerText() == "Не читать").FirstOrDefault()?.ToClick(2000);
+        }
+        /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
         {
             SetDriver(chromeDriver);

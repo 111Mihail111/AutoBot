@@ -8,9 +8,17 @@ namespace AutoBot.Area.Managers.Interface
     public interface ILogManager
     {
         /// <summary>
-        /// Сохранить детали ошибки
+        /// Отправить сообщение
         /// </summary>
-        /// <param name="exception">Исключение</param>
-        public void SaveDetailsException(Exception exception);
+        /// <param name="exception">Возникшее исключение</param>
+        /// <param name="base64Encoded">Изображение в base64</param>
+        public void SendToEmail(Exception exception, string base64Encoded);
+        /// <summary>
+        /// Отправить сообщение
+        /// </summary>
+        /// <param name="taskDescription">Описание задачи</param>
+        /// <param name="methodName">Наименования метода</param>
+        /// <param name="url">Url-адрес страницы</param>
+        public void SendToEmail(string taskDescription, string methodName, string url);
     }
 }

@@ -40,7 +40,7 @@ namespace AutoBot.Area.Managers
             options.AddAdditionalCapability("useAutomationExtension", false); //Скрывает указанное расширение
             options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
 
-            _browser = new ChromeDriver("./BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
+            _browser = new ChromeDriver("./BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(2000));
         }
 
         /// <summary>
@@ -423,6 +423,16 @@ namespace AutoBot.Area.Managers
         {
             Actions action = new Actions(_browser);
             action.MoveToElement(webElement).Build().Perform();
+        }
+
+
+        /// <summary>
+        /// Получить скриншот
+        /// </summary>
+        /// <returns>Изображение экрана</returns>
+        public Screenshot GetScreenshot()
+        {
+            return _browser.GetScreenshot();
         }
     }
 }

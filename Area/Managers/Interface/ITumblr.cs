@@ -26,6 +26,14 @@ namespace AutoBot.Area.Managers.Interface
         /// </summary>
         public void RemoveLike();
         /// <summary>
+        /// Подписаться на блог
+        /// </summary>
+        public void SubscribeToBlog();
+        /// <summary>
+        /// Отписаться от блога
+        /// </summary>
+        public void UnsubscribeToBlog();
+        /// <summary>
         /// Считать контекст браузер менеджера
         /// </summary>
         /// <param name="chromeDriver">Хром драйвер</param>

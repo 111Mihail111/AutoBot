@@ -56,6 +56,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         private ISoundCloud _soundCloudManager;
         private IVimeoManager _vimeoManager;
         private ITikTokManager _tikTokManager;
+        private ILogManager _logManager;
 
         protected void Init()
         {
@@ -83,6 +84,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _soundCloudManager = new SoundCloudManager();
             _vimeoManager = new VimeoManager();
             _tikTokManager = new TikTokManager();
+            _logManager = new LogManager();
 
             var driver = GetDriver();
             _vkManager.SetContextBrowserManager(driver);
@@ -235,6 +237,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             }
         }
 
+
         /// <summary>
         /// Выполнить задачу в VK
         /// </summary>
@@ -291,6 +294,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _vkManager.ToTellAboutGroup();
                     break;
                 default:
+                    _logManager.SendToEmail(taskText, "CarryOutTaskInVk()", GetUrlPage());
+                    isError = true;
                     break;
             }
 
@@ -337,6 +342,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _ytManager.DislikeUnderVideo();
                     break;
                 default:
+                    _logManager.SendToEmail(taskText, "CarryOutTaskInYouTube()", GetUrlPage());
+                    isError = true;
                     break;
             }
 
@@ -385,10 +392,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     }
                     _classmatesManager.MakeRepost();
                     break;
-                case "Добавить в друзья":                    
-                    //https://ok.ru/profile/585729807776
+                case "Добавить в друзья":
+                    _classmatesManager.AddToFriends();
                     break;
                 default:
+                    _logManager.SendToEmail(taskText, "CarryOutTaskInСlassmates()", GetUrlPage());
+                    isError = true;
                     break;
             }
 
@@ -412,6 +421,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
 
+            bool isError = false;
             switch (taskText)
             {
                 case "Поставьте лайк на пост":
@@ -421,11 +431,20 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _yandexZenManager.Subscribe();
                     break;
                 default:
+                    _logManager.SendToEmail(taskText, "CarryOutTaskInZen()", GetUrlPage());
+                    isError = true;
                     break;
             }
 
             CloseTab();
             SwitchToTab();
+
+            if (isError)
+            {
+                SkipTask();
+                return;
+            }
+
             CheckTask();
         }
         /// <summary>
@@ -437,6 +456,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
 
+            bool isError = false;
             switch (taskText)
             {
                 case "Нажать стрелку вверх на Запись":
@@ -451,11 +471,20 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _redditManager.Subscribe();
                     break;
                 default:
+                    _logManager.SendToEmail(taskText, "CarryOutTaskInReddit()", GetUrlPage());
+                    isError = true;
                     break;
             }
 
             CloseTab();
             SwitchToTab();
+
+            if (isError)
+            {
+                SkipTask();
+                return;
+            }
+
             CheckTask();
         }
         /// <summary>
@@ -467,6 +496,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
 
+            bool isError = false;
             switch (taskText)
             {
                 case "Реблогните блог":
@@ -475,12 +505,25 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 case "Поставить лайк на пост":
                     _tumblrManager.LikePost();
                     break;
+                case "Подпишитесь на блог":
+                case "подпишитесь на блог":
+                    _tumblrManager.SubscribeToBlog();
+                    break;
                 default:
+                    _logManager.SendToEmail(taskText, "CarryOutTaskInTumblr()", GetUrlPage());
+                    isError = true;
                     break;
             }
 
             CloseTab();
             SwitchToTab();
+
+            if (isError)
+            {
+                SkipTask();
+                return;
+            }
+
             CheckTask();
         }
         /// <summary>
@@ -492,6 +535,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
 
+            bool isError = false;
             switch (taskText)
             {
                 case "подпишитесь на аккаунт":
@@ -507,11 +551,20 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     Thread.Sleep(500);
                     break;
                 default:
+                    _logManager.SendToEmail(taskText, "CarryOutTaskInSoundCloud()", GetUrlPage());
+                    isError = true;
                     break;
             }
 
             CloseTab();
             SwitchToTab();
+
+            if (isError)
+            {
+                SkipTask();
+                return;
+            }
+
             CheckTask();
         }
         /// <summary>
@@ -541,6 +594,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _quoraManager.MakeRepost();
                     break;
                 default:
+                    _logManager.SendToEmail(taskText, "CarryOutTaskInQuora()", GetUrlPage());
+                    isError = true;
                     break;
             }
 
@@ -564,6 +619,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
 
+            bool isError = false;
             switch (taskText)
             {
                 case "Подпишитесь на пользователя":
@@ -573,11 +629,20 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _tikTokManager.PutLike(); //https://www.tiktok.com/@ageofclonesofficial/video/6898252422603345157
                     break;
                 default:
+                    _logManager.SendToEmail(taskText, "CarryOutTaskInTikTok()", GetUrlPage());
+                    isError = true;
                     break;
             }
 
             CloseTab();
             SwitchToTab();
+
+            if (isError)
+            {
+                SkipTask();
+                return;
+            }
+
             CheckTask();
         }
         /// <summary>
@@ -589,17 +654,27 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
 
+            bool isError = false;
             switch (taskText)
             {
                 case "Поставить лайк на видео":
                     _vimeoManager.LikeUnderVideo();
                     break;
                 default:
+                    _logManager.SendToEmail(taskText, "CarryOutTaskInVimeo()", GetUrlPage());
+                    isError = true;
                     break;
             }
 
             CloseTab();
             SwitchToTab();
+
+            if (isError)
+            {
+                SkipTask();
+                return;
+            }
+
             CheckTask();
         }
 
@@ -705,6 +780,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 case "Поставить 'Класс' на публикации":
                     _classmatesManager.RemoveClass();
                     break;
+                case "Добавить в друзья":
+                    _classmatesManager.RemoveToFriends();
+                    break;
             }
 
             CloseTab();
@@ -804,6 +882,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 case "Поставить лайк на пост":
                     _tumblrManager.RemoveLike();
+                    break;
+                case "Подпишитесь на блог":
+                case "подпишитесь на блог":
+                    _tumblrManager.UnsubscribeToBlog();
                     break;
             }
 

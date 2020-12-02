@@ -12,15 +12,15 @@ namespace AutoBot.Controllers
 {
     public class StartController : Controller
     {
-        private IFreeBitcoin _freeBitcoin;
-        private IMoonBitcoin _moonBitcoin;
-        private IBonusBitcoin _bonusBitcoin;
-        private IMoonDogecoin _moonDogecoin;
-        private IMoonLitecoin _moonLitecoin;
-        private IMoonDash _moonDash;
-        private IVLike _vLike;
-        private IVkTarget _vkTarget;
-        private IVkMyMarket _vkMyMarket;
+        private readonly IFreeBitcoin _freeBitcoin;
+        private readonly IMoonBitcoin _moonBitcoin;
+        private readonly IBonusBitcoin _bonusBitcoin;
+        private readonly IMoonDogecoin _moonDogecoin;
+        private readonly IMoonLitecoin _moonLitecoin;
+        private readonly IMoonDash _moonDash;
+        private readonly IVLike _vLike;
+        private readonly IVkTarget _vkTarget;
+        private readonly IVkMyMarket _vkMyMarket;
 
         public StartController(IFreeBitcoin freeBitcoin, IMoonBitcoin moonBitcoin, IBonusBitcoin bonusBitcoin,
             IMoonDogecoin moonDogecoin, IMoonLitecoin moonLitecoin, IMoonDash moonDash, IVLike vLike, IVkTarget vkTarget,

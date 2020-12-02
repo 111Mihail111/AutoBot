@@ -38,6 +38,10 @@ namespace AutoBot.Area.Managers.Interface
         /// </summary>
         public void AddToFriends();
         /// <summary>
+        /// Удалить из друзей
+        /// </summary>
+        public void RemoveToFriends();
+        /// <summary>
         /// Считать контекст браузер менеджера
         /// </summary>
         /// <param name="chromeDriver">Хром драйвер</param>

@@ -170,12 +170,25 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void AddToFriends()
         {
-            GetElementsByClassName("view_lvl1").Where(w => w.GetInnerText() == "Добавить в друзья").First().ToClick(1500);
+            GetElementsByClassName("view_lvl1").Where(w => w.GetInnerText() == "Добавить в друзья").FirstOrDefault()?.ToClick(1500);
         }
         /// <inheritdoc/>
         public void RemoveToFriends()
         {
+            var span = GetElementsByClassName("toggle-dropdown").Where(w => w.GetInnerText() == "Запрос отправлен").FirstOrDefault();
+            if (span != null)
+            {
+                span.ToClick(1500);
 
+                GetElementByXPath("//*[@id='hook_Block_MainMenu']/div/ul/li[1]/div/div").FindElement(SearchMethod.Tag, "a").ToClick(2000);
+                return;
+            }
+
+            var divContainer = GetElementsByXPath("//*[@id='hook_Block_MainMenu']/div/ul/li").Last();
+            divContainer.ToClick(1500);
+            divContainer.FindElements(SearchMethod.XPath, "div/div/ul/li").Last().ToClick(2000);
+
+            GetElementById("hook_FormButton_button_delete_confirm").ToClick(1500);
         }
 
         /// <summary>
@@ -184,7 +197,7 @@ namespace AutoBot.Area.Managers
         protected void RemovePostDetails()
         {
             Thread.Sleep(1500);
-            ExecuteScript("document.getElementsByClassName('mlr_cnt')[0].remove();");
+            ExecuteScript("document.getElementsByClassName('mlr_cnt')[0]?.remove();");
         }
         /// <summary>
         /// Авторизация под сохраненным профилем

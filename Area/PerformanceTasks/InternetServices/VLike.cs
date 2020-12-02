@@ -72,16 +72,16 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         {
             //try
             //{
-                Init();
-                GoToUrl(service.URL);
-                AuthorizationOnService();
-                BeginCollecting();
+            Init();
+            GoToUrl(service.URL);
+            AuthorizationOnService();
+            BeginCollecting();
 
-                return GetDetailsWithService(service);
+            return GetDetailsWithService(service);
             //}
             //catch (NullReferenceException nullReferenceException)
             //{
-            //    _logManager.SaveDetailsException(nullReferenceException);
+            //    _logManager.SendToEmail(nullReferenceException, GetScreenshot().AsBase64EncodedString);
             //}
 
             //return service;
@@ -166,7 +166,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 }
 
                 _vkManager.PutLike();
-                Thread.Sleep(3500);
+                Thread.Sleep(4500);
 
                 string url = GetUrlPage();
                 CloseTab();

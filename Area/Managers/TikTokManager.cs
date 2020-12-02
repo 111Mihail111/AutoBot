@@ -44,12 +44,12 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void Subscribe()
         {
-            GetElementsByClassName("follow-button").Where(w => w.GetInnerText() == "Подписаться").FirstOrDefault().ToClick(5000);
+            GetElementsByClassName("follow-button").Where(w => w.GetInnerText() == "Подписаться").FirstOrDefault()?.ToClick(5000);
         }
         /// <inheritdoc/>
         public void Unsubscribe()
         {
-            GetElementsByClassName("follow-button").Where(w => w.GetInnerText() == "Подписки").FirstOrDefault().ToClick(5000);
+            GetElementsByClassName("follow-button").Where(w => w.GetInnerText() == "Подписки").FirstOrDefault()?.ToClick(5000);
         }
         /// <inheritdoc/>
         public void PutLike()
