@@ -17,7 +17,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         const string BROWSER_PROFILE_SERVICE = "C:\\_AutoBot\\Profiles\\PerformanceTasks\\VkTarget\\";
 
         /// <summary>
-        /// Авторизация соц. сетей
+        /// Была ли авторизация соц. сетей
         /// </summary>
         private static bool _isAuthorizationSocialNetworks;
         /// <summary>

@@ -1,9 +1,11 @@
 ﻿using AutoBot.Area.Managers.Interface;
+using OpenQA.Selenium;
 using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Text;
 
 namespace AutoBot.Area.Managers
 {
@@ -20,21 +22,6 @@ namespace AutoBot.Area.Managers
 
 
         /// <inheritdoc/>
-        public void SendToEmail(Exception exception, string base64Encoded)
-        {
-            var description = GetDescriptionException(exception);
-            var imageTag = $"<img src='data:image/png;base64,{base64Encoded}' style='width:100%; height:100%;'>";
-
-            var message = new MailMessage(_mailFrom, _mailTo)
-            {
-                Subject = "Возникла ошибка",
-                IsBodyHtml = true,
-                Body = $"{description}<br><center><h3>Изображение страницы</h3>{imageTag}</center>",
-            };
-
-            Send(message);
-        }
-        /// <inheritdoc/>
         public void SendToEmail(string taskDescription, string methodName, string url)
         {
             var message = new MailMessage(_mailFrom, _mailTo)
@@ -48,6 +35,51 @@ namespace AutoBot.Area.Managers
 
             Send(message);
         }
+        /// <inheritdoc/>
+        public void SendToEmail(Exception exception, string base64Encoded, string url)
+        {
+            var description = GetDescriptionException(exception) + $"<br><b>Url-Адрес</b>: {url}";
+            var imageTag = $"<img src='data:image/png;base64,{base64Encoded}' style='width:100%; height:100%;'>";
+
+            var message = new MailMessage(_mailFrom, _mailTo)
+            {
+                Subject = "Возникла ошибка",
+                IsBodyHtml = true,
+                Body = $"{description}<br><center><h3>Изображение страницы</h3>{imageTag}</center>",
+            };
+
+            Send(message);
+        }
+        /// <inheritdoc/>
+        public void SendToEmail(WebDriverException webDriverException, string base64Encoded, string url)
+        {
+            var description = GetDescriptionException(webDriverException) + $"<br><b>Url-Адрес</b>: {url}";
+            var imageTag = $"<img src='data:image/png;base64,{base64Encoded}' style='width:100%; height:100%;'>";
+
+            var message = new MailMessage(_mailFrom, _mailTo)
+            {
+                Subject = "Возникла ошибка",
+                IsBodyHtml = true,
+                Body = $"{description}<br><center><h3>Изображение страницы</h3>{imageTag}</center>",
+            };
+
+            Send(message);
+        }
+        /// <inheritdoc/>
+        public void SendToEmail(NullReferenceException nullReferenceException, string base64Encoded, string url)
+        {
+            var description = GetDescriptionException(nullReferenceException) + $"<br><b>Url-Адрес</b>: {url}";
+            var imageTag = $"<img src='data:image/png;base64,{base64Encoded}' style='width:100%; height:100%;'>";
+
+            var message = new MailMessage(_mailFrom, _mailTo)
+            {
+                Subject = "Возникла ошибка",
+                IsBodyHtml = true,
+                Body = $"{description}<br><center><h3>Изображение страницы</h3>{imageTag}</center>",
+            };
+
+            Send(message);
+        }
 
 
         /// <summary>
@@ -55,9 +87,28 @@ namespace AutoBot.Area.Managers
         /// </summary>
         /// <param name="exception">Возникшее исключение</param>
         /// <returns>Описание исключения</returns>
-        protected string GetDescriptionException(Exception exception)
+        protected StringBuilder GetDescriptionException(Exception exception)
         {
+            var stringBuilder = new StringBuilder();
             var stackTrace = new StackTrace(exception, true);
+            foreach (var errorStack in stackTrace.GetFrames())
+            {
+                stringBuilder.AppendLine($"<b>Файл</b>: {errorStack.GetFileName()}");
+                stringBuilder.AppendLine($"<b>Строка</b>: {errorStack.GetFileLineNumber()}");
+                stringBuilder.AppendLine($"<b>Столбец</b>: {errorStack.GetFileColumnNumber()}");
+                stringBuilder.AppendLine($"<b>Метод</b>: {errorStack.GetMethod()}");
+            }
+
+            return stringBuilder;
+        }
+        /// <summary>
+        /// Получить описание исключения
+        /// </summary>
+        /// <param name="webDriverException">Возникшее WebDriverException-исключение</param>
+        /// <returns>Описание исключения</returns>
+        protected string GetDescriptionException(WebDriverException webDriverException)
+        {
+            var stackTrace = new StackTrace(webDriverException, true);
             var errorStack = stackTrace.GetFrames().First();
 
             return $"<b>Файл</b>: {errorStack.GetFileName()}" +
@@ -65,6 +116,31 @@ namespace AutoBot.Area.Managers
                    $"<br><b>Столбец</b>: {errorStack.GetFileColumnNumber()}" +
                    $"<br><b>Метод</b>: {errorStack.GetMethod()}";
         }
+        /// <summary>
+        /// Получить описание исключения
+        /// </summary>
+        /// <param name="nullReferenceException">Возникшее NullReferenceException-исключение</param>
+        /// <returns>Описание исключения</returns>
+        protected string GetDescriptionException(NullReferenceException nullReferenceException)
+        {
+            var stackTrace = new StackTrace(nullReferenceException, true);
+            var errorStack = stackTrace.GetFrames().First();
+
+            return $"<b>Файл</b>: {errorStack.GetFileName()}" +
+                   $"<br><b>Строка</b>: {errorStack.GetFileLineNumber()}" +
+                   $"<br><b>Столбец</b>: {errorStack.GetFileColumnNumber()}" +
+                   $"<br><b>Метод</b>: {errorStack.GetMethod()}";
+        }
+        //protected string GetDescriptionException(Exception exception)
+        //{
+        //    var stackTrace = new StackTrace(exception, true);
+        //    var errorStack = stackTrace.GetFrames().First();
+
+        //    return $"<b>Файл</b>: {errorStack.GetFileName()}" +
+        //           $"<br><b>Строка</b>: {errorStack.GetFileLineNumber()}" +
+        //           $"<br><b>Столбец</b>: {errorStack.GetFileColumnNumber()}" +
+        //           $"<br><b>Метод</b>: {errorStack.GetMethod()}";
+        //}
         /// <summary>
         /// Отправить
         /// </summary>

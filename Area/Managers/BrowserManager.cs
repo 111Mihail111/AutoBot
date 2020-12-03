@@ -136,6 +136,23 @@ namespace AutoBot.Area.Managers
             _browser.SwitchTo().Alert().Accept();
         }
         /// <summary>
+        /// Открыт ли Alert на странице
+        /// </summary>
+        /// <returns>True - открыт, иначе false</returns>
+        public bool IsAlertExist()
+        {
+            try
+            {
+                _browser.SwitchTo().Alert();
+
+                return true;
+            }
+            catch (NoAlertPresentException)
+            {
+                return false;
+            }
+        }
+        /// <summary>
         /// Получить текст из алерт окна
         /// </summary>
         /// <returns></returns>
@@ -402,6 +419,7 @@ namespace AutoBot.Area.Managers
         /// </summary>
         public void QuitBrowser()
         {
+            _browser.Close();
             _browser.Quit();
         }
 

@@ -6,6 +6,7 @@ using AutoBot.Area.Services;
 using AutoBot.Extentions;
 using AutoBot.Models;
 using Microsoft.CodeAnalysis;
+using OpenQA.Selenium;
 using System;
 using System.Linq;
 using System.Threading;
@@ -14,20 +15,31 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 {
     public class VLike : BrowserManager, IVLike
     {
+        const string BROWSER_PROFILE_SERVICE = "C:\\_AutoBot\\Profiles\\PerformanceTasks\\V_Like\\";
+
+        /// <summary>
+        /// Была ли авторизация соц. сетей
+        /// </summary>
+        private static bool _isAuthorizationSocialNetworks;
+        /// <summary>
+        /// Время засыпания сервиса
+        /// </summary>
+        private static DateTime? _timeFallingAsleep = _timeFallingAsleep == null ? DateTime.Now.AddHours(10) : _timeFallingAsleep;
+        /// <summary>
+        /// Идентификатор задачи
+        /// </summary>
+        private string _taskId;
+
         private IVkManager _vkManager;
         private IInstagramManager _instaManager;
         private ILogManager _logManager;
 
-        const string BROWSER_PROFILE_CRANE = "C:\\_AutoBot\\Profiles\\PerformanceTasks\\V_Like\\";
-        private static bool _isAuthorization;
-        private string _taskId;
-
         protected void Init()
         {
-            Initialization(BROWSER_PROFILE_CRANE);
+            Initialization(BROWSER_PROFILE_SERVICE);
             SetContextForManagers();
 
-            if (!_isAuthorization)
+            if (!_isAuthorizationSocialNetworks)
             {
                 AuthorizationSocialNetworks();
             }
@@ -64,27 +76,50 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 _instaManager.Authorization(accountInstagram.Login, accountInstagram.Password);
             }
 
-            _isAuthorization = true;
+            _isAuthorizationSocialNetworks = true;
         }
-
 
         public InternetService GoTo(InternetService service)
         {
-            //try
-            //{
-            Init();
-            GoToUrl(service.URL);
-            AuthorizationOnService();
-            BeginCollecting();
+            try
+            {
+                //var currentDateTime = DateTime.Now;
+                //if (currentDateTime >= _timeFallingAsleep)
+                //{
+                //    service.StatusService = Status.InSleeping;
+                //    return service;
+                //}
+                
+                Init();
+                GoToUrl(service.URL);
+                AuthorizationOnService();
+                BeginCollecting();
 
-            return GetDetailsWithService(service);
-            //}
-            //catch (NullReferenceException nullReferenceException)
-            //{
-            //    _logManager.SendToEmail(nullReferenceException, GetScreenshot().AsBase64EncodedString);
-            //}
+                return GetDetailsWithService(service);
+            }
+            catch (WebDriverException webDriverException)
+            {
+                service.StatusService = Status.Work;
+                _logManager.SendToEmail(webDriverException, GetScreenshot().AsBase64EncodedString, GetUrlPage());
 
-            //return service;
+                QuitBrowser();
+            }
+            catch (NullReferenceException nullReferenceException)
+            {
+                service.StatusService = Status.Work;
+                _logManager.SendToEmail(nullReferenceException, GetScreenshot().AsBase64EncodedString, GetUrlPage());
+
+                QuitBrowser();
+            }
+            catch (Exception exeption)
+            {
+                service.StatusService = Status.Work;
+                _logManager.SendToEmail(exeption, GetScreenshot().AsBase64EncodedString, GetUrlPage());
+
+                QuitBrowser();
+            }
+
+            return service;
         }
 
         /// <summary>
@@ -106,12 +141,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void JoinInCommunityVK()
         {
-            GetElementById("vk1").Click();
+            GetElementById("vk1").ToClick();
 
             var message = GetElementByXPath("//*[@id='content']/div[3]/div/p[1]/b");
             while (message == null)
             {
-                GetElementByXPath("//*[@id='content']/div[3]/div[1]/div[3]/a").Click();
+                GetElementByXPath("//*[@id='content']/div[3]/div[1]/div[3]/a").ToClick();
                 SwitchToLastTab();
 
                 string url = GetUrlPage();
@@ -128,7 +163,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 CloseTab();
                 SwitchToTab();
 
-                if (DelayPayments())
+                if (DidPaymentPass())
                 {
                     OpenPageInNewTab(url);
                     _vkManager.UnsubscribeToComunity();
@@ -143,13 +178,13 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void WorkWithLikesAndRepostVK()
         {
-            GetElementById("vk2").Click();
+            GetElementById("vk2").ToClick();
 
             var perfomanse = GetElementByClassName("groups")?.GetInnerText();
             while (!string.IsNullOrEmpty(perfomanse) && perfomanse != "Нет доступных заданий. Заходите позже!")
             {
                 ButtonsVisible();
-                GetElementByXPath("//*[@id='content']/div[3]/div[1]/div[3]/a").Click();
+                GetElementByXPath("//*[@id='content']/div[3]/div[1]/div[3]/a").ToClick();
                 var titleTask = GetElementByXPath("//*[@id='content']/div[3]/div[1]/div[2]/p").GetInnerText();
 
                 SwitchToLastTab();
@@ -172,8 +207,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 CloseTab();
                 SwitchToTab();
 
-                GetElementByXPath("//*[@id='buttons']/a[2]").Click();
-                Thread.Sleep(2000);
+                GetElementByXPath("//*[@id='buttons']/a[2]").ToClick(2000);
 
                 if (IsMaxLikes())
                 {
@@ -186,17 +220,16 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 }
                 else if (GetTextFromAlert() == "Лайк не был поставлен")
                 {
-                    if (DelayPayments())
+                    if (!DidPaymentPass())
                     {
                         OpenPageInNewTab(url);
                         _vkManager.RemoveLike();
                         CloseTab();
                         SwitchToTab();
 
-                        GetElementByXPath("//*[@id='buttons']/a[1]").Click();
-                        Thread.Sleep(1000);
+                        GetElementByXPath("//*[@id='buttons']/a[1]").ToClick(1000);
                         GetElementByClassName("groups").FindElements(SearchMethod.ClassName, "group").First()
-                            .FindElement(SearchMethod.Tag, "a").Click();
+                            .FindElement(SearchMethod.Tag, "a").ToClick();
                         AlertAccept();
                     }
                 }
@@ -209,16 +242,15 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void SubscriptionsInInstagram()
         {
-            GetElementById("in0").Click();
+            GetElementById("in0").ToClick();
 
             var groups = GetElementsByClassName("groups");
             while (groups.Count() != 0)
             {
                 _taskId = groups.First().FindElement(SearchMethod.ClassName, "group").GetId();
 
-                GetElementByXPath("//*[@id='content']/div[2]/div[1]/div[3]/a").Click();
+                GetElementByXPath("//*[@id='content']/div[2]/div[1]/div[3]/a").ToClick();
                 SwitchToLastTab();
-                Thread.Sleep(2000);
 
                 if (_instaManager.IsFoundPage())
                 {
@@ -233,7 +265,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 CloseTab();
                 SwitchToTab();
 
-                if (DelayPayments())
+                if (!DidPaymentPass())
                 {
                     OpenPageInNewTab(url);
                     _instaManager.Unsubscribe();
@@ -248,16 +280,15 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void WorkWithLikeInstagram()
         {
-            GetElementById("in1").Click();
+            GetElementById("in1").ToClick();
 
             var groups = GetElementsByClassName("groups");
             while (groups.Count() != 0)
             {
                 _taskId = groups.First().FindElement(SearchMethod.ClassName, "group").GetId();
 
-                GetElementByXPath("//*[@id='content']/div[2]/div[1]/div[3]/a").Click();
+                GetElementByXPath("//*[@id='content']/div[2]/div[1]/div[3]/a").ToClick();
                 SwitchToLastTab();
-                Thread.Sleep(2500);
 
                 if (_instaManager.IsFoundPage())
                 {
@@ -272,7 +303,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 CloseTab();
                 SwitchToTab();
 
-                if (DelayPayments())
+                if (!DidPaymentPass())
                 {
                     OpenPageInNewTab(url);
                     _instaManager.RemoveLike();
@@ -287,47 +318,41 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
 
         /// <summary>
-        /// Задержка платежа
+        /// Прошел ли платеж
         /// </summary>
-        public bool DelayPayments() //TODO
+        /// <returns>True - прошел, иначе false</returns>
+        public bool DidPaymentPass() //TODO
         {
-            try
+            int counter = 0;
+            var getPaymentButton = GetElementByXPath("//*[@id='buttons']/a[2]");
+
+            var modal = GetElementById("modal");
+            while (modal.Displayed)
             {
-                int counter = 0;
-                var modal = GetElementById("modal");
-                while (modal.Displayed)
+                if (counter == 7)
                 {
-                    GetElementByXPath("//*[@id='buttons']/a[2]").Click();
-                    Thread.Sleep(1500);
-
-                    while (true)
-                    {
-                        string text = GetTextFromAlert();
-                        if (!string.IsNullOrWhiteSpace(text) || !modal.Displayed)
-                        {
-                            break;
-                        }
-                        //TODO:Еще может быть такое условие: Список участников скрыт, проверить выполнение нет возможности. Пожалуйста, пропустите это задание.
-                    }
-
-                    AlertAccept();
-
-                    counter++;
-                    if (counter == 10)
-                    {
-                        return true;
-                    }
-
-                    Thread.Sleep(2000);
+                    return false;
                 }
-            }
-            catch
-            {
-                //Alert'a нет, значит модал. окно закрылось
+
+                getPaymentButton.ToClick(5000);
+
+                if (!IsAlertExist())
+                {
+                    return true;
+                }
+
+                string text = GetTextFromAlert();
+                switch (text)
+                {
+                    case "Список участников скрыт, проверить выполнение нет возможности.Пожалуйста, пропустите это задание.":
+                        return false;
+                }
+
+                AlertAccept();
+                counter++;
             }
 
-            Thread.Sleep(3000);
-            return false;
+            return true;
         }
         /// <summary>
         /// Пропустить задание

@@ -17,5 +17,9 @@
         /// В работе
         /// </summary>
         InWork = 2,
+        /// <summary>
+        /// Спящий
+        /// </summary>
+        InSleeping = 3,
     }
 }
