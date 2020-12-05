@@ -2,6 +2,7 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Interactions;
+using OpenQA.Selenium.Remote;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +37,7 @@ namespace AutoBot.Area.Managers
             options.AddArgument("--disable-notifications"); //Блокировка уведомлений
             options.AddArgument("--mute-audio"); //Отключает звук в браузере
             //options.AddArgument("--headless"); //Запуск в фоновом режиме (без отображения бразуера)
-            //options.BinaryLocation = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"; Для дом. запуска
+            //options.BinaryLocation = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"; //Для дом. запуска
             options.AddAdditionalCapability("useAutomationExtension", false); //Скрывает указанное расширение
             options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
 

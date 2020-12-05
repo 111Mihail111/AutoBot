@@ -81,44 +81,31 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
         public InternetService GoTo(InternetService service)
         {
+            //var currentDateTime = DateTime.Now;
+            //if (currentDateTime >= _timeFallingAsleep)
+            //{
+            //    service.StatusService = Status.InSleeping;
+            //    return service;
+            //}
+
+            Init();
+            GoToUrl(service.URL);
+
             try
             {
-                //var currentDateTime = DateTime.Now;
-                //if (currentDateTime >= _timeFallingAsleep)
-                //{
-                //    service.StatusService = Status.InSleeping;
-                //    return service;
-                //}
-                
-                Init();
-                GoToUrl(service.URL);
                 AuthorizationOnService();
                 BeginCollecting();
 
                 return GetDetailsWithService(service);
             }
-            catch (WebDriverException webDriverException)
+            catch (Exception exception)
             {
                 service.StatusService = Status.Work;
-                _logManager.SendToEmail(webDriverException, GetScreenshot().AsBase64EncodedString, GetUrlPage());
+                _logManager.SendToEmail(exception, GetScreenshot().AsBase64EncodedString, GetUrlPage());
 
                 QuitBrowser();
             }
-            catch (NullReferenceException nullReferenceException)
-            {
-                service.StatusService = Status.Work;
-                _logManager.SendToEmail(nullReferenceException, GetScreenshot().AsBase64EncodedString, GetUrlPage());
-
-                QuitBrowser();
-            }
-            catch (Exception exeption)
-            {
-                service.StatusService = Status.Work;
-                _logManager.SendToEmail(exeption, GetScreenshot().AsBase64EncodedString, GetUrlPage());
-
-                QuitBrowser();
-            }
-
+            
             return service;
         }
 
@@ -163,7 +150,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 CloseTab();
                 SwitchToTab();
 
-                if (DidPaymentPass())
+                if (!DidPaymentPass())
                 {
                     OpenPageInNewTab(url);
                     _vkManager.UnsubscribeToComunity();

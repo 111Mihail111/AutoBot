@@ -170,10 +170,20 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
         public void GoTo(string url)
         {
-            Init();
-            GoToUrl(url);
-            AuthorizationOnService();
-            BeginCollecting(url);
+            
+            //try
+            //{
+                Init();
+                GoToUrl(url);
+                AuthorizationOnService();
+                BeginCollecting(url);
+            //}
+            //catch (Exception exception)
+            //{
+            //    _logManager.SendToEmail(exception, GetScreenshot().AsBase64EncodedString, GetUrlPage());
+
+            //    QuitBrowser();
+            //}
         }
 
         public void Quit()

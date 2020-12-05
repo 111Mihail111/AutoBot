@@ -14,6 +14,7 @@ namespace AutoBot.Area.Managers
         {
             string url = "https://www.youtube.com/";
             OpenPageInNewTab(url);
+            Thread.Sleep(5000);
 
             if (GetElementById("avatar-btn") != null)
             {
@@ -27,7 +28,7 @@ namespace AutoBot.Area.Managers
             var savedAccountDiv = GetElementById("profileIdentifier");
             if (savedAccountDiv != null)
             {
-                savedAccountDiv.Click();
+                savedAccountDiv.ToClick();
                 AuthorizationUnderSavedProfile(password);
                 return;
             }
@@ -38,7 +39,7 @@ namespace AutoBot.Area.Managers
                 inputLogin.SendKeys(login);
             }
 
-            GetElementById("identifierNext").FindElement(SearchMethod.Tag, "button").Click();
+            GetElementById("identifierNext").FindElement(SearchMethod.Tag, "button").ToClick(2000);
 
             var inputPassword = GetElementById("password").FindElement(SearchMethod.Tag, "input");
             if (string.IsNullOrWhiteSpace(inputPassword.GetValue()))
@@ -46,8 +47,7 @@ namespace AutoBot.Area.Managers
                 inputPassword.SendKeys(password);
             }
 
-            GetElementById("passwordNext").FindElement(SearchMethod.Tag, "button").Click();
-            Thread.Sleep(2000);
+            GetElementById("passwordNext").FindElement(SearchMethod.Tag, "button").ToClick(2000);
 
             GoToUrl(url);
             ButtonLoginClick();
