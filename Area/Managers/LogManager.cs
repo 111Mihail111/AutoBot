@@ -36,6 +36,23 @@ namespace AutoBot.Area.Managers
             Send(message);
         }
         /// <inheritdoc/>
+        public void SendToEmail(string taskDescription, string methodName, string url, string base64Encoded)
+        {
+            var imageTag = $"<img src='data:image/png;base64,{base64Encoded}' style='width:100%; height:100%;'>";
+
+            var message = new MailMessage(_mailFrom, _mailTo)
+            {
+                Subject = "Новая задача",
+                IsBodyHtml = true,
+                Body = $"<b>Тип</b>: {taskDescription}" +
+                       $"<br><b>Метод</b>: {methodName}" +
+                       $"<br><b>Url-адрес</b>: {url}" +
+                       $"<br><center><h3>Изображение страницы</h3>{imageTag}</center>",
+            };
+
+            Send(message);
+        }
+        /// <inheritdoc/>
         public void SendToEmail(Exception exception, string base64Encoded, string url)
         {
             var description = GetDescriptionException(exception) + $"<br><b>Url-Адрес</b>: {url}";

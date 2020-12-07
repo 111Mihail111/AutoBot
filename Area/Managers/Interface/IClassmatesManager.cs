@@ -14,6 +14,12 @@ namespace AutoBot.Area.Managers.Interface
         /// <param name="password">Пароль к почте</param>
         public void AuthorizationThroughMail(string email, string password);
         /// <summary>
+        /// Авторизация через почту для старой версии браузера
+        /// </summary>
+        /// <param name="email">Email-адрес</param>
+        /// <param name="password">Пароль к почте</param>
+        public void AuthorizationThroughMailOldVersionBrowser(string email, string password);
+        /// <summary>
         /// Вступить в группу
         /// </summary>
         public void JoinGroup();

@@ -106,10 +106,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         {
             var accounts = AccountService.GetAccountsByType(TypeService.VkTarget);
 
-            var accountMain = accounts.Where(w => w.AccountType == AccountType.Main).First();
-            _loginVkTarget = accountMain.Login;
-            _passwordVkTarget = accountMain.Password;
-
             var accountVK = accounts.Where(w => w.AccountType == AccountType.Vk).FirstOrDefault();
             if (accountVK != null)
             {
@@ -126,13 +122,27 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             var accountYouTube = accounts.Where(w => w.AccountType == AccountType.YouTube).FirstOrDefault();
             if (accountYouTube != null)
             {
-                _ytManager.Authorization(accountYouTube.Login, accountYouTube.Password);
+                if (IsBackgroundMode())
+                {
+                    _ytManager.AuthorizationForOldVersionBrowser(accountYouTube.Login, accountYouTube.Password);
+                }
+                else
+                {
+                    _ytManager.Authorization(accountYouTube.Login, accountYouTube.Password);
+                }
             }
 
             var accountClassmates = accounts.Where(w => w.AccountType == AccountType.Classmates).FirstOrDefault();
             if (accountClassmates != null)
             {
-                _classmatesManager.AuthorizationThroughMail(accountClassmates.Login, accountClassmates.Password);
+                if (IsBackgroundMode())
+                {
+                    _classmatesManager.AuthorizationThroughMailOldVersionBrowser(accountClassmates.Login, accountClassmates.Password);
+                }
+                else
+                {
+                    _classmatesManager.AuthorizationThroughMail(accountClassmates.Login, accountClassmates.Password);
+                }
             }
 
             var accountYandexZen = accounts.Where(w => w.AccountType == AccountType.YandexZen).FirstOrDefault();
@@ -162,7 +172,14 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             var accountVimeo = accounts.Where(w => w.AccountType == AccountType.Vimeo).FirstOrDefault();
             if (accountVimeo != null)
             {
-                _vimeoManager.Authorization(accountVimeo.Login, accountVimeo.Password);
+                if (IsBackgroundMode())
+                {
+                    _vimeoManager.AuthorizationInBrowserBackground(accountVimeo.Login, accountVimeo.Password);
+                }
+                else
+                {
+                    _vimeoManager.Authorization(accountVimeo.Login, accountVimeo.Password);
+                }
             }
 
             _isAuthorizationSocialNetworks = true;
@@ -170,20 +187,29 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
         public void GoTo(string url)
         {
-            
-            //try
-            //{
+
+            try
+            {
                 Init();
                 GoToUrl(url);
-                AuthorizationOnService();
-                BeginCollecting(url);
-            //}
-            //catch (Exception exception)
-            //{
-            //    _logManager.SendToEmail(exception, GetScreenshot().AsBase64EncodedString, GetUrlPage());
 
-            //    QuitBrowser();
-            //}
+                if (IsBackgroundMode())
+                {
+                    AuthorizationInBrowserBackground();
+                }
+                else
+                {
+                    AuthorizationOnService();
+                }
+
+                BeginCollecting(url);
+            }
+            catch (Exception exception)
+            {
+                _logManager.SendToEmail(exception, GetScreenshot().AsBase64EncodedString, GetUrlPage());
+                var a = ExecuteScript("return document.body.innerHTML");
+                QuitBrowser();
+            }
         }
 
         public void Quit()
@@ -1140,22 +1166,19 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 return;
             }
 
+            GoTo("https://vktarget.ru/login/");
             GetElementsByClassName("mdl-js-button").Last().ToClick(1500);
-
-            var login = GetElementByXPath("//*[@id='login_form']/div[1]/div/div[2]/div[2]/input");
-            if (string.IsNullOrWhiteSpace(login.Text))
+            GetElementByClassName("icon__vk").ToClick(3000);
+        }
+        protected void AuthorizationInBrowserBackground()
+        {
+            if (GetUrlPage() == "https://users.vktarget.ru/list/")
             {
-                login.SendKeys(_loginVkTarget);
+                return;
             }
 
-            var password = GetElementByXPath("//*[@id='login_form']/div[1]/div/div[3]/div[2]/input");
-            if (string.IsNullOrWhiteSpace(password.Text))
-            {
-                password.SendKeys(_passwordVkTarget);
-            }
-
-            ExecuteScript("document.getElementById('login_form').getElementsByTagName('button')[0].click()");
-            Thread.Sleep(2500);
+            GoToUrl("https://vktarget.ru/login/");
+            GetElementByClassName("icon__vk").ToClick(3000);
         }
         /// <summary>
         /// Получить баланс

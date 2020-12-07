@@ -22,5 +22,13 @@ namespace AutoBot.Area.Managers.Interface
         /// <param name="methodName">Наименования метода</param>
         /// <param name="url">Url-адрес страницы</param>
         void SendToEmail(string taskDescription, string methodName, string url);
+        /// <summary>
+        /// Отправить сообщение
+        /// </summary>
+        /// <param name="taskDescription">Описание задачи</param>
+        /// <param name="methodName">Наименования метода</param>
+        /// <param name="url">Url-адрес страницы</param>
+        /// <param name="base64Encoded">Изображение в base64</param>
+        void SendToEmail(string taskDescription, string methodName, string url, string base64Encoded);
     }
 }

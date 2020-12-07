@@ -13,7 +13,8 @@ namespace AutoBot.Area.Managers
 {
     public class BrowserManager
     {
-        private ChromeDriver _browser;
+        private ChromeDriver _chromeDriver;
+        private bool _isHeadless;
 
         /// <summary>
         /// Ошибка, капча неразрешима
@@ -28,20 +29,27 @@ namespace AutoBot.Area.Managers
         /// </summary>
         public const string ERROR_ZERO_BALANCE = "ERROR_ZERO_BALANCE"; //TODO:Убрать отсюда
 
-        public void Initialization(string pathToProfile)
+        public void Initialization(string pathToProfile, bool isHeadless = false)
         {
             ChromeOptions options = new ChromeOptions();
             options.AddArgument($"--user-data-dir={pathToProfile}"); //Путь к папке с профилем
             options.AddArgument("--profile-directory=AutoBot"); //Профиль
-            options.AddArgument("--start-maximized"); //Полностью открывает браузер
+            options.AddArgument("--start-maximized"); //Разворачивает браузер на ширину экрана
             options.AddArgument("--disable-notifications"); //Блокировка уведомлений
             options.AddArgument("--mute-audio"); //Отключает звук в браузере
-            //options.AddArgument("--headless"); //Запуск в фоновом режиме (без отображения бразуера)
+
+            if (isHeadless)
+            {
+                options.AddArgument("--headless"); //Запуск в фоновом режиме (без отображения бразуера)
+            }
+
+            _isHeadless = options.Arguments.Where(w => w.Contains("--headless")).Any();
+
             //options.BinaryLocation = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"; //Для дом. запуска
             options.AddAdditionalCapability("useAutomationExtension", false); //Скрывает указанное расширение
             options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
 
-            _browser = new ChromeDriver("./BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(2000));
+            _chromeDriver = new ChromeDriver("./BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
         }
 
         /// <summary>
@@ -50,7 +58,7 @@ namespace AutoBot.Area.Managers
         /// <returns>Хром-драйвер</returns>
         public ChromeDriver GetDriver()
         {
-            return _browser;
+            return _chromeDriver;
         }
         /// <summary>
         /// Установить драйвер
@@ -58,7 +66,7 @@ namespace AutoBot.Area.Managers
         /// <param name="chromeDriver">Хром драйвер</param>
         public void SetDriver(ChromeDriver chromeDriver)
         {
-            _browser = chromeDriver;
+            _chromeDriver = chromeDriver;
         }
 
 
@@ -68,7 +76,7 @@ namespace AutoBot.Area.Managers
         /// <param name="url">Адрес</param>
         public void GoToUrl(string url)
         {
-            _browser.Navigate().GoToUrl(url);
+            _chromeDriver.Navigate().GoToUrl(url);
         }
         /// <summary>
         /// Открыть страницу в новой вкладке
@@ -77,7 +85,7 @@ namespace AutoBot.Area.Managers
         public void OpenPageInNewTab(string url)
         {
             Thread.Sleep(2000);
-            _browser.ExecuteScript($"window.open('{url}');");
+            _chromeDriver.ExecuteScript($"window.open('{url}');");
             SwitchToLastTab();
         }
         /// <summary>
@@ -85,7 +93,7 @@ namespace AutoBot.Area.Managers
         /// </summary>
         public void CloseTab()
         {
-            _browser.Close();
+            _chromeDriver.Close();
         }
         /// <summary>
         /// Переключиться на последнюю вкладку
@@ -93,8 +101,8 @@ namespace AutoBot.Area.Managers
         public void SwitchToLastTab()
         {
             Thread.Sleep(1500);
-            var newTabInstance = _browser.WindowHandles[_browser.WindowHandles.Count - 1];
-            _browser.SwitchTo().Window(newTabInstance);
+            var newTabInstance = _chromeDriver.WindowHandles[_chromeDriver.WindowHandles.Count - 1];
+            _chromeDriver.SwitchTo().Window(newTabInstance);
         }
         /// <summary>
         /// Переключиться на вкладку
@@ -103,7 +111,7 @@ namespace AutoBot.Area.Managers
         public void SwitchToTab(int indexTab = 0)
         {
             Thread.Sleep(1500);
-            _browser.SwitchTo().Window(_browser.WindowHandles[indexTab]);
+            _chromeDriver.SwitchTo().Window(_chromeDriver.WindowHandles[indexTab]);
         }
         /// <summary>
         /// Получить количество вкладок
@@ -111,7 +119,7 @@ namespace AutoBot.Area.Managers
         /// <returns>Количество вкладок</returns>
         public int GetTabsCount()
         {
-            return _browser.WindowHandles.Count;
+            return _chromeDriver.WindowHandles.Count;
         }
         /// <summary>
         /// Переключиться на фрейм
@@ -119,14 +127,14 @@ namespace AutoBot.Area.Managers
         /// <param name="frame">IFrame-элемент</param>
         public void SwitchToFrame(IWebElement frame)
         {
-            _browser.SwitchTo().Frame(frame);
+            _chromeDriver.SwitchTo().Frame(frame);
         }
         /// <summary>
         /// Переключиться на основной контент страницы
         /// </summary>
         public void SwitchToDefaultContent()
         {
-            _browser.SwitchTo().DefaultContent();
+            _chromeDriver.SwitchTo().DefaultContent();
         }
 
         /// <summary>
@@ -134,7 +142,7 @@ namespace AutoBot.Area.Managers
         /// </summary>
         public void AlertAccept()
         {
-            _browser.SwitchTo().Alert().Accept();
+            _chromeDriver.SwitchTo().Alert().Accept();
         }
         /// <summary>
         /// Открыт ли Alert на странице
@@ -144,7 +152,7 @@ namespace AutoBot.Area.Managers
         {
             try
             {
-                _browser.SwitchTo().Alert();
+                _chromeDriver.SwitchTo().Alert();
 
                 return true;
             }
@@ -161,7 +169,7 @@ namespace AutoBot.Area.Managers
         {
             try
             {
-                return _browser.SwitchTo().Alert().Text;
+                return _chromeDriver.SwitchTo().Alert().Text;
             }
             catch
             {
@@ -178,7 +186,7 @@ namespace AutoBot.Area.Managers
         /// <param name="scrollHorizontalPosition">Позиция нижнего скрола</param>
         public void SetScrollPosition(int scrollVerticalPosition = 0, int scrollHorizontalPosition = 0)
         {
-            _browser.ExecuteScript($"window.scroll({scrollHorizontalPosition}, {scrollVerticalPosition})");
+            _chromeDriver.ExecuteScript($"window.scroll({scrollHorizontalPosition}, {scrollVerticalPosition})");
         }
         /// <summary>
         /// Установить позицию скрола в модальном окне
@@ -188,7 +196,7 @@ namespace AutoBot.Area.Managers
         /// <param name="scrollHorizontalPosition">Позиция нижнего скрола</param>
         public void SetScrollPositionInWindow(string modalId, int scrollVerticalPosition = 0, int scrollHorizontalPosition = 0)
         {
-            _browser.ExecuteScript($"let modal = document.getElementById('{modalId}');" +
+            _chromeDriver.ExecuteScript($"let modal = document.getElementById('{modalId}');" +
                 $"modal.scrollTop = {scrollVerticalPosition};" +
                 $"modal.scrollHeight = {scrollHorizontalPosition}");
         }
@@ -199,7 +207,7 @@ namespace AutoBot.Area.Managers
         /// <returns>Возвращаемое значение скрипта</returns>
         public string ExecuteScript(string jsScript)
         {
-            return _browser.ExecuteScript(jsScript)?.ToString();
+            return _chromeDriver.ExecuteScript(jsScript)?.ToString();
         }
         /// <summary>
         /// Асинхронно выполнить скрипт
@@ -321,7 +329,6 @@ namespace AutoBot.Area.Managers
             return null;
         }
 
-
         /// <summary>
         /// Асинхронно получить элемент по Id
         /// </summary>
@@ -351,7 +358,7 @@ namespace AutoBot.Area.Managers
         /// <returns>Коллекция вэб-элементов</returns>
         public IEnumerable<IWebElement> GetElementsById(string elementId)
         {
-            return _browser.FindElementsById(elementId);
+            return _chromeDriver.FindElementsById(elementId);
         }
         /// <summary>
         /// Получить элементы по XPath
@@ -360,7 +367,7 @@ namespace AutoBot.Area.Managers
         /// <returns>Коллекция вэб-элементов</returns>
         public IEnumerable<IWebElement> GetElementsByXPath(string xPath)
         {
-            return _browser.FindElementsByXPath(xPath);
+            return _chromeDriver.FindElementsByXPath(xPath);
         }
         /// <summary>
         /// Получить элементы по классу
@@ -369,7 +376,7 @@ namespace AutoBot.Area.Managers
         /// <returns>Коллекция вэб-элементов</returns>
         public IEnumerable<IWebElement> GetElementsByClassName(string className)
         {
-            return _browser.FindElementsByClassName(className);
+            return _chromeDriver.FindElementsByClassName(className);
         }
         /// <summary>
         /// Получить элементы по тэгу
@@ -378,7 +385,7 @@ namespace AutoBot.Area.Managers
         /// <returns>Коллекция вэб-элементов</returns>
         public IEnumerable<IWebElement> GetElementsByTagName(string tagName)
         {
-            return _browser.FindElementsByTagName(tagName);
+            return _chromeDriver.FindElementsByTagName(tagName);
         }
         /// <summary>
         /// Получить элементу по селектору
@@ -387,7 +394,7 @@ namespace AutoBot.Area.Managers
         /// <returns>Коллекция вэб-элементов</returns>
         public IEnumerable<IWebElement> GetElementsByCssSelector(string cssSelector)
         {
-            return _browser.FindElementsByCssSelector(cssSelector);
+            return _chromeDriver.FindElementsByCssSelector(cssSelector);
         }
 
 
@@ -397,7 +404,7 @@ namespace AutoBot.Area.Managers
         /// <returns>URL</returns>
         public string GetUrlPage()
         {
-            return _browser.Url;
+            return _chromeDriver.Url;
         }
         /// <summary>
         /// Получить титул страницы
@@ -405,14 +412,14 @@ namespace AutoBot.Area.Managers
         /// <returns>Титул страницы</returns>
         public string GetTitlePage()
         {
-            return _browser.Title;
+            return _chromeDriver.Title;
         }
         /// <summary>
         /// Обновить страницу
         /// </summary>
         public void RefreshPage()
         {
-            _browser.Navigate().Refresh();
+            _chromeDriver.Navigate().Refresh();
             Thread.Sleep(3500);
         }
         /// <summary>
@@ -420,8 +427,8 @@ namespace AutoBot.Area.Managers
         /// </summary>
         public void QuitBrowser()
         {
-            _browser.Close();
-            _browser.Quit();
+            _chromeDriver.Close();
+            _chromeDriver.Quit();
         }
 
 
@@ -431,7 +438,7 @@ namespace AutoBot.Area.Managers
         /// <param name="webElement">Вэб-элемент</param>
         public void MoveToElementAndClick(IWebElement webElement)
         {
-            Actions action = new Actions(_browser);
+            Actions action = new Actions(_chromeDriver);
             action.MoveToElement(webElement).Click().Build().Perform();
         }
         /// <summary>
@@ -440,7 +447,7 @@ namespace AutoBot.Area.Managers
         /// <param name="webElement">Веб-элемент</param>
         public void FocusOnElement(IWebElement webElement)
         {
-            Actions action = new Actions(_browser);
+            Actions action = new Actions(_chromeDriver);
             action.MoveToElement(webElement).Build().Perform();
         }
 
@@ -451,7 +458,17 @@ namespace AutoBot.Area.Managers
         /// <returns>Изображение экрана</returns>
         public Screenshot GetScreenshot()
         {
-            return _browser.GetScreenshot();
+            return _chromeDriver.GetScreenshot();
+        }
+
+
+        /// <summary>
+        /// В фоном ли режиме запущен браузер
+        /// </summary>
+        /// <returns>True - в фоновом, иначе false</returns>
+        public bool IsBackgroundMode()
+        {
+            return _isHeadless;
         }
     }
 }

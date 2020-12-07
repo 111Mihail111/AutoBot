@@ -22,7 +22,17 @@ namespace AutoBot.Area.Managers
                 return;
             }
 
-            GetElementsByClassName("__gp").First().Click();
+            var saveProfile = GetElementByClassName("anonym_login_user");
+            if (saveProfile != null)
+            {
+                saveProfile.ToClick();
+
+                CloseTab();
+                SwitchToTab();
+                return;
+            }
+
+            GetElementsByClassName("__gp").First().ToClick();
             SwitchToLastTab();
 
             var savedAccountDiv = GetElementById("profileIdentifier");
@@ -30,8 +40,7 @@ namespace AutoBot.Area.Managers
             {
                 int tabsCount = GetTabsCount();
 
-                savedAccountDiv.Click();
-                Thread.Sleep(1500);
+                savedAccountDiv.ToClick(1500);
 
                 if (tabsCount > GetTabsCount())
                 {
@@ -49,19 +58,67 @@ namespace AutoBot.Area.Managers
             {
                 inputLogin.SendKeys(email);
             }
-
-            GetElementById("identifierNext").FindElement(SearchMethod.Tag, "button").Click();
+            GetElementById("identifierNext").FindElement(SearchMethod.Tag, "button").ToClick();
 
             var inputPassword = GetElementById("password").FindElement(SearchMethod.Tag, "input");
             if (string.IsNullOrWhiteSpace(inputPassword.GetValue()))
             {
                 inputPassword.SendKeys(password);
             }
-
-            GetElementById("passwordNext").FindElement(SearchMethod.Tag, "button").Click();
-            Thread.Sleep(2000);
+            GetElementById("passwordNext").FindElement(SearchMethod.Tag, "button").ToClick(2000);
 
             SwitchToLastTab();
+            CloseTab();
+            SwitchToTab();
+        }
+        /// <inheritdoc/>
+        public void AuthorizationThroughMailOldVersionBrowser(string email, string password)
+        {
+            string url = "https://ok.ru/feed";
+            OpenPageInNewTab(url);
+
+            if (url == GetUrlPage())
+            {
+                CloseTab();
+                SwitchToTab();
+                return;
+            }
+
+            var saveProfile = GetElementByClassName("anonym_login_user");
+            if (saveProfile != null)
+            {
+                saveProfile.ToClick();
+
+                CloseTab();
+                SwitchToTab();
+                return;
+            }
+
+            GetElementsByClassName("__gp").First().ToClick();
+            SwitchToLastTab();
+
+            var savedAccountLi = GetElementById($"account-{email}");
+            if (savedAccountLi != null)
+            {
+                GetElementById("choose-account-0").ToClick(2000);
+                SwitchToTab();
+                return;
+            }
+
+            var inputLogin = GetElementById("Email");
+            if (string.IsNullOrWhiteSpace(inputLogin.GetValue()))
+            {
+                inputLogin.SendKeys(email);
+            }
+            GetElementById("next").ToClick(2000);
+
+            var inputPassword = GetElementById("password");
+            if (string.IsNullOrWhiteSpace(inputPassword.GetValue()))
+            {
+                inputPassword.SendKeys(password);
+            }
+            GetElementById("submit").ToClick(2000);
+
             CloseTab();
             SwitchToTab();
         }
@@ -191,6 +248,19 @@ namespace AutoBot.Area.Managers
             GetElementById("hook_FormButton_button_delete_confirm").ToClick(1500);
         }
 
+
+        /// <summary>
+        /// Удалить детали аккаунта в старой версии браузера
+        /// </summary>
+        /// <param name="login">Логин</param>
+        protected void RemoveAccountDetailsOldVersionBrowser(string login)
+        {
+            var savedAccountLi = GetElementById($"account-{login}");
+            if (savedAccountLi != null)
+            {
+                GetElementById("choose-account-0").ToClick(1000);
+            }
+        }
         /// <summary>
         /// Удалить данные поста
         /// </summary>

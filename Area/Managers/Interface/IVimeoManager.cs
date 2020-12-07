@@ -11,6 +11,12 @@ namespace AutoBot.Area.Managers.Interface
         /// <param name="password">Пароль</param>
         public void Authorization(string login, string password);
         /// <summary>
+        /// Авторизация в фоновом режиме браузера
+        /// </summary>
+        /// <param name="login">Логин</param>
+        /// <param name="password">Пароль</param>
+        public void AuthorizationInBrowserBackground(string login, string password);
+        /// <summary>
         /// Лайк под видео
         /// </summary>
         public void LikeUnderVideo();

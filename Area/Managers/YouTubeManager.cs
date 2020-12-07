@@ -12,18 +12,15 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void Authorization(string login, string password)
         {
-            string url = "https://www.youtube.com/";
+            string url = "https://www.youtube.com/account";
             OpenPageInNewTab(url);
-            Thread.Sleep(5000);
 
-            if (GetElementById("avatar-btn") != null)
+            if (GetUrlPage() == url)
             {
                 CloseTab();
                 SwitchToTab();
                 return;
             }
-
-            ButtonLoginClick();
 
             var savedAccountDiv = GetElementById("profileIdentifier");
             if (savedAccountDiv != null)
@@ -38,7 +35,6 @@ namespace AutoBot.Area.Managers
             {
                 inputLogin.SendKeys(login);
             }
-
             GetElementById("identifierNext").FindElement(SearchMethod.Tag, "button").ToClick(2000);
 
             var inputPassword = GetElementById("password").FindElement(SearchMethod.Tag, "input");
@@ -46,11 +42,42 @@ namespace AutoBot.Area.Managers
             {
                 inputPassword.SendKeys(password);
             }
-
             GetElementById("passwordNext").FindElement(SearchMethod.Tag, "button").ToClick(2000);
 
             GoToUrl(url);
             ButtonLoginClick();
+
+            CloseTab();
+            SwitchToTab();
+        }
+        /// <inheritdoc/>
+        public void AuthorizationForOldVersionBrowser(string login, string password)
+        {
+            string url = "https://www.youtube.com/account";
+            OpenPageInNewTab(url);
+
+            if (GetUrlPage() == url)
+            {
+                CloseTab();
+                SwitchToTab();
+                return;
+            }
+
+            RemoveAccountDetailsOldVersionBrowser(login);
+
+            var inputLogin = GetElementById("Email");
+            if (string.IsNullOrWhiteSpace(inputLogin.GetValue()))
+            {
+                inputLogin.SendKeys(login);
+            }
+            GetElementById("next").ToClick(2000);
+
+            var inputPassword = GetElementById("password");
+            if (string.IsNullOrWhiteSpace(inputPassword.GetValue()))
+            {
+                inputPassword.SendKeys(password);
+            }
+            GetElementById("submit").ToClick(2000);
 
             CloseTab();
             SwitchToTab();
@@ -131,6 +158,20 @@ namespace AutoBot.Area.Managers
 
             CloseTab();
             SwitchToTab();
+        }
+        /// <summary>
+        /// Удалить детали аккаунта в старой версии браузера
+        /// </summary>
+        /// <param name="login">Логин</param>
+        protected void RemoveAccountDetailsOldVersionBrowser(string login)
+        {
+            var savedAccountLi = GetElementById($"account-{login}");
+            if (savedAccountLi != null)
+            {
+                GetElementById("edit-account-list").ToClick(1000);
+                GetElementById("choose-account-0").ToClick(1000);
+                GetElementById("edit-account-list").ToClick(1000);
+            }
         }
         /// <summary>
         /// Нажать на кнопку авторизации
