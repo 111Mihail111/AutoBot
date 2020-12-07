@@ -28,8 +28,7 @@ namespace AutoBot.Area.Managers
                 loginInput.SendKeys(login);
             }
 
-            GetElementById("signup_forms_submit").Click();
-            Thread.Sleep(1500);
+            GetElementById("signup_forms_submit").ToClick(2000);
 
             GetElementById("signup_magiclink").FindElements(SearchMethod.Tag, "a")
                 .Where(w => w.GetInnerText() == "Войти с паролем").First().Click();

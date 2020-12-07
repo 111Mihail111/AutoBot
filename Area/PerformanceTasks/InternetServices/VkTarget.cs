@@ -1166,7 +1166,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 return;
             }
 
-            GoTo("https://vktarget.ru/login/");
             GetElementsByClassName("mdl-js-button").Last().ToClick(1500);
             GetElementByClassName("icon__vk").ToClick(3000);
         }
