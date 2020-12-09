@@ -36,7 +36,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
         protected void Init()
         {
-            Initialization(BROWSER_PROFILE_SERVICE, true);
+            Initialization(BROWSER_PROFILE_SERVICE);
             SetContextForManagers();
 
             if (!_isAuthorizationSocialNetworks)
@@ -88,11 +88,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             //    return service;
             //}
 
-            Init();
-            GoToUrl(service.URL);
+
 
             try
             {
+                Init();
+                GoToUrl(service.URL);
                 AuthorizationOnService();
                 BeginCollecting();
 
@@ -105,7 +106,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
                 QuitBrowser();
             }
-            
+
             return service;
         }
 
@@ -187,38 +188,18 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _vkManager.MakeRepost();
                 }
 
-                _vkManager.PutLike();
-                Thread.Sleep(4500);
-
                 string url = GetUrlPage();
+                _vkManager.PutLike();
+                
                 CloseTab();
                 SwitchToTab();
-
                 GetElementByXPath("//*[@id='buttons']/a[2]").ToClick(2000);
 
-                if (IsMaxLikes())
+                if (!DidPaymentPass())
                 {
                     OpenPageInNewTab(url);
                     _vkManager.RemoveLike();
                     SkipTask("vkLike");
-
-                    perfomanse = GetElementByClassName("groups").GetInnerText();
-                    continue;
-                }
-                else if (GetTextFromAlert() == "Лайк не был поставлен")
-                {
-                    if (!DidPaymentPass())
-                    {
-                        OpenPageInNewTab(url);
-                        _vkManager.RemoveLike();
-                        CloseTab();
-                        SwitchToTab();
-
-                        GetElementByXPath("//*[@id='buttons']/a[1]").ToClick(1000);
-                        GetElementByClassName("groups").FindElements(SearchMethod.ClassName, "group").First()
-                            .FindElement(SearchMethod.Tag, "a").ToClick();
-                        AlertAccept();
-                    }
                 }
 
                 perfomanse = GetElementByClassName("groups").GetInnerText();
@@ -295,8 +276,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     OpenPageInNewTab(url);
                     _instaManager.RemoveLike();
                     SkipTask("instaLike");
-                    groups = GetElementsByClassName("groups");
-                    continue;
                 }
 
                 groups = GetElementsByClassName("groups");
@@ -332,6 +311,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 switch (text)
                 {
                     case "Список участников скрыт, проверить выполнение нет возможности.Пожалуйста, пропустите это задание.":
+                        AlertAccept();
+                        return false;
+                    case "К сожалению, уже было поставлено нужное количество лайков к данному объекту. Обновите список заданий.":
+                        AlertAccept();
                         return false;
                 }
 
@@ -348,49 +331,32 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         {
             CloseTab();
             SwitchToTab();
-            GetElementByXPath("//*[@id='buttons']/a[1]").Click();
-            Thread.Sleep(1500);
+            GetElementByXPath("//*[@id='buttons']/a[1]").ToClick(1500);
 
             switch (typeTask)
             {
                 case "vkLike":
-                    GetElementByXPath("//*[@id='content']/div[3]/div/div[3]/span").Click();
+                    GetElementByXPath("//*[@id='content']/div[3]/div/div[3]/span").ToClick();
                     AlertAccept();
                     break;
                 case "instaSubscription":
                 case "instaLike":
-                    string taskId = GetElementsByClassName("groups").First()
-                        .FindElement(SearchMethod.ClassName, "group").GetId();
+                    string taskId = GetElementsByClassName("groups").First().FindElement(SearchMethod.ClassName, "group").GetId();
                     if (_taskId == taskId)
                     {
-                        GetElementByXPath("//*[@id='content']/div[2]/div/a[1]").Click();
+                        GetElementByXPath("//*[@id='content']/div[2]/div/a[1]").ToClick();
                         AlertAccept();
                     }
                     break;
                 case "vkCommunity":
-                    GetElementByXPath("//*[@id='content']/div[3]/div/a[1]").Click();
+                    GetElementByXPath("//*[@id='content']/div[3]/div/a[1]").ToClick();
                     break;
             }
 
             _taskId = string.Empty;
             Thread.Sleep(2000);
         }
-        /// <summary>
-        /// Максимум лайков
-        /// </summary>
-        /// <returns>True - да, иначе false</returns>
-        protected bool IsMaxLikes()
-        {
-            var massage = GetTextFromAlert();
-            if (massage == "К сожалению, уже было поставлено нужное количество лайков к данному объекту. Обновите список заданий.")
-            {
-                AlertAccept();
-                return true;
-            }
-
-            return false;
-        }
-
+        
 
         /// <summary>
         /// Авторизация
@@ -400,8 +366,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             var login = GetElementByXPath("//*[@id='uLogin']/div");
             if (login != null)
             {
-                login.Click();
-                Thread.Sleep(1500);
+                login.ToClick(1500);
             }
         }
         /// <summary>

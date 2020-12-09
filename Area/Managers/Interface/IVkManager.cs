@@ -54,7 +54,7 @@ namespace AutoBot.Area.Managers.Interface
         /// <summary>
         /// Удалить из друзей
         /// </summary>
-        public void RemoveFromFriends();
+        public void RemoveFriend();
         /// <summary>
         /// Заблокирован ли аккаунт
         /// </summary>

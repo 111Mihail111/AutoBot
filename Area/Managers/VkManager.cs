@@ -17,16 +17,14 @@ namespace AutoBot.Area.Managers
             var joinButton = GetElementById("join_button");
             if (joinButton != null)
             {
-                joinButton.Click();
-                Thread.Sleep(1500);
+                joinButton.ToClick(1500);
                 return;
             }
 
             var publicSubscribe = GetElementById("public_subscribe");
             if (publicSubscribe != null)
             {
-                publicSubscribe.Click();
-                Thread.Sleep(1500);
+                publicSubscribe.ToClick(1500);
             }
         }
         /// <inheritdoc/>
@@ -34,11 +32,8 @@ namespace AutoBot.Area.Managers
         {
             RemoveWindowMessage();
 
-            GetElementById("page_actions_btn").Click();
-            Thread.Sleep(600);
-
-            GetElementsByClassName("page_actions_inner").First().FindElements(SearchMethod.Tag, "a").First().Click();
-            Thread.Sleep(1500);
+            GetElementById("page_actions_btn").ToClick();
+            GetElementsByClassName("page_actions_inner").First().FindElements(SearchMethod.Tag, "a").First().ToClick(1500);
         }
         /// <inheritdoc/>
         public void PutLike()
@@ -47,7 +42,7 @@ namespace AutoBot.Area.Managers
             RemoveWindowMessage();
 
             var button = GetElementByClassName("like_btns").FindElements(SearchMethod.Tag, "a");
-            button.Where(w => w.GetTitle() == "Нравится").FirstOrDefault().Click();
+            button.Where(w => w.GetTitle() == "Нравится").FirstOrDefault().ToClick(2000);
         }
         /// <inheritdoc/>
         public void MakeRepost()
@@ -56,11 +51,10 @@ namespace AutoBot.Area.Managers
             RemoveWindowMessage(true);
 
             var buttons = GetElementByClassName("like_btns").FindElements(SearchMethod.Tag, "a");
-            buttons.Where(w => w.GetInnerText().Contains("Поделиться")).FirstOrDefault().Click();
+            buttons.Where(w => w.GetInnerText().Contains("Поделиться")).FirstOrDefault().ToClick();
 
-            GetElementById("like_share_my").Click();
-            GetElementById("like_share_send").Click();
-            Thread.Sleep(1500);
+            GetElementById("like_share_my").ToClick();
+            GetElementById("like_share_send").ToClick(1500);
         }
         /// <inheritdoc/>
         public void RemoveLike()
@@ -87,21 +81,18 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void ToTellAboutGroup()
         {
-            GetElementById("page_menu_group_share").Click();
-            GetElementById("like_share_send").Click();
-            Thread.Sleep(1500);
+            GetElementById("page_menu_group_share").ToClick();
+            GetElementById("like_share_send").ToClick(1500);
         }
         /// <inheritdoc/>
         public void AddToFriends()
         {
-            GetElementByClassName("button_wide").Click();
-            Thread.Sleep(1500);
+            GetElementByClassName("button_wide").ToClick(1500);
         }
         /// <inheritdoc/>
-        public void RemoveFromFriends()
+        public void RemoveFriend()
         {
-            GetElementByClassName("button_wide").Click();
-            Thread.Sleep(1500);
+            GetElementByClassName("button_wide").ToClick(1500);
 
             var hyperLinkCollection = GetElementById("friend_status").FindElements(SearchMethod.Tag, "a");
             foreach (var item in hyperLinkCollection)
@@ -109,7 +100,7 @@ namespace AutoBot.Area.Managers
                 var textButton = item.GetInnerText();
                 if (textButton == "Отписаться" || textButton == "Удалить из друзей" || textButton == "Отменить заявку")
                 {
-                    item.Click();
+                    item.ToClick();
                     return;
                 }
             }
@@ -143,8 +134,7 @@ namespace AutoBot.Area.Managers
                 password.SendKeys(passwordVK);
             }
 
-            GetElementById("index_login_button").Click();
-            Thread.Sleep(3000);
+            GetElementById("index_login_button").ToClick(3000);
 
             CloseTab();
             SwitchToTab();
@@ -154,6 +144,7 @@ namespace AutoBot.Area.Managers
         {
             SetDriver(chromeDriver);
         }
+
 
         /// <summary>
         /// Удалить данные поста

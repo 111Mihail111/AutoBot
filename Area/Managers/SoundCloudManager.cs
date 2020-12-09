@@ -181,6 +181,7 @@ namespace AutoBot.Area.Managers
         }
         protected void RemoveModalWindow()
         {
+            Thread.Sleep(2000);
             ExecuteScript("document.getElementsByClassName('callout g-z-index-callout m-active')[0]?.remove();");
         }
     }

@@ -187,7 +187,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
         public void GoTo(string url)
         {
-
             try
             {
                 Init();
@@ -685,7 +684,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Выполнить задачу в Vimeo
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInVimeo(string taskText)
+        protected void CarryOutTaskInVimeo(string taskText) //TODO
         {
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
@@ -695,6 +694,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 case "Поставить лайк на видео":
                     _vimeoManager.LikeUnderVideo();
+                    break;
+                case "подпишитесь на Аккаунт":
+                    isError = true;
+                    //https://vimeo.com/julianbollerhoff
                     break;
                 default:
                     _logManager.SendToEmail(taskText, "CarryOutTaskInVimeo()", GetUrlPage());
@@ -770,7 +773,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _vkManager.RemoveLike();
                     break;
                 case "Добавить в друзья":
-                    _vkManager.RemoveFromFriends();
+                    _vkManager.RemoveFriend();
                     break;
             }
 
@@ -951,7 +954,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Отменить задачу в Vimeo
         /// </summary>
-        protected void UndoTaskInVimeo()
+        protected void UndoTaskInVimeo() //TODO
         {
             OpenPageInNewTab(_urlByTask);
 
@@ -960,6 +963,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 case "Поставить лайк на видео":
                     _vimeoManager.RemoveLike();
                     break;
+                //case "подпишитесь на Аккаунт":
+                //    //https://vimeo.com/julianbollerhoff
+                //    break;
             }
 
             CloseTab();
@@ -1032,19 +1038,21 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Пропустить задачу
         /// </summary>
-        protected void SkipTask()
+        protected void SkipTask() //TODO: Протестить
         {
             ExecuteScript("var task = document.querySelector('#list>main>section:nth-child(2)>div>div>div>div:nth-child(1)>" +
                 "div.container-fluid.available__table').getElementsByClassName('row tb__row');" +
                 "task[0].children[5].getElementsByClassName('control__item close')[0].click();");
+
+            //GetElementByCssSelector(".control__item.close").ToClick();
         }
         /// <summary>
         /// Проверить задачу
         /// </summary>
-        protected void CheckTask() //TODO: Переработать метод. Разбить на несколько
+        protected void CheckTask() //TODO: Переработать метод. Разбить на несколько 
         {
             string getTaskScript = "var task = document.querySelector('#list>main>section:nth-child(2)>div>div>div>div:nth-child(1)>div" +
-                ".container-fluid.available__table').getElementsByClassName('row tb__row')[0];";
+                ".container-fluid.available__table').getElementsByClassName('row tb__row')[0];"; //string getTaskScript = "var task = document.querySelector('.control__item.close')[0];";
             string clickButtonScript = "task.children[3].getElementsByClassName('default__small__btn check__btn')[0].click();";
             string getAttribute = "return task.getAttribute('data-task-item');";
 
@@ -1167,7 +1175,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             }
 
             GetElementsByClassName("mdl-js-button").Last().ToClick(1500);
-            GetElementByClassName("icon__vk").ToClick(3000);
+            ExecuteScript("document.getElementsByClassName('icon__vk')[0].click();");
+
+            while (!CheckAuthorization())
+            {
+                Thread.Sleep(1000);
+            }
         }
         protected void AuthorizationInBrowserBackground()
         {
@@ -1177,7 +1190,34 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             }
 
             GoToUrl("https://vktarget.ru/login/");
-            GetElementByClassName("icon__vk").ToClick(3000);
+            ExecuteScript("document.getElementsByClassName('icon__vk')[0].click();");
+
+            while (!CheckAuthorization())
+            {
+                Thread.Sleep(1000);
+            }
+        }
+        /// <summary>
+        /// Проверка авторизации
+        /// </summary>
+        /// <returns></returns>
+        protected bool CheckAuthorization() //TODO
+        { 
+            var header = GetElementById("header");
+            if (header != null)
+            {
+                RefreshPage();
+
+                var liElements = GetElementByClassName("header__links").FindElements(SearchMethod.Tag, "li");
+                if (liElements.Count() == 0)
+                {
+                    return true;
+                }
+
+                //TODO:Если есть кнопка "Вход" значить сессия умерла при входе. Браузер закрывается и сервис засыпает на час 
+            }
+
+            return false;
         }
         /// <summary>
         /// Получить баланс
