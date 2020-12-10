@@ -36,7 +36,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
         protected void Init()
         {
-            Initialization(BROWSER_PROFILE_SERVICE);
+            Initialization(BROWSER_PROFILE_SERVICE, true);
             SetContextForManagers();
 
             if (!_isAuthorizationSocialNetworks)
@@ -87,8 +87,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             //    service.StatusService = Status.InSleeping;
             //    return service;
             //}
-
-
 
             try
             {
@@ -287,7 +285,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Прошел ли платеж
         /// </summary>
         /// <returns>True - прошел, иначе false</returns>
-        public bool DidPaymentPass() //TODO
+        public bool DidPaymentPass()
         {
             int counter = 0;
             var getPaymentButton = GetElementByXPath("//*[@id='buttons']/a[2]");

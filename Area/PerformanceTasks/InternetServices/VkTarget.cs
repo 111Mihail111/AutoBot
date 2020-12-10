@@ -21,15 +21,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         private static bool _isAuthorizationSocialNetworks;
         /// <summary>
-        /// Логин для VkTarget
-        /// </summary>
-        private static string _loginVkTarget;
-        /// <summary>
-        /// Пароль для VkTarget
-        /// </summary>
-        private static string _passwordVkTarget;
-
-        /// <summary>
         /// Тип соц. сети
         /// </summary>
         private string _typeSocialNetwork;
@@ -135,14 +126,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             var accountClassmates = accounts.Where(w => w.AccountType == AccountType.Classmates).FirstOrDefault();
             if (accountClassmates != null)
             {
-                if (IsBackgroundMode())
-                {
-                    _classmatesManager.AuthorizationThroughMailOldVersionBrowser(accountClassmates.Login, accountClassmates.Password);
-                }
-                else
-                {
-                    _classmatesManager.AuthorizationThroughMail(accountClassmates.Login, accountClassmates.Password);
-                }
+                _classmatesManager.AuthorizationThroughMail(accountClassmates.Login, accountClassmates.Password);
             }
 
             var accountYandexZen = accounts.Where(w => w.AccountType == AccountType.YandexZen).FirstOrDefault();
@@ -172,14 +156,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             var accountVimeo = accounts.Where(w => w.AccountType == AccountType.Vimeo).FirstOrDefault();
             if (accountVimeo != null)
             {
-                if (IsBackgroundMode())
-                {
-                    _vimeoManager.AuthorizationInBrowserBackground(accountVimeo.Login, accountVimeo.Password);
-                }
-                else
-                {
-                    _vimeoManager.Authorization(accountVimeo.Login, accountVimeo.Password);
-                }
+                _vimeoManager.Authorization(accountVimeo.Login, accountVimeo.Password);
             }
 
             _isAuthorizationSocialNetworks = true;
@@ -191,16 +168,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 Init();
                 GoToUrl(url);
-
-                if (IsBackgroundMode())
-                {
-                    AuthorizationInBrowserBackground();
-                }
-                else
-                {
-                    AuthorizationOnService();
-                }
-
+                AuthorizationOnService();
                 BeginCollecting(url);
             }
             catch (Exception exception)
@@ -963,9 +931,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 case "Поставить лайк на видео":
                     _vimeoManager.RemoveLike();
                     break;
-                //case "подпишитесь на Аккаунт":
-                //    //https://vimeo.com/julianbollerhoff
-                //    break;
+                    //case "подпишитесь на Аккаунт":
+                    //    //https://vimeo.com/julianbollerhoff
+                    //    break;
             }
 
             CloseTab();
@@ -1038,27 +1006,20 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Пропустить задачу
         /// </summary>
-        protected void SkipTask() //TODO: Протестить
+        protected void SkipTask()
         {
-            ExecuteScript("var task = document.querySelector('#list>main>section:nth-child(2)>div>div>div>div:nth-child(1)>" +
-                "div.container-fluid.available__table').getElementsByClassName('row tb__row');" +
-                "task[0].children[5].getElementsByClassName('control__item close')[0].click();");
-
-            //GetElementByCssSelector(".control__item.close").ToClick();
+            GetElementByCssSelector(".control__item.close").ToClick();
         }
         /// <summary>
         /// Проверить задачу
         /// </summary>
         protected void CheckTask() //TODO: Переработать метод. Разбить на несколько 
         {
-            string getTaskScript = "var task = document.querySelector('#list>main>section:nth-child(2)>div>div>div>div:nth-child(1)>div" +
-                ".container-fluid.available__table').getElementsByClassName('row tb__row')[0];"; //string getTaskScript = "var task = document.querySelector('.control__item.close')[0];";
-            string clickButtonScript = "task.children[3].getElementsByClassName('default__small__btn check__btn')[0].click();";
-            string getAttribute = "return task.getAttribute('data-task-item');";
+            string getTaskScript = "var task = document.querySelector('.container-fluid.available__table');";
+            string clickButtonScript = "task.querySelector('.default__small__btn.check__btn').click();";
+            string getAttribute = "return task.children[0].getAttribute('data-task-item');";
 
             var taksId = ExecuteScript(getTaskScript + clickButtonScript + getAttribute);
-            Thread.Sleep(1500);
-
             int waitingСounter = 0;
 
             bool isCheked = true;
@@ -1125,13 +1086,13 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 "var button = tasks[0].children[2].getElementsByTagName('a')[0];" +
                 "var task = document.getElementsByClassName('wrap')[1].innerText;" +
                 "button.click();" +
-                "return systemType + '|' + task;").Split("|");
+                "return systemType + '|' + task;").Split("|").ToList();
 
-            _typeSocialNetwork = taskDetails[0];
+            _typeSocialNetwork = taskDetails.First();
 
-            if (taskDetails.Length == 2)
+            if (taskDetails.Count == 2)
             {
-                _task = taskDetails[1];
+                _task = taskDetails.Last();
             }
         }
         /// <summary>
@@ -1139,26 +1100,19 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void Inaction()
         {
-            string getTaskScript = "var taskEmpty = document.querySelector('#list>main>section:nth-child(3)>div>div>div>div:nth-child" +
-                "(1)>div.empty');if (taskEmpty.classList.length == 1){return 'false'}else{return 'true'}";
+            string checkTaskScript = "return document.querySelector('.empty').classList.length == 1 ? 'false' : 'true';";
             int randomTimerMinuts = GetRandomNumber(10, 61);
 
             while (true)
             {
-                bool taskExists = Convert.ToBoolean(ExecuteScript(getTaskScript));
-                if (taskExists)
+                bool taskExists = Convert.ToBoolean(ExecuteScript(checkTaskScript));
+                if (randomTimerMinuts == 0 || taskExists)
                 {
                     return;
                 }
-                else if (randomTimerMinuts == 0)
-                {
-                    return;
-                }
-                else
-                {
-                    Thread.Sleep(60000);
-                    randomTimerMinuts--;
-                }
+
+                Thread.Sleep(60000);
+                randomTimerMinuts--;
             }
         }
 
@@ -1176,48 +1130,32 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
             GetElementsByClassName("mdl-js-button").Last().ToClick(1500);
             ExecuteScript("document.getElementsByClassName('icon__vk')[0].click();");
-
-            while (!CheckAuthorization())
-            {
-                Thread.Sleep(1000);
-            }
-        }
-        protected void AuthorizationInBrowserBackground()
-        {
-            if (GetUrlPage() == "https://users.vktarget.ru/list/")
-            {
-                return;
-            }
-
-            GoToUrl("https://vktarget.ru/login/");
-            ExecuteScript("document.getElementsByClassName('icon__vk')[0].click();");
-
-            while (!CheckAuthorization())
-            {
-                Thread.Sleep(1000);
-            }
+            WaitingForAuthorization();
         }
         /// <summary>
-        /// Проверка авторизации
+        /// Ожидание авторизации
         /// </summary>
-        /// <returns></returns>
-        protected bool CheckAuthorization() //TODO
-        { 
-            var header = GetElementById("header");
-            if (header != null)
+        protected void WaitingForAuthorization()
+        {
+            bool isAuthorization = false;
+            while (!isAuthorization)
             {
-                RefreshPage();
-
-                var liElements = GetElementByClassName("header__links").FindElements(SearchMethod.Tag, "li");
-                if (liElements.Count() == 0)
+                var header = GetElementById("header");
+                if (header != null)
                 {
-                    return true;
+                    RefreshPage();
+
+                    var liElements = GetElementByClassName("header__links").FindElements(SearchMethod.Tag, "li");
+                    if (liElements.Count() == 0)
+                    {
+                        isAuthorization = true;
+                        continue;
+                    }
                 }
 
-                //TODO:Если есть кнопка "Вход" значить сессия умерла при входе. Браузер закрывается и сервис засыпает на час 
+                Thread.Sleep(1000);
+                isAuthorization = false;
             }
-
-            return false;
         }
         /// <summary>
         /// Получить баланс
@@ -1242,12 +1180,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Получить случайное число
         /// </summary>
-        /// <param name="min">Минимальное значение</param>
-        /// <param name="max">Максимальное значение</param>
-        /// <returns>Случайное числовое значение</returns>
-        protected int GetRandomNumber(int min, int max)
+        /// <param name="minValue">Минимальное значение</param>
+        /// <param name="maxValue">Максимальное значение</param>
+        /// <returns>Случайное число</returns>
+        protected int GetRandomNumber(int minValue, int maxValue)
         {
-            return new Random().Next(min, max);
+            return new Random().Next(minValue, maxValue);
         }
         /// <summary>
         /// Фокус на элемент меню

@@ -29,7 +29,7 @@ namespace AutoBot.Area.Managers
         /// </summary>
         public const string ERROR_ZERO_BALANCE = "ERROR_ZERO_BALANCE"; //TODO:Убрать отсюда
 
-        public void Initialization(string pathToProfile, bool isHeadless = false)
+        public void Initialization(string pathToProfile)
         {
             ChromeOptions options = new ChromeOptions();
             options.AddArgument($"--user-data-dir={pathToProfile}"); //Путь к папке с профилем
@@ -38,18 +38,30 @@ namespace AutoBot.Area.Managers
             options.AddArgument("--disable-notifications"); //Блокировка уведомлений
             options.AddArgument("--mute-audio"); //Отключает звук в браузере
 
-            if (isHeadless)
-            {
-                options.AddArgument("--headless"); //Запуск в фоновом режиме (без отображения бразуера)
-            }
+            //options.BinaryLocation = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"; //Для дом. запуска
+            options.AddAdditionalCapability("useAutomationExtension", false); //Скрывает указанное расширение
+            options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
 
-            _isHeadless = options.Arguments.Where(w => w.Contains("--headless")).Any();
+            _chromeDriver = new ChromeDriver("./BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
+        }
+
+        public void Initialization(string pathToProfile, bool isHeadless)
+        {
+            ChromeOptions options = new ChromeOptions();
+            options.AddArgument($"--user-data-dir={pathToProfile}"); //Путь к папке с профилем
+            options.AddArgument("--profile-directory=AutoBot"); //Профиль
+            options.AddArgument("--window-size=1920,1080"); //Разворачивает браузер на указаную ширину экрана
+            options.AddArgument("--disable-notifications"); //Блокировка уведомлений
+            options.AddArgument("--mute-audio"); //Отключает звук в браузере
+            options.AddArgument("--headless"); //Запуск в фоновом режиме (без отображения бразуера)
+            options.AddArgument("--no-sandbox"); //Отключает безопасность хрома, для корректной работы js-скриптов
 
             //options.BinaryLocation = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"; //Для дом. запуска
             options.AddAdditionalCapability("useAutomationExtension", false); //Скрывает указанное расширение
             options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
 
             _chromeDriver = new ChromeDriver("./BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
+            _isHeadless = isHeadless;
         }
 
         /// <summary>
