@@ -30,5 +30,13 @@ namespace AutoBot.Area.Managers.Interface
         /// <param name="url">Url-адрес страницы</param>
         /// <param name="base64Encoded">Изображение в base64</param>
         void SendToEmail(string taskDescription, string methodName, string url, string base64Encoded);
+        /// <summary>
+        /// Отправить сообщение
+        /// </summary>
+        /// <param name="exception">Возникшее исключение</param>
+        /// <param name="base64Encoded">Изображение в base64</param>
+        /// <param name="url">Url-адрес страницы</param>
+        /// /// <param name="topic">Тема письма</param>
+        public void SendToEmail(Exception exception, string base64Encoded, string url, string topic);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoBot.Area.Managers.Interface;
 using OpenQA.Selenium;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -61,6 +62,21 @@ namespace AutoBot.Area.Managers
             var message = new MailMessage(_mailFrom, _mailTo)
             {
                 Subject = "Возникла ошибка",
+                IsBodyHtml = true,
+                Body = $"{description}<br><center><h3>Изображение страницы</h3>{imageTag}</center>",
+            };
+
+            Send(message);
+        }
+        /// <inheritdoc/>
+        public void SendToEmail(Exception exception, string base64Encoded, string url, string topic)
+        {
+            var description = GetDescriptionException(exception) + $"<br><b>Url-Адрес</b>: {url}";
+            var imageTag = $"<img src='data:image/png;base64,{base64Encoded}' style='width:100%; height:100%;'>";
+
+            var message = new MailMessage(_mailFrom, _mailTo)
+            {
+                Subject = topic,
                 IsBodyHtml = true,
                 Body = $"{description}<br><center><h3>Изображение страницы</h3>{imageTag}</center>",
             };

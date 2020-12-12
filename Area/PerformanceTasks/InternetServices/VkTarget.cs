@@ -1008,7 +1008,18 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void SkipTask()
         {
-            GetElementByCssSelector(".control__item.close").ToClick();
+            var button = GetElementByCssSelector(".control__item.close");
+            if (button.Displayed)
+            {
+                try
+                {
+                    button.ToClick();
+                }
+                catch (Exception exception)
+                {
+                    _logManager.SendToEmail(exception, GetScreenshot().AsBase64EncodedString, GetUrlPage(), "Возникла ожидаемая ошибка");
+                }
+            }
         }
         /// <summary>
         /// Проверить задачу
@@ -1075,13 +1086,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected void GetTask()
         {
             var taskDetails = ExecuteScript(
-                "var taskEmpty = document.querySelector('#list>main>section:nth-child(2)>div>div>div>div:nth-child(1)>div.empty');" +
-                "if (taskEmpty.classList.length == 1)" +
+                "var taskEmptyLength = document.querySelector('.empty').classList.length;" +
+                "if (taskEmptyLength == 1)" +
                 "{" +
-                "return 'NoTasks'" +
+                    "return 'NoTasks';" +
                 "}" +
-                "var tasks = document.querySelector('#list>main>section:nth-child(2)>div>div>div>div:nth-child(1)>div.container-fluid" +
-                ".available__table').getElementsByClassName('row tb__row');" +
+                "var tasks = document.querySelector('.container-fluid.available__table').getElementsByClassName('row tb__row');" +
                 "var systemType = tasks[0].getElementsByClassName('social__img')[0].class.toString().replace('social__img ', '');" +
                 "var button = tasks[0].children[2].getElementsByTagName('a')[0];" +
                 "var task = document.getElementsByClassName('wrap')[1].innerText;" +

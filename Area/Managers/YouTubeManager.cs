@@ -85,17 +85,15 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void SubscribeToChannel()
         {
-            GetElementByXPath("//*[@id='subscribe-button']/ytd-subscribe-button-renderer/paper-button").Click();
-            Thread.Sleep(1500);
+            GetElementByXPath("//*[@id='subscribe-button']/ytd-subscribe-button-renderer/paper-button").ToClick(1500);
         }
         /// <inheritdoc/>
         public void UnsubscribeFromChannel()
         {
-            GetElementByXPath("//*[@id='subscribe-button']/ytd-subscribe-button-renderer/paper-button").Click();
-            Thread.Sleep(1500);
+            GetElementByXPath("//*[@id='subscribe-button']/ytd-subscribe-button-renderer/paper-button").ToClick(1500);
 
-            GetElementById("main").FindElements(SearchMethod.Tag, "paper-button").Last().Click();
-            Thread.Sleep(2000);
+            var modalWindow = GetElementByXPath("//paper-dialog/yt-confirm-dialog-renderer");
+            modalWindow.FindElements(SearchMethod.Tag, "a").Last().ToClick(2000);
         }
         /// <inheritdoc/>
         public void LikeUnderVideo()
