@@ -285,7 +285,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Прошел ли платеж
         /// </summary>
         /// <returns>True - прошел, иначе false</returns>
-        public bool DidPaymentPass()
+        public bool DidPaymentPass() //TODO: Лайк не был поставлен.
         {
             int counter = 0;
             var getPaymentButton = GetElementByXPath("//*[@id='buttons']/a[2]");
@@ -306,7 +306,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 }
 
                 string text = GetTextFromAlert();
-                switch (text)
+                switch (text) 
                 {
                     case "Список участников скрыт, проверить выполнение нет возможности.Пожалуйста, пропустите это задание.":
                         AlertAccept();

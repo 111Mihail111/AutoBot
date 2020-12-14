@@ -1147,9 +1147,17 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void WaitingForAuthorization()
         {
-            bool isAuthorization = false;
-            while (!isAuthorization)
+            int counter = 0;
+
+            while (true)
             {
+                if (counter == 5)
+                {
+                    return;
+                }
+
+                Thread.Sleep(4000);
+
                 var header = GetElementById("header");
                 if (header != null)
                 {
@@ -1158,13 +1166,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     var liElements = GetElementByClassName("header__links").FindElements(SearchMethod.Tag, "li");
                     if (liElements.Count() == 0)
                     {
-                        isAuthorization = true;
-                        continue;
+                        return;
                     }
                 }
 
-                Thread.Sleep(1000);
-                isAuthorization = false;
+                counter++;
             }
         }
         /// <summary>

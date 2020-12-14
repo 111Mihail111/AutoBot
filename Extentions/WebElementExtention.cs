@@ -1,6 +1,7 @@
 ﻿using AutoBot.Area.Enums;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -186,6 +187,15 @@ namespace AutoBot.Extentions
         /// <param name="timeout">Время ожидания после нажатия</param>
         public static void ToClick(this IWebElement webElement, int timeout = 1000)
         {
+            if (webElement == null)
+            {
+                throw new NullReferenceException();
+            }
+            else if (!webElement.Displayed)
+            {
+                throw new ElementNotVisibleException();
+            }
+
             webElement.Click();
             Thread.Sleep(timeout);
         }
