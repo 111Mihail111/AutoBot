@@ -104,6 +104,7 @@ namespace AutoBot.Area.Managers
             }
 
             stringBuilder.AppendLine($"<br><b>Описание</b>: {exception.Message}");
+            stringBuilder.AppendLine($"<br><b>Кол-во. вкладок</b>: {GetTabsCount()}");
 
             return stringBuilder;
         }

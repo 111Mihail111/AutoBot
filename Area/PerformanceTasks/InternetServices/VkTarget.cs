@@ -89,7 +89,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _vimeoManager.SetContextBrowserManager(driver);
             _tikTokManager.SetContextBrowserManager(driver);
         }
-
         /// <summary>
         /// Авторизация в соц сетях
         /// </summary>
@@ -174,9 +173,13 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             catch (Exception exception)
             {
                 _logManager.SendToEmail(exception, GetScreenshot().AsBase64EncodedString, GetUrlPage());
-                var a = ExecuteScript("return document.body.innerHTML");
-                QuitBrowser();
+                //var a = ExecuteScript("return document.body.innerHTML");
+                //QuitBrowser();
             }
+            //finally
+            //{
+            //    BeginCollecting(url);
+            //}
         }
 
         public void Quit()
@@ -463,7 +466,14 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (taskText)
             {
                 case "Нажать стрелку вверх на Запись":
-                    _redditManager.UpArrowForPost();
+                    try
+                    {
+                        _redditManager.UpArrowForPost();
+                    }
+                    catch (Exception exception)
+                    {
+                        _logManager.SendToEmail(exception, GetScreenshot().AsBase64EncodedString, GetUrlPage(), "Возникла ожидаемая ошибка");
+                    }
                     break;
                 case "Подпишитесь на пользователя":
                     var panel = GetElementByClassName("bDDEX4BSkswHAG_45VkFB");
@@ -533,7 +543,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Выполнить задачу в SoundCloud
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInSoundCloud(string taskText)
+        protected void CarryOutTaskInSoundCloud(string taskText) //Есть TODO
         {
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
@@ -552,6 +562,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     break;
                 case "Воспроизвести трэк":
                     Thread.Sleep(500);
+                    break;
+                case "Скачать трэк":
+                    isError = true; //TODO
                     break;
                 default:
                     _logManager.SendToEmail(taskText, "CarryOutTaskInSoundCloud()", GetUrlPage());
@@ -594,6 +607,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _quoraManager.LikeAnswer();
                     break;
                 case "Поделиться ответом":
+                    if (!_quoraManager.IsPageFound())
+                    {
+                        isError = true;
+                        break;
+                    }
                     _quoraManager.MakeRepost();
                     break;
                 default:
@@ -629,7 +647,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _tikTokManager.Subscribe();
                     break;
                 case "Поставьте лайк на видео":
-                    _tikTokManager.PutLike(); //https://www.tiktok.com/@ageofclonesofficial/video/6898252422603345157
+                    isError = true;
+                    //_tikTokManager.PutLike(); //https://www.tiktok.com/@ageofclonesofficial/video/6898252422603345157
                     break;
                 default:
                     _logManager.SendToEmail(taskText, "CarryOutTaskInTikTok()", GetUrlPage());
@@ -652,7 +671,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Выполнить задачу в Vimeo
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInVimeo(string taskText) //TODO
+        protected void CarryOutTaskInVimeo(string taskText)
         {
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
@@ -664,8 +683,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _vimeoManager.LikeUnderVideo();
                     break;
                 case "подпишитесь на Аккаунт":
-                    isError = true;
-                    //https://vimeo.com/julianbollerhoff
+                    _vimeoManager.Subscribe();
                     break;
                 default:
                     _logManager.SendToEmail(taskText, "CarryOutTaskInVimeo()", GetUrlPage());
@@ -922,7 +940,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Отменить задачу в Vimeo
         /// </summary>
-        protected void UndoTaskInVimeo() //TODO
+        protected void UndoTaskInVimeo()
         {
             OpenPageInNewTab(_urlByTask);
 
@@ -931,9 +949,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 case "Поставить лайк на видео":
                     _vimeoManager.RemoveLike();
                     break;
-                    //case "подпишитесь на Аккаунт":
-                    //    //https://vimeo.com/julianbollerhoff
-                    //    break;
+                case "подпишитесь на Аккаунт":
+                    _vimeoManager.Unsubscribe();
+                    break;
             }
 
             CloseTab();
@@ -1190,6 +1208,26 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             internetService.BalanceOnService = GetBalance();
 
             WebService.UpdateInternetService(internetService);
+        }
+        /// <summary>
+        /// Анализатор исключений
+        /// </summary>
+        protected void ExceptionAnalyzer()
+        {
+
+        }
+        /// <summary>
+        /// Проверить сеанс
+        /// </summary>
+        public void СheckSession()
+        {
+            var header = GetElementById("header").FindElement(SearchMethod.ClassName, "header__links");
+
+            var liElements = GetElementByClassName("header__links").FindElements(SearchMethod.Tag, "li");
+            if (liElements.Count() == 0)
+            {
+                return;
+            }
         }
 
 

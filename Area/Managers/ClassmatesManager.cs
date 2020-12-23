@@ -163,34 +163,44 @@ namespace AutoBot.Area.Managers
         {
             RemovePostDetails();
 
-            var vidget = GetElementByClassName("mlr_bot")
-                .FindElements(SearchMethod.ClassName, "widget_cnt").Last();
+            var vidget = GetElementById("hook_Block_ActionsPLLB");
+            if (vidget == null)
+            {
+                vidget = GetElementByClassName("mlr_bot");
+                return;
+            }
 
-            string vigetName = vidget.FindElement(SearchMethod.ClassName, "widget_tx").GetInnerText();
+            var span = vidget.FindElement(SearchMethod.Selector, ".widget_cnt.controls-list_lk");
+            string vigetName = span.FindElement(SearchMethod.ClassName, "widget_tx").GetInnerText();
+            
             if (vigetName == "Класс!")
             {
                 return;
             }
 
-            vidget.Click();
-            Thread.Sleep(1500);
+            span.ToClick(1500);
         }
         /// <inheritdoc/>
         public void RemoveClass()
         {
             RemovePostDetails();
 
-            var vidget = GetElementByClassName("mlr_bot")
-                .FindElements(SearchMethod.ClassName, "widget_cnt").Last();
+            var vidget = GetElementById("hook_Block_ActionsPLLB");
+            if (vidget == null)
+            {
+                vidget = GetElementByClassName("mlr_bot");
+                return;
+            }
 
-            string vigetName = vidget.FindElement(SearchMethod.ClassName, "widget_tx").GetInnerText();
+            var span = vidget.FindElement(SearchMethod.Selector, ".widget_cnt.controls-list_lk");
+            string vigetName = span.FindElement(SearchMethod.ClassName, "widget_tx").GetInnerText();
+
             if (vigetName == "Класс")
             {
                 return;
             }
 
-            vidget.Click();
-            Thread.Sleep(1500);
+            span.ToClick(1500);
         }
         /// <inheritdoc/>
         public void MakeRepost()

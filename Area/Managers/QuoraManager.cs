@@ -132,6 +132,11 @@ namespace AutoBot.Area.Managers
             return false;
         }
         /// <inheritdoc/>
+        public bool IsPageFound()
+        {
+            return !GetTitlePage().Contains("Error 404 - Quora");
+        }
+        /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
         {
             SetDriver(chromeDriver);

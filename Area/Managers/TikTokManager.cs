@@ -3,7 +3,6 @@ using AutoBot.Area.Managers.Interface;
 using AutoBot.Extentions;
 using OpenQA.Selenium.Chrome;
 using System.Linq;
-using System.Threading;
 
 namespace AutoBot.Area.Managers
 {
@@ -44,40 +43,80 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void Subscribe()
         {
-            GetElementsByClassName("follow-button").Where(w => w.GetInnerText() == "Подписаться").FirstOrDefault()?.ToClick(5000);
+            int counter = 0;
+            while (counter != 2)
+            {
+                var button = GetElementsByClassName("follow-button").Where(w => w.GetInnerText() == "Подписаться").FirstOrDefault();
+                if (button == null)
+                {
+                    return;
+                }
+                
+                button.ToClick(5000);
+                counter++;
+
+                RefreshPage();
+            }
         }
         /// <inheritdoc/>
         public void Unsubscribe()
         {
-            GetElementsByClassName("follow-button").Where(w => w.GetInnerText() == "Подписки").FirstOrDefault()?.ToClick(5000);
+            int counter = 0;
+            while (counter != 2)
+            {
+                var button = GetElementsByClassName("follow-button").Where(w => w.GetInnerText() == "Подписки").FirstOrDefault();
+                if (button == null)
+                {
+                    return;
+                }
+
+                button.ToClick(5000);
+                counter++;
+
+                RefreshPage();
+            }
         }
         /// <inheritdoc/>
         public void PutLike()
         {
-            var divElement = GetElementByClassName("video-feed-container").FindElement(SearchMethod.XPath, "span/div/div[1]");
-            var divLikeElement = divElement.FindElement(SearchMethod.ClassName, "engagement-icon");
-            var fillColor = divLikeElement.FindElement(SearchMethod.Tag, "svg").GetFill();
-
-            if (fillColor != "currentColor")
+            int counter = 0;
+            while (counter != 2)
             {
-                return;
-            }
+                var divElement = GetElementByClassName("video-feed-container").FindElement(SearchMethod.XPath, "span/div/div[1]");
+                var divLikeElement = divElement.FindElement(SearchMethod.ClassName, "engagement-icon");
+                var fillColor = divLikeElement.FindElement(SearchMethod.Tag, "svg").GetFill();
 
-            divLikeElement.ToClick(5000);
+                if (fillColor != "currentColor")
+                {
+                    return;
+                }
+
+                divLikeElement.ToClick(5000);
+                counter++;
+
+                RefreshPage();
+            }
         }
         /// <inheritdoc/>
         public void RemoveLike()
         {
-            var divElement = GetElementByClassName("video-feed-container").FindElement(SearchMethod.XPath, "span/div/div[1]");
-            var divLikeElement = divElement.FindElement(SearchMethod.ClassName, "engagement-icon");
-            var fillColor = divLikeElement.FindElement(SearchMethod.Tag, "svg").GetFill();
-
-            if (fillColor == "currentColor")
+            int counter = 0;
+            while (counter != 2)
             {
-                return;
-            }
+                var divElement = GetElementByClassName("video-feed-container").FindElement(SearchMethod.XPath, "span/div/div[1]");
+                var divLikeElement = divElement.FindElement(SearchMethod.ClassName, "engagement-icon");
+                var fillColor = divLikeElement.FindElement(SearchMethod.Tag, "svg").GetFill();
 
-            divLikeElement.ToClick(5000);
+                if (fillColor != "currentColor")
+                {
+                    return;
+                }
+
+                divLikeElement.ToClick(5000);
+                counter++;
+
+                RefreshPage();
+            }
         }
         /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)

@@ -191,7 +191,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 
                 CloseTab();
                 SwitchToTab();
-                GetElementByXPath("//*[@id='buttons']/a[2]").ToClick(2000);
 
                 if (!DidPaymentPass())
                 {
@@ -285,7 +284,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Прошел ли платеж
         /// </summary>
         /// <returns>True - прошел, иначе false</returns>
-        public bool DidPaymentPass() //TODO: Лайк не был поставлен.
+        public bool DidPaymentPass()
         {
             int counter = 0;
             var getPaymentButton = GetElementByXPath("//*[@id='buttons']/a[2]");
@@ -298,9 +297,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     return false;
                 }
 
-                getPaymentButton.ToClick(5000);
+                getPaymentButton.ToClick();
 
-                if (!IsAlertExist())
+                if (!IsAlertExist(5))
                 {
                     return true;
                 }

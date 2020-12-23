@@ -160,18 +160,23 @@ namespace AutoBot.Area.Managers
         /// Открыт ли Alert на странице
         /// </summary>
         /// <returns>True - открыт, иначе false</returns>
-        public bool IsAlertExist()
+        public bool IsAlertExist(int waitingTimeSecond = 2)
         {
-            try
+            while (waitingTimeSecond != 0)
             {
-                _chromeDriver.SwitchTo().Alert();
+                try
+                {
+                    _chromeDriver.SwitchTo().Alert();
+                    return true;
+                }
+                catch (NoAlertPresentException)
+                {
+                    Thread.Sleep(1000);
+                    waitingTimeSecond--;
+                }
+            }
 
-                return true;
-            }
-            catch (NoAlertPresentException)
-            {
-                return false;
-            }
+            return false;
         }
         /// <summary>
         /// Получить текст из алерт окна

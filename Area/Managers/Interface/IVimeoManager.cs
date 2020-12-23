@@ -15,7 +15,7 @@ namespace AutoBot.Area.Managers.Interface
         /// </summary>
         /// <param name="login">Логин</param>
         /// <param name="password">Пароль</param>
-        public void AuthorizationInBrowserBackground(string login, string password);
+        //public void AuthorizationInBrowserBackground(string login, string password);
         /// <summary>
         /// Лайк под видео
         /// </summary>
@@ -24,6 +24,14 @@ namespace AutoBot.Area.Managers.Interface
         /// Удалить лайк
         /// </summary>
         public void RemoveLike();
+        /// <summary>
+        /// Подписаться под пользователем
+        /// </summary>
+        public void Subscribe();
+        /// <summary>
+        /// Отписаться от пользователя
+        /// </summary>
+        public void Unsubscribe();
         /// <summary>
         /// Считать контекст браузер менеджера
         /// </summary>

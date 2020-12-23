@@ -41,7 +41,7 @@ namespace AutoBot.Area.Managers
             SwitchToTab();
         }
         /// <inheritdoc/>
-        public void AuthorizationInBrowserBackground(string login, string password)
+        /*public void AuthorizationInBrowserBackground(string login, string password)
         {
             OpenPageInNewTab("https://vimeo.com/");
 
@@ -71,7 +71,7 @@ namespace AutoBot.Area.Managers
 
             CloseTab();
             SwitchToTab();
-        }
+        }*/
         /// <inheritdoc/>
         public void LikeUnderVideo()
         {
@@ -93,6 +93,32 @@ namespace AutoBot.Area.Managers
             }
 
             button.ToClick();
+        }
+        /// <inheritdoc/>
+        public void Subscribe()
+        {
+            var divPanel = GetElementByCssSelector(".InfoCard-sc-1l1ehfe-0.kJlqmZ");
+            var button = divPanel.FindElement(SearchMethod.Selector, ".CommonStyles__FollowButton-sc-1w85dbj-7.ijjoJn");
+
+            if (button.FindElements(SearchMethod.Tag, "svg").Count() == 2)
+            {
+                return;
+            }
+            
+            button.ToClick(1700);
+        }
+        /// <inheritdoc/>
+        public void Unsubscribe()
+        {
+            var divPanel = GetElementByCssSelector(".InfoCard-sc-1l1ehfe-0.kJlqmZ");
+            var button = divPanel.FindElement(SearchMethod.Selector, ".CommonStyles__FollowButton-sc-1w85dbj-7.ijjoJn");
+
+            if (button.FindElements(SearchMethod.Tag, "svg").Count() != 2)
+            {
+                return;
+            }
+
+            button.ToClick(1700);
         }
         /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)

@@ -36,6 +36,11 @@ namespace AutoBot.Area.Managers.Interface
         /// <returns>True - да, иначе False</returns>
         public bool IsUserPageProfile();
         /// <summary>
+        /// Найдена ли страница
+        /// </summary>
+        /// <returns>True - найдена, иначе false</returns>
+        public bool IsPageFound();
+        /// <summary>
         /// Считать контекст браузер менеджера
         /// </summary>
         /// <param name="chromeDriver">Хром драйвер</param>
