@@ -1,6 +1,7 @@
 ﻿using AutoBot.Area.Enums;
 using AutoBot.Area.Managers;
 using AutoBot.Area.Managers.Interface;
+using AutoBot.Area.Models;
 using AutoBot.Area.PerformanceTasks.Interface;
 using AutoBot.Area.Services;
 using AutoBot.Extentions;
@@ -36,7 +37,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
         protected void Init()
         {
-            Initialization(BROWSER_PROFILE_SERVICE, true);
+            Initialization(BROWSER_PROFILE_SERVICE);
             SetContextForManagers();
 
             if (!_isAuthorizationSocialNetworks)
@@ -100,7 +101,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             catch (Exception exception)
             {
                 service.StatusService = Status.Work;
-                _logManager.SendToEmail(exception, GetScreenshot().AsBase64EncodedString, GetUrlPage());
+                _logManager.SendToEmail(GenerateMessage(exception, "Произошла ошибка"));
 
                 QuitBrowser();
             }
@@ -287,7 +288,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         public bool DidPaymentPass()
         {
             int counter = 0;
-            var getPaymentButton = GetElementByXPath("//*[@id='buttons']/a[2]");
+            var paymentButton = GetPaymentButton();
 
             var modal = GetElementById("modal");
             while (modal.Displayed)
@@ -297,7 +298,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     return false;
                 }
 
-                getPaymentButton.ToClick();
+                paymentButton.ToClick();
 
                 if (!IsAlertExist(5))
                 {
@@ -307,10 +308,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 string text = GetTextFromAlert();
                 switch (text) 
                 {
-                    case "Список участников скрыт, проверить выполнение нет возможности.Пожалуйста, пропустите это задание.":
-                        AlertAccept();
-                        return false;
                     case "К сожалению, уже было поставлено нужное количество лайков к данному объекту. Обновите список заданий.":
+                    case "Список участников скрыт, проверить выполнение нет возможности.Пожалуйста, пропустите это задание.":
                         AlertAccept();
                         return false;
                 }
@@ -353,7 +352,21 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _taskId = string.Empty;
             Thread.Sleep(2000);
         }
-        
+        /// <summary>
+        /// Получить кнопку оплаты
+        /// </summary>
+        /// <returns>Кнопка готовая к нажатию</returns>
+        public IWebElement GetPaymentButton()
+        {
+            var button = GetElementByXPath("//*[@id='buttons']/a[2]");
+            while (!button.Displayed)
+            {
+                Thread.Sleep(1000);
+                button = GetElementByXPath("//*[@id='buttons']/a[2]");
+            }
+
+            return button;
+        }
 
         /// <summary>
         /// Авторизация
@@ -391,6 +404,23 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             QuitBrowser();
 
             return internetService;
+        }
+        /// <summary>
+        /// Сформировать сообщение
+        /// </summary>
+        /// <param name="exception">Исключение</param>
+        /// <param name="topic">Тема</param>
+        /// <returns>Сообщение</returns>
+        protected Message GenerateMessage(Exception exception, string topic)
+        {
+            return new Message
+            {
+                Url = GetUrlPage(),
+                Exception = exception,
+                Base64Encoded = GetScreenshot().AsBase64EncodedString,
+                TabsCount = GetTabsCount(),
+                Topic = topic,
+            };
         }
     }
 }

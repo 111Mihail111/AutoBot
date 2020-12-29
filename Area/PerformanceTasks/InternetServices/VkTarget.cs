@@ -1,6 +1,7 @@
 ﻿using AutoBot.Area.Enums;
 using AutoBot.Area.Managers;
 using AutoBot.Area.Managers.Interface;
+using AutoBot.Area.Models;
 using AutoBot.Area.PerformanceTasks.Interface;
 using AutoBot.Area.Services;
 using AutoBot.Extentions;
@@ -165,14 +166,14 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         {
             try
             {
-                Init();
+                Init();                
                 GoToUrl(url);
                 AuthorizationOnService();
                 BeginCollecting(url);
             }
             catch (Exception exception)
             {
-                _logManager.SendToEmail(exception, GetScreenshot().AsBase64EncodedString, GetUrlPage());
+                _logManager.SendToEmail(GetMessage(exception, "Произошла ошибка"));
                 //var a = ExecuteScript("return document.body.innerHTML");
                 //QuitBrowser();
             }
@@ -380,7 +381,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _classmatesManager.JoinGroup();
                     break;
                 case "Поставьте класс под записью":
-                    if (_classmatesManager.IsBlokedContent())
+                    if (_classmatesManager.IsBlokedContent()) 
                     {
                         isError = true;
                         break;
@@ -472,7 +473,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     }
                     catch (Exception exception)
                     {
-                        _logManager.SendToEmail(exception, GetScreenshot().AsBase64EncodedString, GetUrlPage(), "Возникла ожидаемая ошибка");
+                        _logManager.SendToEmail(GetMessage(exception, "Возникла ожидаемая ошибка"));
                     }
                     break;
                 case "Подпишитесь на пользователя":
@@ -564,7 +565,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     Thread.Sleep(500);
                     break;
                 case "Скачать трэк":
-                    isError = true; //TODO
+                    isError = true; //TODO More >> DownLoad
                     break;
                 default:
                     _logManager.SendToEmail(taskText, "CarryOutTaskInSoundCloud()", GetUrlPage());
@@ -1035,7 +1036,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 }
                 catch (Exception exception)
                 {
-                    _logManager.SendToEmail(exception, GetScreenshot().AsBase64EncodedString, GetUrlPage(), "Возникла ожидаемая ошибка");
+                    _logManager.SendToEmail(GetMessage(exception, "Возникла ожидаемая ошибка"));
                 }
             }
         }
@@ -1326,6 +1327,16 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 default:
                     return ActionToBrowser.FocusOnElement;
             }
+        }
+
+        protected Message GetMessage(Exception exception, string topic)
+        {
+            return new Message 
+            { 
+                Url = GetUrlPage(), Exception = exception,
+                Base64Encoded = GetScreenshot().AsBase64EncodedString,
+                TabsCount = GetTabsCount(), Topic = topic,
+            };
         }
     }
 }

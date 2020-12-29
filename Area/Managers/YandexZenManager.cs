@@ -25,7 +25,7 @@ namespace AutoBot.Area.Managers
             var conservedAccount = GetElementByClassName("AuthAccountListItem");
             if (conservedAccount != null)
             {
-                conservedAccount.Click();
+                conservedAccount.ToClick();
                 AuthorizationUnderConservedAccount(password);
                 return;
             }
@@ -41,8 +41,7 @@ namespace AutoBot.Area.Managers
                 loginInput.SendKeys(login);
             }
 
-            GetElementByClassName("Button2_view_action").Click();
-            Thread.Sleep(1500);
+            GetElementByClassName("Button2_view_action").ToClick(1500);
 
             var passwordInput = GetElementById("passp-field-passwd");
             if (string.IsNullOrWhiteSpace(passwordInput.Text))
@@ -50,8 +49,7 @@ namespace AutoBot.Area.Managers
                 passwordInput.SendKeys(password);
             }
 
-            GetElementByClassName("Button2_view_action").Click();
-            Thread.Sleep(2000);
+            GetElementByClassName("Button2_view_action").ToClick(2000);
 
             CloseTab();
             SwitchToTab();
@@ -69,8 +67,7 @@ namespace AutoBot.Area.Managers
                 return;
             }
 
-            button.Click();
-            Thread.Sleep(2000);
+            button.ToClick(2000);
         }
 
         /// <inheritdoc/>
@@ -85,8 +82,7 @@ namespace AutoBot.Area.Managers
                 return;
             }
 
-            button.Click();
-            Thread.Sleep(2000);
+            button.ToClick(2000);
         }
 
         /// <inheritdoc/>
@@ -98,8 +94,7 @@ namespace AutoBot.Area.Managers
                 return;                
             }
 
-            subscribeButton.Click();
-            Thread.Sleep(2000);
+            subscribeButton.ToClick(2000);
         }
 
         /// <inheritdoc/>
@@ -111,8 +106,7 @@ namespace AutoBot.Area.Managers
                 return;
             }
 
-            unsubscribeButton.Click();
-            Thread.Sleep(2000);
+            unsubscribeButton.ToClick(2000);
         }
 
         /// <inheritdoc/>
@@ -133,8 +127,7 @@ namespace AutoBot.Area.Managers
                 passwordInputInSaveAccount.SendKeys(password);
             }
 
-            GetElementByClassName("Button2_view_action").Click();
-            Thread.Sleep(2000);
+            GetElementByClassName("Button2_view_action").ToClick(2000);
 
             CloseTab();
             SwitchToTab();

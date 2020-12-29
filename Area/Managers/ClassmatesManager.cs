@@ -133,7 +133,7 @@ namespace AutoBot.Area.Managers
             {
                 if (item.GetInnerText() == "Вступить")
                 {
-                    item.Click();
+                    item.ToClick();
                     break;
                 }
             }
@@ -152,11 +152,9 @@ namespace AutoBot.Area.Managers
             }
 
             var item = ddlCollections.First();
-            item.Click();
-            Thread.Sleep(500);
+            item.ToClick();
 
-            item.FindElements(SearchMethod.Tag, "a").First().Click();
-            Thread.Sleep(1000);
+            item.FindElements(SearchMethod.Tag, "a").First().ToClick();
         }
         /// <inheritdoc/>
         public void PutClass()
@@ -167,7 +165,6 @@ namespace AutoBot.Area.Managers
             if (vidget == null)
             {
                 vidget = GetElementByClassName("mlr_bot");
-                return;
             }
 
             var span = vidget.FindElement(SearchMethod.Selector, ".widget_cnt.controls-list_lk");
@@ -189,7 +186,6 @@ namespace AutoBot.Area.Managers
             if (vidget == null)
             {
                 vidget = GetElementByClassName("mlr_bot");
-                return;
             }
 
             var span = vidget.FindElement(SearchMethod.Selector, ".widget_cnt.controls-list_lk");
@@ -212,8 +208,7 @@ namespace AutoBot.Area.Managers
                 .Where(w => w.FindElement(SearchMethod.ClassName, "widget_tx").GetInnerText() == "Поделиться")
                 .FirstOrDefault();
 
-            vidget.Click();
-            Thread.Sleep(1500);
+            vidget.ToClick(1500);
 
             var button = bottom.FindElement(SearchMethod.ClassName, "js-doNotHide");
             if (button == null)
@@ -221,8 +216,7 @@ namespace AutoBot.Area.Managers
                 return;
             }
 
-            button.Click();
-            Thread.Sleep(1500);
+            button.ToClick(1500);
         }
         /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
