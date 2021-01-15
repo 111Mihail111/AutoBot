@@ -171,12 +171,18 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _isAuthorizationSocialNetworks = true;
         }
 
+
         public void GoTo(string url)
         {
             while (true)
             {
                 try
                 {
+                    if (CheckTimer())
+                    {
+
+                    }
+
                     Init();
                     GoToUrl(url);
                     AuthorizationOnService();
@@ -184,22 +190,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 }
                 catch (Exception exception)
                 {
-                    int tabsCount = GetTabsCount();
-                    if (tabsCount >= 2)
-                    {
-                        _logManager.SendToEmail(GetMessage(exception, "Произошла ошибка"));
-
-                        CloseTab();
-                        SwitchToTab();
-                        GoToUrl("https://vktarget.ru/");
-                        SkipTask();
-                    }
-                    else if (tabsCount == 1)
-                    {
-                        _logManager.SendToEmail(GetMessage(exception, "Ошибка на головном сайте. Работа с ним временно прекращена."));
-                        QuitBrowser();
-                    }
-                    
+                    ProcessingException(exception);
                 }
                 finally
                 {
@@ -211,12 +202,33 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             }
         }
 
+        /// <summary>
+        /// Обработать исключение
+        /// </summary>
+        /// <param name="exception">Исключение</param>
+        protected void ProcessingException(Exception exception)
+        {
+            int tabsCount = GetTabsCount();
+            if (tabsCount >= 2)
+            {
+                _logManager.SendToEmail(GetMessage(exception, "Произошла ошибка"));
+
+                CloseTab();
+                SwitchToTab();
+                GoToUrl("https://vktarget.ru/");
+                SkipTask();
+            }
+            else if (tabsCount == 1)
+            {
+                _logManager.SendToEmail(GetMessage(exception, "Ошибка на головном сайте. Работа с ним временно прекращена."));
+                QuitBrowser();
+            }
+        }
         public void Quit()
         {
             UpdateModel(GetUrlPage());
             QuitBrowser();
         }
-
         /// <summary>
         /// Начать сбор
         /// </summary>
@@ -1246,6 +1258,14 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
             WebService.UpdateInternetService(internetService);
         }
+        /// <summary>
+        /// Проверить таймер
+        /// </summary>
+        /// <returns>True - продолжить работу сервиса, иначе false</returns>
+        protected bool CheckTimer()
+        {
+            return true;
+        }
         
 
         /// <summary>
@@ -1343,7 +1363,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     return ActionToBrowser.FocusOnElement;
             }
         }
-
+        /// <summary>
+        /// Получить сообщение
+        /// </summary>
+        /// <param name="exception">Исключение</param>
+        /// <param name="topic">Тема</param>
+        /// <returns></returns>
         protected Message GetMessage(Exception exception, string topic)
         {
             return new Message 
