@@ -191,7 +191,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
                         CloseTab();
                         SwitchToTab();
-                        GoToUrl(url);
+                        GoToUrl("https://vktarget.ru/");
+                        SkipTask();
                     }
                     else if (tabsCount == 1)
                     {
