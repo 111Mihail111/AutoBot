@@ -37,7 +37,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
         protected void Init()
         {
-            Initialization(BROWSER_PROFILE_SERVICE, true);
+            Initialization(BROWSER_PROFILE_SERVICE);
             SetContextForManagers();
 
             if (!_isAuthorizationSocialNetworks)

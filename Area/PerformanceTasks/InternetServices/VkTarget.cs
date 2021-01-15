@@ -30,13 +30,22 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         private string _task;
         /// <summary>
-        /// Url-страницы,
+        /// Идентификатор задачи
+        /// </summary>
+        private int _taksId;
+        /// <summary>
+        /// Url-страницы
         /// </summary>
         private string _urlByTask;
         /// <summary>
         /// Количество действий
         /// </summary>
         private int _countAction;
+        /// <summary>
+        /// Количество исключений сегодня
+        /// </summary>
+        private int _numberExceptionsToday = 0;
+
 
         private IVkManager _vkManager;
         private IYouTubeManager _ytManager;
@@ -50,6 +59,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         private ITikTokManager _tikTokManager;
         private ILogManager _logManager;
 
+        
         protected void Init()
         {
             Initialization(BROWSER_PROFILE_SERVICE);
@@ -60,7 +70,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 AuthorizationSocialNetworks();
             }
         }
-
         /// <summary>
         /// Установить контекст для менеджеров
         /// </summary>
@@ -164,23 +173,41 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
         public void GoTo(string url)
         {
-            try
+            while (true)
             {
-                Init();                
-                GoToUrl(url);
-                AuthorizationOnService();
-                BeginCollecting(url);
+                try
+                {
+                    Init();
+                    GoToUrl(url);
+                    AuthorizationOnService();
+                    BeginCollecting(url);
+                }
+                catch (Exception exception)
+                {
+                    int tabsCount = GetTabsCount();
+                    if (tabsCount >= 2)
+                    {
+                        _logManager.SendToEmail(GetMessage(exception, "Произошла ошибка"));
+
+                        CloseTab();
+                        SwitchToTab();
+                        GoToUrl(url);
+                    }
+                    else if (tabsCount == 1)
+                    {
+                        _logManager.SendToEmail(GetMessage(exception, "Ошибка на головном сайте. Работа с ним временно прекращена."));
+                        QuitBrowser();
+                    }
+                    
+                }
+                finally
+                {
+                    if (_numberExceptionsToday == 50)
+                    {
+                        QuitBrowser();
+                    }
+                }
             }
-            catch (Exception exception)
-            {
-                _logManager.SendToEmail(GetMessage(exception, "Произошла ошибка"));
-                //var a = ExecuteScript("return document.body.innerHTML");
-                //QuitBrowser();
-            }
-            //finally
-            //{
-            //    BeginCollecting(url);
-            //}
         }
 
         public void Quit()
@@ -233,12 +260,15 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                         ShowActivity();
                         break;
                     default:
+                        _logManager.SendToEmail(_typeSocialNetwork, "CarryOutTaskInVk()", GetUrlPage(), "Новая соц. сеть в выдаче");
+                        SkipTask();
                         break;
                 }
 
                 _typeSocialNetwork = string.Empty;
                 _task = string.Empty;
                 _urlByTask = string.Empty;
+                _taksId = 0;
 
                 UpdateModel(url);
             }
@@ -301,7 +331,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _vkManager.ToTellAboutGroup();
                     break;
                 default:
-                    _logManager.SendToEmail(taskText, "CarryOutTaskInVk()", GetUrlPage());
+                    _logManager.SendToEmail(taskText, "CarryOutTaskInVk()", GetUrlPage(), "Новая задача");
                     isError = true;
                     break;
             }
@@ -349,7 +379,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _ytManager.DislikeUnderVideo();
                     break;
                 default:
-                    _logManager.SendToEmail(taskText, "CarryOutTaskInYouTube()", GetUrlPage());
+                    _logManager.SendToEmail(taskText, "CarryOutTaskInYouTube()", GetUrlPage(), "Новая задача");
                     isError = true;
                     break;
             }
@@ -403,7 +433,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _classmatesManager.AddToFriends();
                     break;
                 default:
-                    _logManager.SendToEmail(taskText, "CarryOutTaskInСlassmates()", GetUrlPage());
+                    _logManager.SendToEmail(taskText, "CarryOutTaskInСlassmates()", GetUrlPage(), "Новая задача");
                     isError = true;
                     break;
             }
@@ -438,7 +468,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _yandexZenManager.Subscribe();
                     break;
                 default:
-                    _logManager.SendToEmail(taskText, "CarryOutTaskInZen()", GetUrlPage());
+                    _logManager.SendToEmail(taskText, "CarryOutTaskInZen()", GetUrlPage(), "Новая задача");
                     isError = true;
                     break;
             }
@@ -473,6 +503,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     }
                     catch (Exception exception)
                     {
+                        isError = true;
                         _logManager.SendToEmail(GetMessage(exception, "Возникла ожидаемая ошибка"));
                     }
                     break;
@@ -485,7 +516,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _redditManager.Subscribe();
                     break;
                 default:
-                    _logManager.SendToEmail(taskText, "CarryOutTaskInReddit()", GetUrlPage());
+                    _logManager.SendToEmail(taskText, "CarryOutTaskInReddit()", GetUrlPage(), "Новая задача");
                     isError = true;
                     break;
             }
@@ -524,7 +555,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _tumblrManager.SubscribeToBlog();
                     break;
                 default:
-                    _logManager.SendToEmail(taskText, "CarryOutTaskInTumblr()", GetUrlPage());
+                    _logManager.SendToEmail(taskText, "CarryOutTaskInTumblr()", GetUrlPage(), "Новая задача");
                     isError = true;
                     break;
             }
@@ -568,7 +599,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     isError = true; //TODO More >> DownLoad
                     break;
                 default:
-                    _logManager.SendToEmail(taskText, "CarryOutTaskInSoundCloud()", GetUrlPage());
+                    _logManager.SendToEmail(taskText, "CarryOutTaskInSoundCloud()", GetUrlPage(), "Новая задача");
                     isError = true;
                     break;
             }
@@ -616,7 +647,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _quoraManager.MakeRepost();
                     break;
                 default:
-                    _logManager.SendToEmail(taskText, "CarryOutTaskInQuora()", GetUrlPage());
+                    _logManager.SendToEmail(taskText, "CarryOutTaskInQuora()", GetUrlPage(), "Новая задача");
                     isError = true;
                     break;
             }
@@ -652,7 +683,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     //_tikTokManager.PutLike(); //https://www.tiktok.com/@ageofclonesofficial/video/6898252422603345157
                     break;
                 default:
-                    _logManager.SendToEmail(taskText, "CarryOutTaskInTikTok()", GetUrlPage());
+                    _logManager.SendToEmail(taskText, "CarryOutTaskInTikTok()", GetUrlPage(), "Новая задача");
                     isError = true;
                     break;
             }
@@ -687,7 +718,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _vimeoManager.Subscribe();
                     break;
                 default:
-                    _logManager.SendToEmail(taskText, "CarryOutTaskInVimeo()", GetUrlPage());
+                    _logManager.SendToEmail(taskText, "CarryOutTaskInVimeo()", GetUrlPage(), "Новая задача");
                     isError = true;
                     break;
             }
@@ -1049,7 +1080,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             string clickButtonScript = "task.querySelector('.default__small__btn.check__btn').click();";
             string getAttribute = "return task.children[0].getAttribute('data-task-item');";
 
-            var taksId = ExecuteScript(getTaskScript + clickButtonScript + getAttribute);
+            _taksId = Convert.ToInt32(ExecuteScript(getTaskScript + clickButtonScript + getAttribute));
             int waitingСounter = 0;
 
             bool isCheked = true;
@@ -1058,8 +1089,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 var errorPanel = GetElementByClassName("is_error");
                 if (errorPanel != null)
                 {
-                    var dataId = errorPanel.GetDataId();
-                    if (dataId != taksId)
+                    var dataId = Convert.ToInt32(errorPanel.GetDataId());
+                    if (dataId != _taksId)
                     {
                         return;
                     }
@@ -1082,13 +1113,17 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                             SkipTask();
                             UndoTask();
                             return;
+                        case "Задание уже остановлено. Приносим свои извинения.":
                         case "Увы, но список заданий устарел! Скоро вы получите новые задания.":
                             SkipTask();
                             UndoTask();
                             return;
+                        default:
+                            _logManager.SendToEmail(error, "CheckTask()", GetUrlPage(), "Непредвиденный кейс");
+                            break;
                     }
                 }
-                else if (taksId != ExecuteScript(getTaskScript + getAttribute))
+                else if (_taksId != Convert.ToInt32(ExecuteScript(getTaskScript + getAttribute)))
                 {
                     isCheked = false;
                 }
@@ -1210,27 +1245,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
             WebService.UpdateInternetService(internetService);
         }
-        /// <summary>
-        /// Анализатор исключений
-        /// </summary>
-        protected void ExceptionAnalyzer()
-        {
-
-        }
-        /// <summary>
-        /// Проверить сеанс
-        /// </summary>
-        public void СheckSession()
-        {
-            var header = GetElementById("header").FindElement(SearchMethod.ClassName, "header__links");
-
-            var liElements = GetElementByClassName("header__links").FindElements(SearchMethod.Tag, "li");
-            if (liElements.Count() == 0)
-            {
-                return;
-            }
-        }
-
+        
 
         /// <summary>
         /// Получить случайное число
@@ -1270,8 +1285,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
             foreach (var item in liCollection)
             {
-                item.Click();
-                Thread.Sleep(1500);
+                item.ToClick(1500);
             }
 
             liCollection.First().Click();

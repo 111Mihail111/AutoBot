@@ -13,7 +13,8 @@ namespace AutoBot.Area.Managers.Interface
         /// <param name="taskDescription">Описание задачи</param>
         /// <param name="methodName">Наименования метода</param>
         /// <param name="url">Url-адрес страницы</param>
-        void SendToEmail(string taskDescription, string methodName, string url);
+        /// <param name="topic">Тема письма</param>
+        public void SendToEmail(string taskDescription, string methodName, string url, string topic);
         /// <summary>
         /// Отправить сообщение
         /// </summary>
