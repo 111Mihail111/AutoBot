@@ -7,6 +7,8 @@ using AutoBot.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.IO;
+using System.Linq;
 
 namespace AutoBot.Controllers
 {
@@ -37,7 +39,18 @@ namespace AutoBot.Controllers
             _vkMyMarket = vkMyMarket;
         }
 
-        public ActionResult Index() => View(WebService.GetAllData());
+        public ActionResult Index()
+        {
+            var allAccounts = AccountService.GetAccounts();
+            if (allAccounts.Count() == 0)
+            {
+                var dataFile = new StreamReader("../AutoBot/BrowserSettings/Учетки.txt", System.Text.Encoding.Default).ReadToEnd();
+                AccountManager accountManager = new AccountManager();  //TODO:Прокинуть через DI
+                accountManager.SaveAccounts(dataFile);
+            }
+
+            return View(WebService.GetAllData());
+        }
 
         [HttpGet]
         public PartialViewResult UpdateTimerCrane(Crane crane)
@@ -173,20 +186,6 @@ namespace AutoBot.Controllers
         public PartialViewResult UpdateDataManualStartView()
         {
             return PartialView("_ManualStart", WebService.GetInternetServices());
-        }
-
-        [HttpPost]
-        public ActionResult SaveAccounts(IFormFile fileAccounts) //ЕСТЬ TODO
-        {
-            if (fileAccounts == null)
-            {
-                return RedirectToAction("Index");
-            }
-
-            AccountManager accountManager = new AccountManager();  //TODO:Прокинуть через DI
-            accountManager.SaveAccounts(fileAccounts);
-
-            return RedirectToAction("Index");
         }
     }
 }

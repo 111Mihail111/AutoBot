@@ -174,6 +174,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
         public void GoTo(string url)
         {
+            Init();
+            GoToUrl(url);
+            AuthorizationOnService();
+
             while (true)
             {
                 try
@@ -183,9 +187,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
                     }
 
-                    Init();
-                    GoToUrl(url);
-                    AuthorizationOnService();
                     BeginCollecting(url);
                 }
                 catch (Exception exception)
@@ -208,20 +209,27 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <param name="exception">Исключение</param>
         protected void ProcessingException(Exception exception)
         {
-            int tabsCount = GetTabsCount();
-            if (tabsCount >= 2)
+            try
+            {
+                int tabsCount = GetTabsCount();
+                if (tabsCount >= 2)
+                {
+                    _logManager.SendToEmail(GetMessage(exception, "Произошла ошибка"));
+
+                    CloseTab();
+                    SwitchToTab();
+                    GoToUrl("https://vktarget.ru/");
+                    SkipTask();
+                }
+                else if (tabsCount == 1)
+                {
+                    _logManager.SendToEmail(GetMessage(exception, "Ошибка на головном сайте. Работа с ним временно прекращена."));
+                    QuitBrowser();
+                }
+            }
+            catch (Exception)
             {
                 _logManager.SendToEmail(GetMessage(exception, "Произошла ошибка"));
-
-                CloseTab();
-                SwitchToTab();
-                GoToUrl("https://vktarget.ru/");
-                SkipTask();
-            }
-            else if (tabsCount == 1)
-            {
-                _logManager.SendToEmail(GetMessage(exception, "Ошибка на головном сайте. Работа с ним временно прекращена."));
-                QuitBrowser();
             }
         }
         public void Quit()

@@ -12,9 +12,13 @@ namespace AutoBot.Area.Managers
 {
     public class AccountManager
     {
-        public void SaveAccounts(IFormFile fileAccounts)
+        /// <summary>
+        /// Сохранить аккаунты
+        /// </summary>
+        /// <param name="fileLine">Строка файла</param>
+        public void SaveAccounts(string fileLine)
         {
-            var lineData = GetLinesFile(ReadFile(fileAccounts));
+            var lineData = GetLinesFile(fileLine);
             var accounts = GetUserAccounts(lineData);
 
             if (AccountService.GetAccounts().Any())
@@ -24,7 +28,6 @@ namespace AutoBot.Area.Managers
 
             AccountService.SaveAccounts(accounts);
         }
-
         /// <summary>
         /// Получить аккаунты пользователя
         /// </summary>
@@ -77,24 +80,6 @@ namespace AutoBot.Area.Managers
             }
 
             return lines;
-        }
-        /// <summary>
-        /// Считать содержимое файла
-        /// </summary>
-        /// <param name="fileAccounts">Файл аккаунтов</param>
-        /// <returns>Строка данных</returns>
-        protected string ReadFile(IFormFile fileAccounts)
-        {
-            string textFromFile;
-
-            using (Stream stream = fileAccounts.OpenReadStream())
-            {
-                byte[] array = new byte[stream.Length];
-                stream.Read(array, 0, array.Length);
-                textFromFile = System.Text.Encoding.UTF8.GetString(array);
-            }
-
-            return textFromFile;
         }
     }
 }
