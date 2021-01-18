@@ -29,7 +29,7 @@ function CheckSites(site, isCrane) {
             }
             else {
                 data = GetDataRow(notes.children[i]);
-                UpdatingStatusService(data.URL, data.Status);
+                UpdatingStatusService(data.URL, data.Status, data.TypeService);
                 GoToService(data);
             }
         }
@@ -125,18 +125,18 @@ function UpdatingStatusCrane(url, status) {
 }
 
 /*Обновить статус сервиса*/
-function UpdatingStatusService(url, status, isManualStart = false) {
+function UpdatingStatusService(url, status, typeService, isManualStart = false) {
     $.ajax({
         type: "GET",
         data: {
             url: url,
             statusService: status,
             isManualStart: isManualStart,
+            typeService, typeService,
         },
         contentType: "application/json; charset=utf-8",
         url: "/Start/UpdateStatusService/",
         success: function (data) {
-            debugger;
             if (isManualStart) {
                 $('#ManualStart').html(data);
                 return;
@@ -224,8 +224,7 @@ function InternetServicesManualStart(button) {
     if (button.children[0].innerText === "Старт") {
         divContainer.insertAdjacentHTML('beforeend',
             '<button class="btn btn-warning btn-sm btn-block mt-1" onclick="InternetServicesManualStart(this)"><span>Стоп</span></button>');
-        debugger;
-        UpdatingStatusService(data.URL, "InWork", true);
+        UpdatingStatusService(data.URL, "InWork", data.TypeService, true);
         GoToInternetServicesManualStart(data);
     }
     else {
@@ -247,7 +246,6 @@ function GoToInternetServicesManualStart(data) {
 }
 
 setInterval(function () {
-    debugger;
     $.ajax({
         type: "GET",
         url: "/Start/UpdateDataManualStartView",

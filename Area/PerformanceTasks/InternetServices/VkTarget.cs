@@ -15,7 +15,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 {
     public class VkTarget : BrowserManager, IVkTarget
     {
-        const string BROWSER_PROFILE_SERVICE = "C:\\_AutoBot\\Profiles\\PerformanceTasks\\VkTarget\\";
+        const string BROWSER_PROFILE_SERVICE = "C:\\_AutoBot\\Profiles\\PerformanceTasks\\";
 
         /// <summary>
         /// Была ли авторизация соц. сетей
@@ -60,14 +60,14 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         private ILogManager _logManager;
 
         
-        protected void Init()
+        protected void Init(TypeService typeService)
         {
-            Initialization(BROWSER_PROFILE_SERVICE);
+            Initialization($"{BROWSER_PROFILE_SERVICE + typeService}\\");
             SetContextForManagers();
 
             if (!_isAuthorizationSocialNetworks)
             {
-                AuthorizationSocialNetworks();
+                AuthorizationSocialNetworks(typeService);
             }
         }
         /// <summary>
@@ -102,9 +102,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Авторизация в соц сетях
         /// </summary>
-        protected void AuthorizationSocialNetworks()
+        protected void AuthorizationSocialNetworks(TypeService typeService)
         {
-            var accounts = AccountService.GetAccountsByType(TypeService.VkTarget);
+            var accounts = AccountService.GetAccountsByType(typeService);
 
             var accountVK = accounts.Where(w => w.AccountType == AccountType.Vk).FirstOrDefault();
             if (accountVK != null)
@@ -172,9 +172,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         }
 
 
-        public void GoTo(string url)
+        public void GoTo(string url, TypeService typeService)
         {
-            Init();
+            Init(typeService);
             GoToUrl(url);
             AuthorizationOnService();
 

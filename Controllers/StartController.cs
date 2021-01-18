@@ -86,9 +86,9 @@ namespace AutoBot.Controllers
         }
 
         [HttpGet]
-        public PartialViewResult UpdateStatusService(string url, Status statusService, bool isManualStart)
+        public PartialViewResult UpdateStatusService(string url, Status statusService, TypeService typeService, bool isManualStart)
         {
-            WebService.UpdateStatusService(url, statusService);
+            WebService.UpdateStatusService(url, typeService, statusService);
 
             var internetServices = WebService.GetInternetServices();
             if (isManualStart)
@@ -161,7 +161,10 @@ namespace AutoBot.Controllers
             switch (typeService)
             {
                 case TypeService.VkTarget:
-                    _vkTarget.GoTo(url);
+                case TypeService.VkTarget_2:
+                case TypeService.VkTarget_3:
+                case TypeService.VkTarget_4:
+                    _vkTarget.GoTo(url, typeService);
                     break;
                 case TypeService.VkMyMarket:
                     _vkMyMarket.GoTo(url);

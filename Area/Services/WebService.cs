@@ -36,6 +36,12 @@ namespace AutoBot.Area.Services
                 StatusService = Status.Work, TypeService = TypeService.VLike, RunType = false },
             new InternetService { URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.Work,
                 TypeService = TypeService.VkTarget, RunType = true },
+            new InternetService { URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.Work,
+                TypeService = TypeService.VkTarget_2, RunType = true },
+            new InternetService { URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.Work,
+                TypeService = TypeService.VkTarget_3, RunType = true },
+            new InternetService { URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.Work,
+                TypeService = TypeService.VkTarget_4, RunType = true },
             new InternetService { URL = "http://vkmymarket.ru/", BalanceOnService = "0", StatusService = Status.Work, 
                 TypeService = TypeService.VkMyMarket, RunType = true },
         };
@@ -92,9 +98,9 @@ namespace AutoBot.Area.Services
         /// </summary>
         /// <param name="url">Url-адрес сервиса</param>
         /// <param name="status">Статус сервиса</param>
-        public static void UpdateStatusService(string url, Status status)
+        public static void UpdateStatusService(string url, TypeService typeService, Status status)
         {
-            int index = _services.FindIndex(fi => fi.URL == url);
+            int index = _services.FindIndex(fi => fi.URL == url && fi.TypeService == typeService);
             _services[index].StatusService = status;
         }
 
