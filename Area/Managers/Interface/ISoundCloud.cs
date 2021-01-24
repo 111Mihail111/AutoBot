@@ -35,6 +35,10 @@ namespace AutoBot.Area.Managers.Interface
         /// </summary>
         public void RemoveRepost();
         /// <summary>
+        /// Скачать трэк
+        /// </summary>
+        public void DownloadTrack();
+        /// <summary>
         /// Считать контекст браузер менеджера
         /// </summary>
         /// <param name="chromeDriver">Хром драйвер</param>

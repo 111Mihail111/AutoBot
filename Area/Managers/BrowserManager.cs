@@ -328,7 +328,7 @@ namespace AutoBot.Area.Managers
         /// <summary>
         /// Получить элемент по CssSelecor'y
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Вэб-элемент</returns>
         public IWebElement GetElementByCssSelector(string cssSelector, int waitingTimeSecond = 5)
         {
             while (waitingTimeSecond != 0)

@@ -644,7 +644,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     Thread.Sleep(500);
                     break;
                 case "Скачать трэк":
-                    isError = true; //TODO More >> DownLoad
+                    _soundCloudManager.DownloadTrack();
                     break;
                 default:
                     _logManager.SendToEmail(taskText, "CarryOutTaskInSoundCloud()", GetUrlPage(), "Новая задача");

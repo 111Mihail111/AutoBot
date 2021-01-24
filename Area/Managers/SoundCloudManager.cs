@@ -22,8 +22,7 @@ namespace AutoBot.Area.Managers
                 return;
             }
 
-            GetElementByClassName("frontHero__loginButton").Click();
-            Thread.Sleep(1500);
+            GetElementByClassName("frontHero__loginButton").ToClick(1500);
 
             var frame = GetElementByClassName("webAuthContainer__iframe");
             SwitchToFrame(frame);
@@ -35,7 +34,7 @@ namespace AutoBot.Area.Managers
             var savedAccountDiv = GetElementById("profileIdentifier");
             if (savedAccountDiv != null)
             {
-                savedAccountDiv.Click();
+                savedAccountDiv.ToClick();
                 AuthorizationUnderSavedProfile(password);
                 return;
             }
@@ -58,8 +57,7 @@ namespace AutoBot.Area.Managers
             {
                 if (button.GetAriaLabel() == "Follow")
                 {
-                    button.Click();
-                    Thread.Sleep(1500);
+                    button.ToClick(1500);
                     break;
                 }
             }
@@ -79,8 +77,7 @@ namespace AutoBot.Area.Managers
             {
                 if (button.GetAriaLabel() == "Unfollow")
                 {
-                    button.Click();
-                    Thread.Sleep(1500);
+                    button.ToClick(1500);
                     break;
                 }
             }
@@ -96,8 +93,7 @@ namespace AutoBot.Area.Managers
                 string attribute = button.GetAriaLabel();
                 if (attribute == "Like")
                 {
-                    button.Click();
-                    Thread.Sleep(1500);
+                    button.ToClick(1500);
                     return;
                 }
                 else if (attribute == "Unlike")
@@ -117,8 +113,7 @@ namespace AutoBot.Area.Managers
                 string attribute = button.GetAriaLabel();
                 if (attribute == "Unlike")
                 {
-                    button.Click();
-                    Thread.Sleep(1500);
+                    button.ToClick(1500);
                     return;
                 }
                 else if (attribute == "Like")
@@ -138,8 +133,7 @@ namespace AutoBot.Area.Managers
                 return;
             }
 
-            button.Click();
-            Thread.Sleep(1500);
+            button.ToClick(1500);
         }
         /// <inheritdoc/>
         public void RemoveRepost()
@@ -152,8 +146,30 @@ namespace AutoBot.Area.Managers
                 return;
             }
 
-            button.Click();
-            Thread.Sleep(1500);
+            button.ToClick(1500);
+        }
+        /// <inheritdoc/>
+        public void DownloadTrack()
+        {
+            RemoveModalWindow();
+
+            var buttons = GetElementByCssSelector(".sc-button-group.sc-button-group-medium").FindElements(SearchMethod.Tag, "button");
+            foreach (var button in buttons)
+            {
+                if (button.GetAriaLabel() == "More")
+                {
+                    button.ToClick(1500);
+                    break;
+                }
+            }
+            
+            var buttonDownload = GetElementByClassName("sc-button-download");
+            if (buttonDownload.GetAriaLabel() != "Download this track")
+            {
+                return;
+            }
+
+            buttonDownload.ToClick();
         }
         /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
@@ -173,8 +189,7 @@ namespace AutoBot.Area.Managers
                 inputPass.SendKeys(password);
             }
 
-            GetElementById("passwordNext").FindElement(SearchMethod.Tag, "button").Click();
-            Thread.Sleep(2000);
+            GetElementById("passwordNext").FindElement(SearchMethod.Tag, "button").ToClick(2000);
 
             CloseTab();
             SwitchToTab();
