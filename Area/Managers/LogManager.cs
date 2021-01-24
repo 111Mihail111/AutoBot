@@ -62,6 +62,11 @@ namespace AutoBot.Area.Managers
         protected StringBuilder GetDetailsException(Message message)
         {
             var stringBuilder = new StringBuilder();
+            if (message.Exception == null)
+            {
+                return stringBuilder;
+            }
+            
             var stackTrace = new StackTrace(message.Exception, true);
 
             foreach (var errorStack in stackTrace.GetFrames().Where(w => w.GetFileLineNumber() != 0))

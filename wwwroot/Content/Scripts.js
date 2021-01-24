@@ -52,7 +52,15 @@ function ChangeStatus(select) {
     row.children[0].children[2].children[0].value = select.value;
 
     var model = GetDataRow(row);
-    UpdatingStatusService(model.URL, model.Status)
+    UpdatingStatusService(model.URL, model.Status, model.TypeService)
+}
+
+function ChangeStatusManualStart(select) {
+    var row = select.parentElement.parentElement.parentElement;
+    row.children[0].children[1].children[0].value = select.value;
+
+    var model = GetDataRow(row);
+    UpdatingStatusService(model.URL, model.Status, model.TypeService, true)
 }
 
 /*Получить данные строки*/
@@ -230,7 +238,6 @@ function InternetServicesManualStart(button) {
     else {
         divContainer.insertAdjacentHTML('beforeend',
             '<button class="btn btn-warning btn-sm btn-block mt-1" onclick="InternetServicesManualStart(this)"><span>Старт</span></button>');
-        CloseBrowser(data.TypeService);
     }    
 }
 
@@ -245,6 +252,39 @@ function GoToInternetServicesManualStart(data) {
     });
 }
 
+function checkLaunchTime() {
+    var divPanel = document.getElementById("ManualStart");
+    for (var i = 2; i < divPanel.childElementCount; i++) {
+        var rowDataTable = GetDataRow(divPanel.children[i]);
+        if (rowDataTable.Status != "InSleeping") {
+            continue;
+        }
+
+        if (!isTimeToLaunch(rowDataTable.LaunchTime)) {
+            continue;
+        }
+
+        UpdatingStatusService(rowDataTable.URL, "InWork", rowDataTable.TypeService, true);
+        GoToInternetServicesManualStart(rowDataTable);
+    }
+}
+
+function isTimeToLaunch(dateTimeLaunch) {
+    var result;
+    $.ajax({
+        type: "GET",
+        async: false,
+        data: {
+            'dateTimeLaunch': dateTimeLaunch,
+        },
+        url: "/Start/IsTimeToLaunch",
+        success: function (data) {
+            result = data;
+        }
+    });
+    return result;
+}
+
 setInterval(function () {
     $.ajax({
         type: "GET",
@@ -253,17 +293,7 @@ setInterval(function () {
             $('#ManualStart').html(data);
         }
     });
-}, 60000)
 
-function CloseBrowser(typeService) {
-    $.ajax({
-        type: "GET",
-        data: {
-            'TypeService': typeService,
-        },
-        url: "/Start/CloseBrowserManualStart",
-        success: function (data) {
-            $('#ManualStart').html(data);
-        }
-    });
-}
+    debugger;
+    checkLaunchTime();
+}, 60000)

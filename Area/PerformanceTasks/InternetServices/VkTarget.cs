@@ -5,11 +5,11 @@ using AutoBot.Area.Models;
 using AutoBot.Area.PerformanceTasks.Interface;
 using AutoBot.Area.Services;
 using AutoBot.Extentions;
-using OpenQA.Selenium;
+using AutoBot.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AutoBot.Area.PerformanceTasks.InternetServices
 {
@@ -42,10 +42,18 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         private int _countAction;
         /// <summary>
-        /// Количество исключений сегодня
+        /// Количество исключений
         /// </summary>
-        private int _numberExceptionsToday = 0;
+        private int _countExceptions = 0;
 
+        /// <summary>
+        /// Дата и время засыпания
+        /// </summary>
+        private DateTime? _dateAnTimeFallingAsleep;
+        /// <summary>
+        /// Тип сервиса
+        /// </summary>
+        private TypeService _typeService;
 
         private IVkManager _vkManager;
         private IYouTubeManager _ytManager;
@@ -59,16 +67,18 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         private ITikTokManager _tikTokManager;
         private ILogManager _logManager;
 
-        
-        protected void Init(TypeService typeService)
+
+        protected void Init()
         {
-            Initialization($"{BROWSER_PROFILE_SERVICE + typeService}\\");
+            Initialization($"{BROWSER_PROFILE_SERVICE + _typeService}\\");
             SetContextForManagers();
 
             if (!_isAuthorizationSocialNetworks)
             {
-                AuthorizationSocialNetworks(typeService);
+                AuthorizationSocialNetworks();
             }
+
+            SetSleepTimer();
         }
         /// <summary>
         /// Установить контекст для менеджеров
@@ -102,9 +112,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Авторизация в соц сетях
         /// </summary>
-        protected void AuthorizationSocialNetworks(TypeService typeService)
+        protected void AuthorizationSocialNetworks()
         {
-            var accounts = AccountService.GetAccountsByType(typeService);
+            var accounts = AccountService.GetAccountsByType(_typeService);
 
             var accountVK = accounts.Where(w => w.AccountType == AccountType.Vk).FirstOrDefault();
             if (accountVK != null)
@@ -170,24 +180,40 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
             _isAuthorizationSocialNetworks = true;
         }
+        /// <summary>
+        /// Установить таймер сна
+        /// </summary>
+        protected void SetSleepTimer()
+        {
+            if (_dateAnTimeFallingAsleep != null)
+            {
+                return;
+            }
+
+            _dateAnTimeFallingAsleep = DateTime.Now.AddHours(11);
+        }
 
 
         public void GoTo(string url, TypeService typeService)
         {
-            Init(typeService);
+            _typeService = typeService;
+
+            Init();
             GoToUrl(url);
             AuthorizationOnService();
 
-            while (true)
+            bool isWork = true;
+            while (isWork)
             {
                 try
                 {
-                    if (CheckTimer())
+                    if (IsTimeToSleep())
                     {
-
+                        Quit(Status.InSleeping);
+                        return;
                     }
 
-                    BeginCollecting(url);
+                    BeginCollecting();
                 }
                 catch (Exception exception)
                 {
@@ -195,14 +221,14 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 }
                 finally
                 {
-                    if (_numberExceptionsToday == 50)
+                    if (_countExceptions == 50)
                     {
-                        QuitBrowser();
+                        Quit(Status.NoWork);
+                        isWork = false;
                     }
                 }
             }
         }
-
         /// <summary>
         /// Обработать исключение
         /// </summary>
@@ -223,8 +249,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 }
                 else if (tabsCount == 1)
                 {
-                    _logManager.SendToEmail(GetMessage(exception, "Ошибка на головном сайте. Работа с ним временно прекращена."));
-                    QuitBrowser();
+                    _logManager.SendToEmail(GetMessage(exception, "Ошибка на головном сайте. Работа с ним прекращена."));
+                    Quit(Status.NoWork);
                 }
             }
             catch (Exception)
@@ -232,67 +258,68 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 _logManager.SendToEmail(GetMessage(exception, "Произошла ошибка"));
             }
         }
-        public void Quit()
+        /// <summary>
+        /// Закрытие браузера
+        /// </summary>
+        /// <param name="status">Статус сервиса</param>
+        public void Quit(Status status)
         {
-            UpdateModel(GetUrlPage());
+            UpdateModel(status);
             QuitBrowser();
         }
         /// <summary>
         /// Начать сбор
         /// </summary>
-        protected void BeginCollecting(string url)
+        protected void BeginCollecting()
         {
-            while (true)
+            GetTask();
+            switch (_typeSocialNetwork)
             {
-                GetTask();
-                switch (_typeSocialNetwork)
-                {
-                    case "vk":
-                        CarryOutTaskInVk(_task);
-                        break;
-                    case "youtube":
-                        CarryOutTaskInYouTube(_task);
-                        break;
-                    case "odnoklassniki":
-                        CarryOutTaskInСlassmates(_task);
-                        break;
-                    case "zen":
-                        CarryOutTaskInZen(_task);
-                        break;
-                    case "reddit":
-                        CarryOutTaskInReddit(_task);
-                        break;
-                    case "tumblr":
-                        CarryOutTaskInTumblr(_task);
-                        break;
-                    case "soundcloud":
-                        CarryOutTaskInSoundCloud(_task);
-                        break;
-                    case "quora":
-                        CarryOutTaskInQuora(_task);
-                        break;
-                    case "tiktok":
-                        CarryOutTaskInTikTok(_task);
-                        break;
-                    case "vimeo":
-                        CarryOutTaskInVimeo(_task);
-                        break;
-                    case "NoTasks":
-                        ShowActivity();
-                        break;
-                    default:
-                        _logManager.SendToEmail(_typeSocialNetwork, "CarryOutTaskInVk()", GetUrlPage(), "Новая соц. сеть в выдаче");
-                        SkipTask();
-                        break;
-                }
-
-                _typeSocialNetwork = string.Empty;
-                _task = string.Empty;
-                _urlByTask = string.Empty;
-                _taksId = 0;
-
-                UpdateModel(url);
+                case "vk":
+                    CarryOutTaskInVk(_task);
+                    break;
+                case "youtube":
+                    CarryOutTaskInYouTube(_task);
+                    break;
+                case "odnoklassniki":
+                    CarryOutTaskInСlassmates(_task);
+                    break;
+                case "zen":
+                    CarryOutTaskInZen(_task);
+                    break;
+                case "reddit":
+                    CarryOutTaskInReddit(_task);
+                    break;
+                case "tumblr":
+                    CarryOutTaskInTumblr(_task);
+                    break;
+                case "soundcloud":
+                    CarryOutTaskInSoundCloud(_task);
+                    break;
+                case "quora":
+                    CarryOutTaskInQuora(_task);
+                    break;
+                case "tiktok":
+                    CarryOutTaskInTikTok(_task);
+                    break;
+                case "vimeo":
+                    CarryOutTaskInVimeo(_task);
+                    break;
+                case "NoTasks":
+                    ShowActivity();
+                    break;
+                default:
+                    _logManager.SendToEmail(_typeSocialNetwork, "BeginCollecting()", GetUrlPage(), "Новая соц. сеть в выдаче");
+                    SkipTask();
+                    break;
             }
+
+            _typeSocialNetwork = string.Empty;
+            _task = string.Empty;
+            _urlByTask = string.Empty;
+            _taksId = 0;
+
+            UpdateModel(Status.Work);
         }
 
 
@@ -432,7 +459,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _classmatesManager.JoinGroup();
                     break;
                 case "Поставьте класс под записью":
-                    if (_classmatesManager.IsBlokedContent()) 
+                    if (_classmatesManager.IsBlokedContent())
                     {
                         isError = true;
                         break;
@@ -1139,6 +1166,18 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                             SkipTask();
                             UndoTask();
                             return;
+                        case "Похоже, что вы не поставили класс!":
+                            waitingСounter++;
+                            if (waitingСounter < 3)
+                            {
+                                Thread.Sleep(3000);
+                                ExecuteScript(getTaskScript + clickButtonScript);
+                                continue;
+                            }
+                            _logManager.SendToEmail(error, "CheckTask()", _urlByTask, "Задача не прошла проверку");
+                            SkipTask();
+                            UndoTask();
+                            return;
                         default:
                             _logManager.SendToEmail(error, "CheckTask()", GetUrlPage(), "Непредвиденный кейс");
                             break;
@@ -1258,23 +1297,31 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Обновить модель
         /// </summary>
-        /// <param name="url">Url-адрес</param>
-        protected void UpdateModel(string url)
+        /// <param name="status">Статус сервиса</param>
+        protected void UpdateModel(Status status)
         {
-            var internetService = WebService.GetInternetServices().Where(w => w.URL == url).FirstOrDefault();
+            var internetService = WebService.GetInternetServices().Where(w => w.TypeService == _typeService).FirstOrDefault();
             internetService.BalanceOnService = GetBalance();
+            internetService.StatusService = status;
+
+            if (status == Status.InSleeping)
+            {
+                _dateAnTimeFallingAsleep = null;
+                _countExceptions = 0;
+                internetService.LaunchTime = DateTime.Now.AddHours(13).AddMinutes(2 * GetRandomNumber(1, 4));
+            }
 
             WebService.UpdateInternetService(internetService);
         }
         /// <summary>
-        /// Проверить таймер
+        /// Пришло ли время засыпать
         /// </summary>
-        /// <returns>True - продолжить работу сервиса, иначе false</returns>
-        protected bool CheckTimer()
+        /// <returns>True - пришло, иначе false</returns>
+        protected bool IsTimeToSleep()
         {
-            return true;
+            return DateTime.Now >= _dateAnTimeFallingAsleep;
         }
-        
+
 
         /// <summary>
         /// Получить случайное число
@@ -1341,49 +1388,38 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             var logotype = GetElementByXPath("//*[@id='header']/div/div/div[1]/div/a");
             FocusOnElement(logotype);
 
-            Thread.Sleep(1000);
-            logotype.Click();
+            logotype.ToClick();
         }
         /// <summary>
         /// Получить действие
         /// </summary>
         /// <returns>Действие в браузере</returns>
-        protected ActionToBrowser GetAction()
+        protected ActionToBrowser GetAction() => GetRandomNumber(0, 7) switch
         {
-            int randomAction = GetRandomNumber(0, 7);
-            switch (randomAction)
-            {
-                case 0:
-                    return ActionToBrowser.FocusOnElement;
-                case 1:
-                    return ActionToBrowser.FocusOnElements;
-                case 2:
-                    return ActionToBrowser.FocusOnTab;
-                case 3:
-                    return ActionToBrowser.RefreshPage;
-                case 4:
-                    return ActionToBrowser.Inaction;
-                case 5:
-                    return ActionToBrowser.ClickOnElement;
-                case 6:
-                    return ActionToBrowser.ClickOnElements;
-                default:
-                    return ActionToBrowser.FocusOnElement;
-            }
-        }
+            0 => ActionToBrowser.FocusOnElement,
+            1 => ActionToBrowser.FocusOnElements,
+            2 => ActionToBrowser.FocusOnTab,
+            3 => ActionToBrowser.RefreshPage,
+            4 => ActionToBrowser.Inaction,
+            5 => ActionToBrowser.ClickOnElement,
+            6 => ActionToBrowser.ClickOnElements,
+            _ => ActionToBrowser.FocusOnElement,
+        };
         /// <summary>
         /// Получить сообщение
         /// </summary>
         /// <param name="exception">Исключение</param>
         /// <param name="topic">Тема</param>
-        /// <returns></returns>
+        /// <returns>Модель сообщения</returns>
         protected Message GetMessage(Exception exception, string topic)
         {
-            return new Message 
-            { 
-                Url = GetUrlPage(), Exception = exception,
+            return new Message
+            {
+                Url = GetUrlPage(),
+                Exception = exception,
                 Base64Encoded = GetScreenshot().AsBase64EncodedString,
-                TabsCount = GetTabsCount(), Topic = topic,
+                TabsCount = GetTabsCount(),
+                Topic = topic,
             };
         }
     }

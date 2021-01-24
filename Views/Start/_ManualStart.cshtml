@@ -51,6 +51,7 @@
         <div><input id="Status" value="@item.StatusService" /></div>
         <div><input id="Balance" value="@item.BalanceOnService" /></div>
         <div><input id="TypeService" value="@item.TypeService" /></div>
+        <div><input id="LaunchTime" value="@item.LaunchTime" /></div>
     </div>
 
     <div class="col-4 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
@@ -59,11 +60,12 @@
 
     <div class="col-2">
         <div class="row">
-            @Html.DropDownListFor(x => item.StatusService, new SelectList(new string[] { "Work", "NoWork", "InWork" }, item.StatusService), null, new
+            @Html.DropDownListFor(x => item.StatusService, 
+                new SelectList(new string[] { "Work", "NoWork", "InWork", "InSleeping" }, item.StatusService), null, new
                 {
                    @class = "form-control",
                    @style = "background-color: rgb(222,243,202); border: 2px solid white; height: 44px; text-align-last: center;",
-                   @onchange = "ChangeStatus(this)",
+                   @onchange = "ChangeStatusManualStart(this)",
                 })
         </div>
     </div>

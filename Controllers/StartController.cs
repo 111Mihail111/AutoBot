@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace AutoBot.Controllers
 {
@@ -44,7 +45,7 @@ namespace AutoBot.Controllers
             var allAccounts = AccountService.GetAccounts();
             if (allAccounts.Count() == 0)
             {
-                var dataFile = new StreamReader("../AutoBot/BrowserSettings/Учетки.txt", System.Text.Encoding.Default).ReadToEnd();
+                var dataFile = new StreamReader("../AutoBot/BrowserSettings/Учетки.txt", Encoding.Default).ReadToEnd();
                 AccountManager accountManager = new AccountManager();  //TODO:Прокинуть через DI
                 accountManager.SaveAccounts(dataFile);
             }
@@ -178,11 +179,17 @@ namespace AutoBot.Controllers
             switch (typeService)
             {
                 case TypeService.VkTarget:
-                    _vkTarget.Quit();
+                    //_vkTarget.Quit();
                     break;
             }
 
             return PartialView("_ManualStart", WebService.GetInternetServices());
+        }
+
+        [HttpGet]
+        public bool IsTimeToLaunch(string dateTimeLaunch)
+        {
+            return DateTime.Now >= Convert.ToDateTime(dateTimeLaunch);
         }
 
         [HttpGet]
