@@ -623,7 +623,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Выполнить задачу в SoundCloud
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInSoundCloud(string taskText) //Есть TODO
+        protected void CarryOutTaskInSoundCloud(string taskText)
         {
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
@@ -1131,8 +1131,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _taksId = Convert.ToInt32(ExecuteScript(getTaskScript + clickButtonScript + getAttribute));
             int waitingСounter = 0;
 
-            bool isCheked = true;
-            while (isCheked)
+            while (true)
             {
                 var errorPanel = GetElementByClassName("is_error");
                 if (errorPanel != null)
@@ -1185,10 +1184,15 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 }
                 else if (_taksId != Convert.ToInt32(ExecuteScript(getTaskScript + getAttribute)))
                 {
-                    isCheked = false;
+                    return;
                 }
                 else
                 {
+                    if (IsTimeToSleep())
+                    {
+                        return;
+                    }
+
                     ShowActivity(false);
                 }
             }
@@ -1292,7 +1296,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected string GetBalance()
         {
-            return GetElementByXPath("//*[@id='header']/div/div/div[3]/div/div/div[2]/span[2]").GetInnerText() + "руб";
+            var spanElement = GetElementByXPath("//*[@id='header']/div/div/div[3]/div/div/div[2]/span[2]");
+            return spanElement == null ? string.Empty : spanElement.GetInnerText() + "руб";
         }
         /// <summary>
         /// Обновить модель
@@ -1301,7 +1306,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected void UpdateModel(Status status)
         {
             var internetService = WebService.GetInternetServices().Where(w => w.TypeService == _typeService).FirstOrDefault();
-            internetService.BalanceOnService = GetBalance();
+            var balance = GetBalance();
+
+            internetService.BalanceOnService = string.IsNullOrWhiteSpace(balance) ? internetService.BalanceOnService : balance;
             internetService.StatusService = status;
 
             if (status == Status.InSleeping)
