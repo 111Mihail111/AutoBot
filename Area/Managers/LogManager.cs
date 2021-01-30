@@ -24,15 +24,27 @@ namespace AutoBot.Area.Managers
 
 
         /// <inheritdoc/>
-        public void SendToEmail(string taskDescription, string methodName, string url, string topic)
+        public void SendToEmail(string description, string methodName, string url, string topic)
         {
             var message = new MailMessage(_mailFrom, _mailTo)
             {
                 Subject = topic,
                 IsBodyHtml = true,
-                Body = $"<b>Тип</b>: {taskDescription}" +
+                Body = $"<b>Тип</b>: {description}" +
                        $"<br><b>Метод</b>: {methodName}" +
                        $"<br><b>Url-адрес</b>: {url}",
+            };
+
+            Send(message);
+        }
+        /// <inheritdoc/>
+        public void SendToEmail(string description, string topic)
+        {
+            var message = new MailMessage(_mailFrom, _mailTo)
+            {
+                Subject = topic,
+                IsBodyHtml = true,
+                Body = $"<b>Описание</b>: {description}"
             };
 
             Send(message);

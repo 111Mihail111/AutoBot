@@ -217,12 +217,13 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 }
                 catch (Exception exception)
                 {
-                    ProcessingException(exception);
+                    isWork = ProcessingException(exception);
                 }
                 finally
                 {
                     if (_countExceptions == 50)
                     {
+                        _logManager.SendToEmail("TODO:Здесь будут все возникшие ошибки за день", "Колличество ошибок за сегодня достигло своего предела.");
                         Quit(Status.NoWork);
                         isWork = false;
                     }
@@ -233,29 +234,45 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Обработать исключение
         /// </summary>
         /// <param name="exception">Исключение</param>
-        protected void ProcessingException(Exception exception)
+        /// <returns>True - ошибка обработана, иначе false</returns>
+        protected bool ProcessingException(Exception exception) //Есть TODO
         {
             try
             {
                 int tabsCount = GetTabsCount();
-                if (tabsCount >= 2)
+                switch (tabsCount)
                 {
-                    _logManager.SendToEmail(GetMessage(exception, "Произошла ошибка"));
+                    case 1:
+                        _logManager.SendToEmail(GetMessage(exception, "Ошибка на головном сайте. Работа с ним прекращена."));
+                        Quit(Status.NoWork);
 
-                    CloseTab();
-                    SwitchToTab();
-                    GoToUrl("https://vktarget.ru/");
-                    SkipTask();
+                        return false;
+                    case 2:
+                        _logManager.SendToEmail(GetMessage(exception, "Произошла ошибка"));
+
+                        CloseTab();
+                        SwitchToTab();
+                        GoToUrl("https://vktarget.ru/");
+                        SkipTask();
+
+                        return true;
+                    default:
+                        return false;
                 }
-                else if (tabsCount == 1)
-                {
-                    _logManager.SendToEmail(GetMessage(exception, "Ошибка на головном сайте. Работа с ним прекращена."));
-                    Quit(Status.NoWork);
-                }
+                
+                //TODO:Проверка авторизации
+                //TODO:Проверка работоспособности страницы
             }
-            catch (Exception)
+            catch (Exception newException)
             {
-                _logManager.SendToEmail(GetMessage(exception, "Произошла ошибка"));
+                _logManager.SendToEmail(new Message 
+                { 
+                    Topic = "Ошибка при обработке исключения в методе ProcessingException()", Exception = newException 
+                });
+
+                Quit(Status.NoWork);
+                
+                return false;
             }
         }
         /// <summary>
@@ -393,7 +410,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 return;
             }
 
-            CheckTask();
+            GetPayout();
         }
         /// <summary>
         /// Выполнить задачу в YouTube
@@ -441,7 +458,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 return;
             }
 
-            CheckTask();
+            GetPayout();
         }
         /// <summary>
         /// Выполнить задачу в Сlassmates
@@ -495,7 +512,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 return;
             }
 
-            CheckTask();
+            GetPayout();
         }
         /// <summary>
         /// Выполнить задачу в Yandex.Zen
@@ -530,7 +547,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 return;
             }
 
-            CheckTask();
+            GetPayout();
         }
         /// <summary>
         /// Выполнить задачу в Reddit
@@ -578,7 +595,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 return;
             }
 
-            CheckTask();
+            GetPayout();
         }
         /// <summary>
         /// Выполнить задачу в Tumblr
@@ -617,7 +634,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 return;
             }
 
-            CheckTask();
+            GetPayout();
         }
         /// <summary>
         /// Выполнить задачу в SoundCloud
@@ -661,7 +678,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 return;
             }
 
-            CheckTask();
+            GetPayout();
         }
         /// <summary>
         /// Выполнить задачу в Quora
@@ -709,7 +726,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 return;
             }
 
-            CheckTask();
+            GetPayout();
         }
         /// <summary>
         /// Выполнить задачу в TikTok
@@ -745,7 +762,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 return;
             }
 
-            CheckTask();
+            GetPayout();
         }
         /// <summary>
         /// Выполнить задачу в Vimeo
@@ -780,7 +797,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 return;
             }
 
-            CheckTask();
+            GetPayout();
         }
 
 
@@ -1120,9 +1137,9 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             }
         }
         /// <summary>
-        /// Проверить задачу
+        /// Получить выплату
         /// </summary>
-        protected void CheckTask() //TODO: Переработать метод. Разбить на несколько 
+        protected void GetPayout() //TODO: Переработать метод. Разбить на несколько 
         {
             string getTaskScript = "var task = document.querySelector('.container-fluid.available__table');";
             string clickButtonScript = "task.querySelector('.default__small__btn.check__btn').click();";
@@ -1165,6 +1182,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                             SkipTask();
                             UndoTask();
                             return;
+                        case "Похоже, Вы не выполнили задание":
                         case "Похоже, что вы не поставили класс!":
                             waitingСounter++;
                             if (waitingСounter < 3)
@@ -1173,13 +1191,18 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                                 ExecuteScript(getTaskScript + clickButtonScript);
                                 continue;
                             }
+
                             _logManager.SendToEmail(error, "CheckTask()", _urlByTask, "Задача не прошла проверку");
+
                             SkipTask();
                             UndoTask();
                             return;
                         default:
                             _logManager.SendToEmail(error, "CheckTask()", GetUrlPage(), "Непредвиденный кейс");
-                            break;
+
+                            SkipTask();
+                            UndoTask();
+                            return;
                     }
                 }
                 else if (_taksId != Convert.ToInt32(ExecuteScript(getTaskScript + getAttribute)))
@@ -1311,11 +1334,16 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             internetService.BalanceOnService = string.IsNullOrWhiteSpace(balance) ? internetService.BalanceOnService : balance;
             internetService.StatusService = status;
 
-            if (status == Status.InSleeping)
+            switch (status)
             {
-                _dateAnTimeFallingAsleep = null;
-                _countExceptions = 0;
-                internetService.LaunchTime = DateTime.Now.AddHours(13).AddMinutes(2 * GetRandomNumber(1, 4));
+                case Status.InSleeping:
+                    _dateAnTimeFallingAsleep = null;
+                    _countExceptions = 0;
+                    internetService.LaunchTime = DateTime.Now.AddHours(13).AddMinutes(2 * GetRandomNumber(1, 4));
+                    break;
+                case Status.NoWork:
+                    _countExceptions = 0;
+                    break;
             }
 
             WebService.UpdateInternetService(internetService);
