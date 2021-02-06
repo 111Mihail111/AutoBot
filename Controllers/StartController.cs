@@ -41,8 +41,7 @@ namespace AutoBot.Controllers
 
         public ActionResult Index()
         {
-            var allAccounts = AccountService.GetAccounts();
-            if (allAccounts.Count() == 0)
+            if (!AccountService.GetAccounts().Any())
             {
                 var dataFile = new StreamReader("../AutoBot/BrowserSettings/Учетки.txt", Encoding.Default).ReadToEnd();
                 AccountManager accountManager = new AccountManager();  //TODO:Прокинуть через DI
