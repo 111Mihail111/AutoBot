@@ -120,7 +120,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             if (accountVK != null)
             {
                 _vkManager.Authorization(accountVK.Login, accountVK.Password);
-                _tikTokManager.Authorization(accountVK.Login, accountVK.Password);
+                //_tikTokManager.Authorization(accountVK.Login, accountVK.Password);
             }
 
             var accountReddit = accounts.Where(w => w.AccountType == AccountType.Reddit).FirstOrDefault();
@@ -190,7 +190,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 return;
             }
 
-            _dateAnTimeFallingAsleep = DateTime.Now.AddHours(11);
+            _dateAnTimeFallingAsleep = DateTime.Now.AddHours(13);
         }
 
 
@@ -257,6 +257,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
                         return true;
                     default:
+                        _logManager.SendToEmail(GetMessage(exception, "Неопределенная ошибка. Количество вкладок превысило 2."));
                         return false;
                 }
                 
@@ -336,7 +337,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             _urlByTask = string.Empty;
             _taksId = 0;
 
-            UpdateModel(Status.Work);
+            UpdateModel(Status.InWork);
         }
 
 
@@ -1339,7 +1340,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 case Status.InSleeping:
                     _dateAnTimeFallingAsleep = null;
                     _countExceptions = 0;
-                    internetService.LaunchTime = DateTime.Now.AddHours(13).AddMinutes(2 * GetRandomNumber(1, 4));
+                    internetService.LaunchTime = DateTime.Now.AddHours(11).AddMinutes(2 * GetRandomNumber(1, 4));
                     break;
                 case Status.NoWork:
                     _countExceptions = 0;
