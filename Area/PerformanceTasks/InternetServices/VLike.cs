@@ -16,7 +16,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 {
     public class VLike : BrowserManager, IVLike
     {
-        const string BROWSER_PROFILE_SERVICE = "C:\\_AutoBot\\Profiles\\PerformanceTasks\\V_Like\\";
+        const string BROWSER_PROFILE_SERVICE = "/home/mihail/_AutoBot/Profiles/PerformanceTasks/V_Like/";
 
         /// <summary>
         /// Была ли авторизация соц. сетей
@@ -37,7 +37,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
         protected void Init()
         {
-            Initialization(BROWSER_PROFILE_SERVICE, true);
+            Initialization(BROWSER_PROFILE_SERVICE);
             SetContextForManagers();
 
             if (!_isAuthorizationSocialNetworks)
@@ -376,7 +376,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             var login = GetElementByXPath("//*[@id='uLogin']/div");
             if (login != null)
             {
-                login.ToClick(1500);
+                login.ToClick(3000);
             }
         }
         /// <summary>

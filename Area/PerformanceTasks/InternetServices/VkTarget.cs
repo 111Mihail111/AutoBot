@@ -15,7 +15,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 {
     public class VkTarget : BrowserManager, IVkTarget
     {
-        const string BROWSER_PROFILE_SERVICE = "C:\\_AutoBot\\Profiles\\PerformanceTasks\\";
+        const string BROWSER_PROFILE_SERVICE = "/home/mihail/_AutoBot/Profiles/PerformanceTasks/";
 
         /// <summary>
         /// Была ли авторизация соц. сетей
@@ -70,7 +70,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
         protected void Init()
         {
-            Initialization($"{BROWSER_PROFILE_SERVICE + _typeService}\\");
+            Initialization($"{BROWSER_PROFILE_SERVICE + _typeService}/");
             SetContextForManagers();
 
             if (!_isAuthorizationSocialNetworks)
@@ -160,11 +160,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 _tumblrManager.Authorization(accountTumblr.Login, accountTumblr.Password);
             }
 
-            var accountQuora = accounts.Where(w => w.AccountType == AccountType.Quora).FirstOrDefault();
+            //TODO: Адаптировать для работы под Линукс
+            /*var accountQuora = accounts.Where(w => w.AccountType == AccountType.Quora).FirstOrDefault();
             if (accountQuora != null)
             {
                 _quoraManager.Authorization(accountQuora.Login, accountQuora.Password);
-            }
+            }*/
 
             var accountSoundCloud = accounts.Where(w => w.AccountType == AccountType.SoundCloud).FirstOrDefault();
             if (accountSoundCloud != null)
@@ -172,11 +173,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 _soundCloudManager.Authorization(accountSoundCloud.Login, accountSoundCloud.Password);
             }
 
-            var accountVimeo = accounts.Where(w => w.AccountType == AccountType.Vimeo).FirstOrDefault();
+            /*var accountVimeo = accounts.Where(w => w.AccountType == AccountType.Vimeo).FirstOrDefault();
             if (accountVimeo != null)
             {
                 _vimeoManager.Authorization(accountVimeo.Login, accountVimeo.Password);
-            }
+            }*/
 
             _isAuthorizationSocialNetworks = true;
         }

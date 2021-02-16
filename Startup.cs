@@ -1,7 +1,7 @@
 using AutoBot.Area.API;
-using AutoBot.Area.Collecting—ryptocurrencies;
-using AutoBot.Area.Collecting—ryptocurrencies.Cranes;
-using AutoBot.Area.Collecting—ryptocurrencies.Interface;
+using AutoBot.Area.Collecting–°ryptocurrencies;
+using AutoBot.Area.Collecting–°ryptocurrencies.Cranes;
+using AutoBot.Area.Collecting–°ryptocurrencies.Interface;
 using AutoBot.Area.Managers;
 using AutoBot.Area.Managers.Interface;
 using AutoBot.Area.PerformanceTasks.Interface;

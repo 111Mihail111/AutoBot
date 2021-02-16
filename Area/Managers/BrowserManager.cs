@@ -42,7 +42,7 @@ namespace AutoBot.Area.Managers
             options.AddAdditionalCapability("useAutomationExtension", false); //Скрывает указанное расширение
             options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
 
-            _chromeDriver = new ChromeDriver("./BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
+            _chromeDriver = new ChromeDriver("../AutoBot/BrowserSettings/", options, TimeSpan.FromSeconds(200));
         }
 
         public void Initialization(string pathToProfile, bool isHeadless)
@@ -60,7 +60,7 @@ namespace AutoBot.Area.Managers
             options.AddAdditionalCapability("useAutomationExtension", false); //Скрывает указанное расширение
             options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
 
-            _chromeDriver = new ChromeDriver("./BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
+            _chromeDriver = new ChromeDriver("../AutoBot/BrowserSettings/chromedriver", options, TimeSpan.FromSeconds(200));
             _isHeadless = isHeadless;
         }
 
