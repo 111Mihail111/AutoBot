@@ -282,6 +282,7 @@ function isTimeToLaunch(dateTimeLaunch) {
             result = data;
         }
     });
+
     return result;
 }
 
@@ -294,6 +295,5 @@ setInterval(function () {
         }
     });
 
-    debugger;
     checkLaunchTime();
 }, 60000)
