@@ -14,7 +14,7 @@ namespace AutoBot.Area.Managers.Interface
         /// <param name="password">Пароль</param>
         public void Authorization(string login, string password);
         /// <summary>
-        /// Реблог
+        /// Реблог поста
         /// </summary>
         public void Reblog();
         /// <summary>

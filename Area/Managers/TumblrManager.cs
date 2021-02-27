@@ -3,7 +3,6 @@ using AutoBot.Area.Managers.Interface;
 using AutoBot.Extentions;
 using OpenQA.Selenium.Chrome;
 using System.Linq;
-using System.Threading;
 
 namespace AutoBot.Area.Managers
 {
@@ -22,26 +21,21 @@ namespace AutoBot.Area.Managers
                 return;
             }
 
-            var loginInput = GetElementById("signup_determine_email");
+            var loginInput = GetElementsByTagName("input").Where(w => w.GetName() == "email").First();
             if (string.IsNullOrWhiteSpace(loginInput.GetValue()))
             {
                 loginInput.SendKeys(login);
             }
 
-            GetElementById("signup_forms_submit").ToClick(2000);
+            GetElementsByTagName("button").Where(w => w.GetAriaLabel() == "Вперед").First().ToClick(2000);
 
-            GetElementById("signup_magiclink").FindElements(SearchMethod.Tag, "a")
-                .Where(w => w.GetInnerText() == "Войти с паролем").First().Click();
-            Thread.Sleep(500);
-
-            var passwordInput = GetElementById("signup_password");
+            var passwordInput = GetElementsByTagName("input").Where(w => w.GetName() == "password").First();
             if (string.IsNullOrWhiteSpace(passwordInput.GetValue()))
             {
                 passwordInput.SendKeys(password);
             }
 
-            GetElementById("signup_forms_submit").Click();
-            Thread.Sleep(500);
+            GetElementsByTagName("button").Where(w => w.GetAriaLabel() == "Войти").First().ToClick(2000);
 
             CloseTab();
             SwitchToTab();
@@ -49,23 +43,15 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void Reblog()
         {
-            var frame = GetElementByXPath("/html/body/iframe[1]");
-            SwitchToFrame(frame);
-
-            GetElementByClassName("reblog-button").Click();
-            Thread.Sleep(1500);
-
+            SwitchToFrame(GetElementByXPath("/html/body/iframe[1]"));
+            GetElementByClassName("reblog-button").ToClick(1500);
             ExecuteScript("document.getElementsByClassName('post-form--form')[0].remove();");
-
-            GetElementByClassName("create_post_button").Click();
-            Thread.Sleep(1500);
-
+            GetElementByClassName("create_post_button").ToClick(1500);
         }
         /// <inheritdoc/>
         public void LikePost()
         {
-            var frame = GetElementByXPath("/html/body/iframe[1]");
-            SwitchToFrame(frame);
+            SwitchToFrame(GetElementByXPath("/html/body/iframe[1]"));
 
             var button = GetElementByClassName("like-button");
             if (!button.Displayed)
@@ -73,14 +59,12 @@ namespace AutoBot.Area.Managers
                 return;
             }
 
-            button.Click();
-            Thread.Sleep(1500);
+            button.ToClick(1500);
         }
         /// <inheritdoc/>
         public void RemoveLike()
         {
-            var frame = GetElementByXPath("/html/body/iframe[1]");
-            SwitchToFrame(frame);
+            SwitchToFrame(GetElementByXPath("/html/body/iframe[1]"));
 
             var button = GetElementByClassName("unlike-button");
             if (!button.Displayed)
@@ -88,8 +72,7 @@ namespace AutoBot.Area.Managers
                 return;
             }
 
-            button.Click();
-            Thread.Sleep(1500);
+            button.ToClick(1500);
         }
         /// <inheritdoc/>
         public void SubscribeToBlog()

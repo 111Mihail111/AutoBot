@@ -272,7 +272,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     Topic = "Ошибка при обработке исключения в методе ProcessingException()", Exception = newException 
                 });
 
-                Quit(Status.NoWork);
+                Quit(Status.NoWork); //TODO: Нужно как-то проверять, что у нас закрыт браузер. Если мы будем закрывать то, что и так закрыто, то получим ошибку.
                 
                 return false;
             }
@@ -1307,7 +1307,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     RefreshPage();
 
                     var liElements = GetElementByClassName("header__links").FindElements(SearchMethod.Tag, "li");
-                    if (liElements.Count() == 0)
+                    if (!liElements.Any())
                     {
                         return;
                     }
