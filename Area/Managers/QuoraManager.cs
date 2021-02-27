@@ -22,30 +22,19 @@ namespace AutoBot.Area.Managers
                 return;
             }
 
-            var inputCollection = GetElementsByClassName("ignore_interaction");
-            foreach (var input in inputCollection)
+            var loginInput = GetElementById("email");
+            if (string.IsNullOrWhiteSpace(loginInput.GetValue()))
             {
-                string inputName = input.GetName();
-                string inputValue = input.GetValue();
-
-                if (inputName == "email")
-                {
-                    if (string.IsNullOrWhiteSpace(inputValue))
-                    {
-                        input.SendKeys(login);
-                    }
-                }
-                else if (inputName == "password")
-                {
-                    if (string.IsNullOrWhiteSpace(inputValue))
-                    {
-                        input.SendKeys(password);
-                    }
-                }
+                loginInput.SendKeys(login);
             }
 
-            inputCollection.Last().Click();
-            Thread.Sleep(1500);
+            var passwordInput = GetElementById("password");
+            if (string.IsNullOrWhiteSpace(passwordInput.GetValue()))
+            {
+                passwordInput.SendKeys(password);
+            }
+
+            GetElementsByTagName("button").Where(w => w.GetInnerText() == "Login").First().ToClick(2000);
 
             CloseTab();
             SwitchToTab();
@@ -90,8 +79,7 @@ namespace AutoBot.Area.Managers
                 return;
             }
 
-            button.Click();
-            Thread.Sleep(1500);
+            button.ToClick(1500);
         }
         /// <inheritdoc/>
         public void RemoveLike()
@@ -102,8 +90,7 @@ namespace AutoBot.Area.Managers
                 return;
             }
 
-            button.Click();
-            Thread.Sleep(1500);
+            button.ToClick(1500);
         }
         /// <inheritdoc/>
         public void MakeRepost()
@@ -140,7 +127,6 @@ namespace AutoBot.Area.Managers
         public void SetContextBrowserManager(ChromeDriver chromeDriver)
         {
             SetDriver(chromeDriver);
-
         }
     }
 }
