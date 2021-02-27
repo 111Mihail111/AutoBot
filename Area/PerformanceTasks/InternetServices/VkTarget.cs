@@ -1306,7 +1306,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     RefreshPage();
 
                     var liElements = GetElementByClassName("header__links").FindElements(SearchMethod.Tag, "li");
-                    if (liElements.Count() == 0)
+                    if (!liElements.Any())
                     {
                         return;
                     }
