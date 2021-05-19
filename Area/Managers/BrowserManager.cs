@@ -31,14 +31,14 @@ namespace AutoBot.Area.Managers
 
         public void Initialization(string pathToProfile)
         {
-            ChromeOptions options = new ChromeOptions();
+            var options = new ChromeOptions();
             options.AddArgument($"--user-data-dir={pathToProfile}"); //Путь к папке с профилем
             options.AddArgument("--profile-directory=AutoBot"); //Профиль
             options.AddArgument("--start-maximized"); //Разворачивает браузер на ширину экрана
             options.AddArgument("--disable-notifications"); //Блокировка уведомлений
             options.AddArgument("--mute-audio"); //Отключает звук в браузере
 
-            //options.BinaryLocation = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"; //Для дом. запуска
+            options.BinaryLocation = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"; //Для дом. запуска
             options.AddAdditionalCapability("useAutomationExtension", false); //Скрывает указанное расширение
             options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
 
@@ -47,7 +47,7 @@ namespace AutoBot.Area.Managers
 
         public void Initialization(string pathToProfile, bool isHeadless)
         {
-            ChromeOptions options = new ChromeOptions();
+            var options = new ChromeOptions();
             options.AddArgument($"--user-data-dir={pathToProfile}"); //Путь к папке с профилем
             options.AddArgument("--profile-directory=AutoBot"); //Профиль
             options.AddArgument("--window-size=1920,1080"); //Разворачивает браузер на указаную ширину экрана
@@ -56,7 +56,7 @@ namespace AutoBot.Area.Managers
             options.AddArgument("--headless"); //Запуск в фоновом режиме (без отображения бразуера)
             options.AddArgument("--no-sandbox"); //Отключает безопасность хрома, для корректной работы js-скриптов
 
-            //options.BinaryLocation = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"; //Для дом. запуска
+            options.BinaryLocation = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"; //Для дом. запуска
             options.AddAdditionalCapability("useAutomationExtension", false); //Скрывает указанное расширение
             options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
 
@@ -124,6 +124,15 @@ namespace AutoBot.Area.Managers
         {
             Thread.Sleep(1500);
             _chromeDriver.SwitchTo().Window(_chromeDriver.WindowHandles[indexTab]);
+        }
+        /// <summary>
+        /// Закрыть выбранную вкладку и переключиться на другую
+        /// </summary>
+        /// <param name="indexTab">Индекс вкладки</param>
+        public void CloseSelectedTabAndSwitchToAnother(int indexTab = 0)
+        {
+            CloseTab();
+            SwitchToTab(indexTab);
         }
         /// <summary>
         /// Получить количество вкладок

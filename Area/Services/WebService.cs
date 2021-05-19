@@ -12,7 +12,7 @@ namespace AutoBot.Area.Services
         /// <summary>
         /// Краны
         /// </summary>
-        public static List<Crane> _cranes = new List<Crane>
+        private static List<Crane> _cranes = new()
         {
             new Crane { URL = "https://freebitco.in/", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
                 StatusCrane = Status.NoWork, TypeCurrencies = TypeCurrencies.Bitcoin, TypeCrane = TypeCrane.FreeBitcoin },
@@ -30,20 +30,20 @@ namespace AutoBot.Area.Services
         /// <summary>
         /// Интернет-сервисы
         /// </summary>
-        public static List<InternetService> _services = new List<InternetService>
+        private static List<InternetService> _services = new()
         {
             new InternetService { URL = "https://v-like.ru/", ActivityTime = TimeSpan.FromHours(0), BalanceOnService = "0",
-                StatusService = Status.Work, TypeService = TypeService.VLike, RunType = false },
-            new InternetService { URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.Work,
-                TypeService = TypeService.VkTarget, RunType = true },
-            new InternetService { URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.Work,
-                TypeService = TypeService.VkTarget_2, RunType = true },
-            new InternetService { URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.Work,
-                TypeService = TypeService.VkTarget_3, RunType = true },
-            new InternetService { URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.Work,
-                TypeService = TypeService.VkTarget_4, RunType = true },
-            new InternetService { URL = "http://vkmymarket.ru/", BalanceOnService = "0", StatusService = Status.Work, 
-                TypeService = TypeService.VkMyMarket, RunType = true },
+                StatusService = Status.NoWork, TypeService = TypeService.VLike, RunType = RunType.Auto },
+            new InternetService { URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.NoWork,
+                TypeService = TypeService.VkTarget, RunType = RunType.Manually },
+            new InternetService { URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.NoWork,
+                TypeService = TypeService.VkTarget_2, RunType = RunType.Manually },
+            new InternetService { URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.NoWork,
+                TypeService = TypeService.VkTarget_3, RunType = RunType.Manually },
+            new InternetService { URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.NoWork,
+                TypeService = TypeService.VkTarget_4, RunType = RunType.Manually },
+            new InternetService { URL = "http://vkmymarket.ru/", BalanceOnService = "0", StatusService = Status.NoWork, 
+                TypeService = TypeService.VkMyMarket, RunType = RunType.Manually },
         };
 
         /// <summary>
@@ -68,7 +68,11 @@ namespace AutoBot.Area.Services
         /// <returns></returns>
         public static WebSitesVM GetAllData()
         {
-            return new WebSitesVM { Cranes = GetCranes().ToList(), InternetServices = GetInternetServices().ToList() };
+            return new WebSitesVM 
+            { 
+                Cranes = GetCranes().ToList(), 
+                InternetServices = GetInternetServices().ToList() 
+            };
         }
 
 

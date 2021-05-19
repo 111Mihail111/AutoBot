@@ -1,4 +1,6 @@
-﻿@model IEnumerable<AutoBot.Models.InternetService>
+﻿@using AutoBot.Area.Enums
+
+@model IEnumerable<AutoBot.Models.InternetService>
 
 <div class="row">
     <div class="col-12">
@@ -41,13 +43,12 @@
 
 @foreach (var item in Model)
 {
-    @if (item.RunType != false)
+    @if (item.RunType != RunType.Auto)
     {
         continue;
     }
 
     <div id="Row" class="row mb-2">
-
         <div class="row-cols-12" style="display: none">
             <div><input id="URL" value="@item.URL" /></div>
             <div><input id="ActivityTime" value="@item.ActivityTime.ToString(@"hh\:mm\:ss")" /></div>

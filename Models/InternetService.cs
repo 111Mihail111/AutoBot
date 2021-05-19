@@ -31,7 +31,7 @@ namespace AutoBot.Models
         /// <summary>
         /// Тип запуска
         /// </summary>
-        public bool RunType { get; set; }
+        public RunType RunType { get; set; }
         /// <summary>
         /// Время запуска
         /// </summary>

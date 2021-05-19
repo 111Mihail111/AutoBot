@@ -71,6 +71,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             if (accountYouTube != null)
             {
                 _ytManager.Authorization(accountYouTube.Login, accountYouTube.Password);
+                CloseSelectedTabAndSwitchToAnother();
             }
 
             var accountClassmates = accounts.Where(w => w.AccountType == AccountType.Classmates).FirstOrDefault();

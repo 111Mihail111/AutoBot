@@ -82,13 +82,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
         public InternetService GoTo(InternetService service)
         {
-            //var currentDateTime = DateTime.Now;
-            //if (currentDateTime >= _timeFallingAsleep)
-            //{
-            //    service.StatusService = Status.InSleeping;
-            //    return service;
-            //}
-
             try
             {
                 Init();
@@ -112,12 +105,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Начать сбор
         /// </summary>
-        private void BeginCollecting() //ЕСТЬ TODO
+        private void BeginCollecting()
         {
-            JoinInCommunityVK();
+            JoinVkCommunity();
             WorkWithLikesAndRepostVK();
-            //AddToFriendsVK();
-            //WorkWithYouTube(); //TODO: Не отлажен
             SubscriptionsInInstagram();
             WorkWithLikeInstagram();
         }
@@ -126,7 +117,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Вступить в сообщество ВК
         /// </summary>
-        protected void JoinInCommunityVK()
+        protected void JoinVkCommunity()
         {
             GetElementById("vk1").ToClick();
 
@@ -306,12 +297,16 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 }
 
                 string text = GetTextFromAlert();
-                switch (text) 
+                switch (text)
                 {
                     case "К сожалению, уже было поставлено нужное количество лайков к данному объекту. Обновите список заданий.":
                     case "Список участников скрыт, проверить выполнение нет возможности.Пожалуйста, пропустите это задание.":
                         AlertAccept();
                         return false;
+                    default:
+                        counter = 6;
+                        _logManager.SendToEmail(text, "DidPaymentPass()", string.Empty, "Непредвиденный кейс в alert-окне");
+                        break;
                 }
 
                 AlertAccept();
@@ -385,10 +380,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected void ButtonsVisible()
         {
             ExecuteScript("var buttonList = document.getElementsByClassName('button');" +
-                "for (var i = 0; i < buttonList.length; i++)" +
-                "{" +
-                    "buttonList[i].style.display = 'inline-block';" +
-                "}");
+                          "for (var i = 0; i < buttonList.length; i++)" +
+                          "{" +
+                               "buttonList[i].style.display = 'inline-block';" +
+                          "}");
         }
         /// <summary>
         /// Получить детали интернет-сервиса

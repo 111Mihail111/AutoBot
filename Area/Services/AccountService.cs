@@ -7,7 +7,7 @@ namespace AutoBot.Area.Services
 {
     public static class AccountService
     {
-        private static List<Account> _accounts = new List<Account>();
+        private static List<Account> _accounts = new();
 
         /// <summary>
         /// Сохранить аккаунты

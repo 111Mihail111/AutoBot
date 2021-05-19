@@ -135,10 +135,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 if (IsBackgroundMode())
                 {
                     _ytManager.AuthorizationForOldVersionBrowser(accountYouTube.Login, accountYouTube.Password);
+                    CloseSelectedTabAndSwitchToAnother();
                 }
                 else
                 {
                     _ytManager.Authorization(accountYouTube.Login, accountYouTube.Password);
+                    CloseSelectedTabAndSwitchToAnother();
                 }
             }
 
@@ -288,7 +290,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Начать сбор
         /// </summary>
-        protected void BeginCollecting()
+        protected void BeginCollecting() //Есть TODO
         {
             GetTask();
             switch (_typeSocialNetwork)
@@ -297,7 +299,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     CarryOutTaskInVk(_task);
                     break;
                 case "youtube":
-                    CarryOutTaskInYouTube(_task);
+                    CarryOutTaskInYouTube(_task); 
                     break;
                 case "odnoklassniki":
                     CarryOutTaskInСlassmates(_task);
@@ -417,7 +419,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Выполнить задачу в YouTube
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInYouTube(string taskText)
+        protected void CarryOutTaskInYouTube(string taskText) //Есть TODO
         {
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
@@ -426,7 +428,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (taskText)
             {
                 case "Подпишитесь на канал":
-                    _ytManager.SubscribeToChannel();
+                    _ytManager.SubscribeToChannel(); //TODO: Не работает
                     break;
                 case "Поставьте 'Лайк' под видео":
                     if (!_ytManager.IsVideoAvailable())
@@ -1167,17 +1169,19 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                         case "Ошибка при выполнении проверки, попробуйте снова":
                         case "Похоже, вы не выполнили задание. Подождите 15 секунд и повторите попытку":
                         case "Проверка не пройдена. Попробуйте через 10 секунд.":
-                            waitingСounter++;
-                            if (waitingСounter < 3)
                             {
-                                Thread.Sleep(12000);
-                                ExecuteScript(getTaskScript + clickButtonScript);
-                                continue;
-                            }
+                                waitingСounter++;
+                                if (waitingСounter < 3)
+                                {
+                                    Thread.Sleep(12000);
+                                    ExecuteScript(getTaskScript + clickButtonScript);
+                                    continue;
+                                }
 
-                            SkipTask();
-                            UndoTask();
-                            return;
+                                SkipTask();
+                                UndoTask();
+                                return;
+                            }
                         case "Задание уже остановлено. Приносим свои извинения.":
                         case "Увы, но список заданий устарел! Скоро вы получите новые задания.":
                             SkipTask();
@@ -1185,19 +1189,21 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                             return;
                         case "Похоже, Вы не выполнили задание":
                         case "Похоже, что вы не поставили класс!":
-                            waitingСounter++;
-                            if (waitingСounter < 3)
                             {
-                                Thread.Sleep(3000);
-                                ExecuteScript(getTaskScript + clickButtonScript);
-                                continue;
+                                waitingСounter++;
+                                if (waitingСounter < 3)
+                                {
+                                    Thread.Sleep(3000);
+                                    ExecuteScript(getTaskScript + clickButtonScript);
+                                    continue;
+                                }
+
+                                _logManager.SendToEmail(error, "CheckTask()", _urlByTask, "Задача не прошла проверку");
+
+                                SkipTask();
+                                UndoTask();
+                                return;
                             }
-
-                            _logManager.SendToEmail(error, "CheckTask()", _urlByTask, "Задача не прошла проверку");
-
-                            SkipTask();
-                            UndoTask();
-                            return;
                         default:
                             _logManager.SendToEmail(error, "CheckTask()", GetUrlPage(), "Непредвиденный кейс");
 

@@ -17,8 +17,6 @@ namespace AutoBot.Area.Managers
 
             if (GetUrlPage() == url)
             {
-                CloseTab();
-                SwitchToTab();
                 return;
             }
 
@@ -35,6 +33,7 @@ namespace AutoBot.Area.Managers
             {
                 inputLogin.SendKeys(login);
             }
+
             GetElementById("identifierNext").FindElement(SearchMethod.Tag, "button").ToClick(2000);
 
             var inputPassword = GetElementById("password").FindElement(SearchMethod.Tag, "input");
@@ -42,13 +41,11 @@ namespace AutoBot.Area.Managers
             {
                 inputPassword.SendKeys(password);
             }
+
             GetElementById("passwordNext").FindElement(SearchMethod.Tag, "button").ToClick(2000);
 
             GoToUrl(url);
             ButtonLoginClick();
-
-            CloseTab();
-            SwitchToTab();
         }
         /// <inheritdoc/>
         public void AuthorizationForOldVersionBrowser(string login, string password)
@@ -58,8 +55,6 @@ namespace AutoBot.Area.Managers
 
             if (GetUrlPage() == url)
             {
-                CloseTab();
-                SwitchToTab();
                 return;
             }
 
@@ -70,6 +65,7 @@ namespace AutoBot.Area.Managers
             {
                 inputLogin.SendKeys(login);
             }
+
             GetElementById("next").ToClick(2000);
 
             var inputPassword = GetElementById("password");
@@ -77,10 +73,8 @@ namespace AutoBot.Area.Managers
             {
                 inputPassword.SendKeys(password);
             }
-            GetElementById("submit").ToClick(2000);
 
-            CloseTab();
-            SwitchToTab();
+            GetElementById("submit").ToClick(2000);
         }
         /// <inheritdoc/>
         public void SubscribeToChannel()
@@ -151,11 +145,7 @@ namespace AutoBot.Area.Managers
                 inputPass.SendKeys(password);
             }
 
-            GetElementById("passwordNext").FindElement(SearchMethod.Tag, "button").Click();
-            Thread.Sleep(2000);
-
-            CloseTab();
-            SwitchToTab();
+            GetElementById("passwordNext").FindElement(SearchMethod.Tag, "button").ToClick(2000);
         }
         /// <summary>
         /// Удалить детали аккаунта в старой версии браузера

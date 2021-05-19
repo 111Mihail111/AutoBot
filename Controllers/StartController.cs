@@ -43,9 +43,14 @@ namespace AutoBot.Controllers
         {
             if (!AccountService.GetAccounts().Any())
             {
-                var dataFile = new StreamReader("../AutoBot/BrowserSettings/Учетки.txt", Encoding.Default).ReadToEnd();
-                AccountManager accountManager = new AccountManager();  //TODO:Прокинуть через DI
-                accountManager.SaveAccounts(dataFile);
+                string fileData = string.Empty;
+                using (var stream = new StreamReader("../AutoBot/BrowserSettings/Учетки.txt", Encoding.Default))
+                {
+                    fileData = stream.ReadToEnd();
+                };
+
+                AccountManager accountManager = new();  //TODO:Прокинуть через DI
+                accountManager.SaveAccounts(fileData);
             }
 
             return View(WebService.GetAllData());
