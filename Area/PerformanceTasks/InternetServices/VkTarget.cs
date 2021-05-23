@@ -49,7 +49,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Дата и время засыпания
         /// </summary>
-        private DateTime? _dateAnTimeFallingAsleep;
+        private DateTime? _dateAndTimeFallingAsleep;
         /// <summary>
         /// Тип сервиса
         /// </summary>
@@ -67,18 +67,16 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         private ITikTokManager _tikTokManager;
         private ILogManager _logManager;
 
-
         protected void Init()
         {
             Initialization($"{BROWSER_PROFILE_SERVICE + _typeService}\\");
             SetContextForManagers();
+            SetSleepTimer();
 
             if (!_isAuthorizationSocialNetworks)
             {
                 AuthorizationSocialNetworks();
             }
-
-            SetSleepTimer();
         }
         /// <summary>
         /// Установить контекст для менеджеров
@@ -123,62 +121,62 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 //_tikTokManager.Authorization(accountVK.Login, accountVK.Password);
             }
 
-            var accountReddit = accounts.Where(w => w.AccountType == AccountType.Reddit).FirstOrDefault();
-            if (accountReddit != null)
-            {
-                _redditManager.Authorization(accountReddit.Login, accountReddit.Password);
-            }
+            //var accountReddit = accounts.Where(w => w.AccountType == AccountType.Reddit).FirstOrDefault();
+            //if (accountReddit != null)
+            //{
+            //    _redditManager.Authorization(accountReddit.Login, accountReddit.Password);
+            //}
 
-            var accountYouTube = accounts.Where(w => w.AccountType == AccountType.YouTube).FirstOrDefault();
-            if (accountYouTube != null)
-            {
-                if (IsBackgroundMode())
-                {
-                    _ytManager.AuthorizationForOldVersionBrowser(accountYouTube.Login, accountYouTube.Password);
-                    CloseSelectedTabAndSwitchToAnother();
-                }
-                else
-                {
-                    _ytManager.Authorization(accountYouTube.Login, accountYouTube.Password);
-                    CloseSelectedTabAndSwitchToAnother();
-                }
-            }
+            //var accountYouTube = accounts.Where(w => w.AccountType == AccountType.YouTube).FirstOrDefault();
+            //if (accountYouTube != null)
+            //{
+            //    if (IsBackgroundMode())
+            //    {
+            //        _ytManager.AuthorizationForOldVersionBrowser(accountYouTube.Login, accountYouTube.Password);
+            //        CloseCurrentTabAndSwitchToAnother();
+            //    }
+            //    else
+            //    {
+            //        _ytManager.Authorization(accountYouTube.Login, accountYouTube.Password);
+            //        CloseCurrentTabAndSwitchToAnother();
+            //    }
+            //}
 
-            var accountClassmates = accounts.Where(w => w.AccountType == AccountType.Classmates).FirstOrDefault();
-            if (accountClassmates != null)
-            {
-                _classmatesManager.AuthorizationThroughMail(accountClassmates.Login, accountClassmates.Password);
-            }
+            //var accountClassmates = accounts.Where(w => w.AccountType == AccountType.Classmates).FirstOrDefault();
+            //if (accountClassmates != null)
+            //{
+            //    _classmatesManager.AuthorizationThroughMail(accountClassmates.Login, accountClassmates.Password);
+            //}
 
-            var accountYandexZen = accounts.Where(w => w.AccountType == AccountType.YandexZen).FirstOrDefault();
-            if (accountYandexZen != null)
-            {
-                _yandexZenManager.Authorization(accountYandexZen.Login, accountYandexZen.Password);
-            }
+            //var accountYandexZen = accounts.Where(w => w.AccountType == AccountType.YandexZen).FirstOrDefault();
+            //if (accountYandexZen != null)
+            //{
+            //    _yandexZenManager.Authorization(accountYandexZen.Login, accountYandexZen.Password);
+            //}
 
-            var accountTumblr = accounts.Where(w => w.AccountType == AccountType.Tumblr).FirstOrDefault();
-            if (accountTumblr != null)
-            {
-                _tumblrManager.Authorization(accountTumblr.Login, accountTumblr.Password);
-            }
+            //var accountTumblr = accounts.Where(w => w.AccountType == AccountType.Tumblr).FirstOrDefault();
+            //if (accountTumblr != null)
+            //{
+            //    _tumblrManager.Authorization(accountTumblr.Login, accountTumblr.Password);
+            //}
 
-            var accountQuora = accounts.Where(w => w.AccountType == AccountType.Quora).FirstOrDefault();
-            if (accountQuora != null)
-            {
-                _quoraManager.Authorization(accountQuora.Login, accountQuora.Password);
-            }
+            //var accountQuora = accounts.Where(w => w.AccountType == AccountType.Quora).FirstOrDefault();
+            //if (accountQuora != null)
+            //{
+            //    _quoraManager.Authorization(accountQuora.Login, accountQuora.Password);
+            //}
 
-            var accountSoundCloud = accounts.Where(w => w.AccountType == AccountType.SoundCloud).FirstOrDefault();
-            if (accountSoundCloud != null)
-            {
-                _soundCloudManager.Authorization(accountSoundCloud.Login, accountSoundCloud.Password);
-            }
+            //var accountSoundCloud = accounts.Where(w => w.AccountType == AccountType.SoundCloud).FirstOrDefault();
+            //if (accountSoundCloud != null)
+            //{
+            //    _soundCloudManager.Authorization(accountSoundCloud.Login, accountSoundCloud.Password);
+            //}
 
-            var accountVimeo = accounts.Where(w => w.AccountType == AccountType.Vimeo).FirstOrDefault();
-            if (accountVimeo != null)
-            {
-                _vimeoManager.Authorization(accountVimeo.Login, accountVimeo.Password);
-            }
+            //var accountVimeo = accounts.Where(w => w.AccountType == AccountType.Vimeo).FirstOrDefault();
+            //if (accountVimeo != null)
+            //{
+            //    _vimeoManager.Authorization(accountVimeo.Login, accountVimeo.Password);
+            //}
 
             _isAuthorizationSocialNetworks = true;
         }
@@ -187,12 +185,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void SetSleepTimer()
         {
-            if (_dateAnTimeFallingAsleep != null)
+            if (_dateAndTimeFallingAsleep != null)
             {
                 return;
             }
 
-            _dateAnTimeFallingAsleep = DateTime.Now.AddHours(13);
+            _dateAndTimeFallingAsleep = DateTime.Now.AddHours(13);
         }
 
 
@@ -219,6 +217,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 }
                 catch (Exception exception)
                 {
+                    _countExceptions++;
+
                     isWork = ProcessingException(exception);
                 }
                 finally
@@ -250,14 +250,15 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
                         return false;
                     case 2:
-                        _logManager.SendToEmail(GetMessage(exception, "Произошла ошибка"));
+                        {
+                            _logManager.SendToEmail(GetMessage(exception, "Произошла ошибка"));
 
-                        CloseTab();
-                        SwitchToTab();
-                        GoToUrl("https://vktarget.ru/");
-                        SkipTask();
+                            CloseCurrentTabAndSwitchToAnother();
+                            GoToUrl("https://vktarget.ru/");
+                            SkipTask();
 
-                        return true;
+                            return true;
+                        }
                     default:
                         _logManager.SendToEmail(GetMessage(exception, "Неопределенная ошибка. Количество вкладок превысило 2."));
                         return false;
@@ -279,7 +280,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             }
         }
         /// <summary>
-        /// Закрытие браузера
+        /// Закрыть браузер
         /// </summary>
         /// <param name="status">Статус сервиса</param>
         public void Quit(Status status)
@@ -1068,6 +1069,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
             var randomNumber = GetRandomNumber(0, 3);
             var action = GetAction();
+
             switch (action)
             {
                 case ActionToBrowser.FocusOnElement:
@@ -1080,45 +1082,57 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     SwitchToTab();
                     break;
                 case ActionToBrowser.RefreshPage:
-                    if (!isRefresh)
                     {
-                        break;
+                        if (!isRefresh)
+                        {
+                            break;
+                        }
+                        else if (randomNumber == 2)
+                        {
+                            Refresh();
+                            break;
+                        }
+
+                        FocusOnFirstElementMenu();
                     }
-                    else if (randomNumber == 2)
-                    {
-                        Refresh();
-                        break;
-                    }
-                    FocusOnFirstElementMenu();
                     break;
                 case ActionToBrowser.ClickOnElement:
-                    if (randomNumber == 2)
                     {
-                        ClickOnElementMenu();
-                        break;
+                        if (randomNumber == 2)
+                        {
+                            ClickOnElementMenu();
+                            break;
+                        }
+
+                        FocusOnFirstElementMenu();
                     }
-                    FocusOnFirstElementMenu();
                     break;
                 case ActionToBrowser.ClickOnElements:
-                    if (randomNumber == 2)
                     {
-                        ClickOnElementsMenu();
-                        break;
+                        if (randomNumber == 2)
+                        {
+                            ClickOnElementsMenu();
+                            break;
+                        }
+
+                        FocusOnAllElementsMenu();
                     }
-                    FocusOnAllElementsMenu();
                     break;
                 case ActionToBrowser.Inaction:
-                    if (_countAction >= 40)
                     {
-                        Inaction();
-                        _countAction = 0;
-                        return;
+                        if (_countAction >= 40)
+                        {
+                            Inaction();
+                            _countAction = 0;
+                            return;
+                        }
                     }
                     break;
             }
 
             int randomMilliseconds = GetRandomNumber(1000, 5000);
             int randomSleep = GetRandomNumber(2, 4) * randomMilliseconds;
+
             Thread.Sleep(randomSleep);
         }
         /// <summary>
@@ -1254,18 +1268,20 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             }
         }
         /// <summary>
-        /// Бездействие
+        /// Бездействовать
         /// </summary>
         protected void Inaction()
         {
-            string checkTaskScript = "return document.querySelector('.empty').classList.length == 1 ? 'false' : 'true';";
-            int randomTimerMinuts = GetRandomNumber(10, 61);
+            var url = "https://vktarget.ru/";
+            OpenPageInNewTab(url);
+            CloseCurrentTabAndSwitchToAnother();
 
+            int randomTimerMinuts = GetRandomNumber(10, 61);
             while (true)
             {
-                bool taskExists = Convert.ToBoolean(ExecuteScript(checkTaskScript));
-                if (randomTimerMinuts == 0 || taskExists)
+                if (randomTimerMinuts == 0)
                 {
+                    GoToUrl(url);
                     return;
                 }
 
@@ -1344,7 +1360,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (status)
             {
                 case Status.InSleeping:
-                    _dateAnTimeFallingAsleep = null;
+                    _dateAndTimeFallingAsleep = null;
                     _countExceptions = 0;
                     internetService.LaunchTime = DateTime.Now.AddHours(11).AddMinutes(2 * GetRandomNumber(1, 4));
                     break;
@@ -1361,7 +1377,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <returns>True - пришло, иначе false</returns>
         protected bool IsTimeToSleep()
         {
-            return DateTime.Now >= _dateAnTimeFallingAsleep;
+            return DateTime.Now >= _dateAndTimeFallingAsleep;
         }
 
 

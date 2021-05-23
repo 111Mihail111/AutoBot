@@ -47,13 +47,13 @@
     }
 
     <div id="Row" class="row mb-2">
-
         <div class="row-cols-12" style="display: none">
             <div><input id="URL" value="@item.URL" /></div>
-            <div><input id="Status" value="@item.StatusService" /></div>
+            <div><input id="StatusService" value="@item.StatusService" /></div>
             <div><input id="Balance" value="@item.BalanceOnService" /></div>
             <div><input id="TypeService" value="@item.TypeService" /></div>
             <div><input id="LaunchTime" value="@item.LaunchTime" /></div>
+            <div><input id="RunType" value="@item.RunType" /></div>
         </div>
 
         <div class="col-4 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
@@ -67,7 +67,7 @@
                     {
                        @class = "form-control",
                        @style = "background-color: rgb(222,243,202); border: 2px solid white; height: 44px; text-align-last: center;",
-                       @onchange = "ChangeStatusManualStart(this)",
+                       @onchange = "changeStatus(this)",
                     })
             </div>
         </div>
@@ -81,7 +81,7 @@
         </div>
 
         <div class="col-2" style="background-color: rgb(222,243,202); border: 2px solid white;">
-            <button class="btn btn-warning btn-sm btn-block mt-1" onclick="InternetServicesManualStart(this)"><span>Старт</span></button>
+            <button class="btn btn-warning btn-sm btn-block mt-1" onclick="runManualInternetService(this)"><span>Старт</span></button>
         </div>
     </div>
 }

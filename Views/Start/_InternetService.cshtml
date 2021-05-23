@@ -51,10 +51,12 @@
     <div id="Row" class="row mb-2">
         <div class="row-cols-12" style="display: none">
             <div><input id="URL" value="@item.URL" /></div>
-            <div><input id="ActivityTime" value="@item.ActivityTime.ToString(@"hh\:mm\:ss")" /></div>
-            <div><input id="Status" value="@item.StatusService" /></div>
+            <div><input id="ActivationTime" value="@item.ActivationTime.ToString(@"hh\:mm\:ss")" /></div>
+            <div><input id="StatusService" value="@item.StatusService" /></div>
             <div><input id="BalanceOnService" value="@item.BalanceOnService" /></div>
             <div><input id="TypeService" value="@item.TypeService" /></div>
+            <div><input id="LaunchTime" value="@item.LaunchTime" /></div>
+            <div><input id="RunType" value="@item.RunType" /></div>
         </div>
 
         <div class="col-4 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
@@ -62,7 +64,7 @@
         </div>
 
         <div class="col-2 text-center" style="background-color: rgb(222,243,202); border: 2px solid white;">
-            <div class="mt-2 mb-2"><span>@item.ActivityTime.ToString(@"hh\:mm\:ss")</span></div>
+            <div class="mt-2 mb-2"><span>@item.ActivationTime.ToString(@"hh\:mm\:ss")</span></div>
         </div>
 
         <div class="col-2">
@@ -71,7 +73,7 @@
                     {
                        @class = "form-control",
                        @style = "background-color: rgb(222,243,202); border: 2px solid white; height: 44px; text-align-last: center;",
-                       @onchange = "ChangeStatus(this)",
+                       @onchange = "changeStatus(this)",
                     })
             </div>
         </div>

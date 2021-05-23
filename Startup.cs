@@ -1,7 +1,3 @@
-using AutoBot.Area.API;
-using AutoBot.Area.Collecting—ryptocurrencies;
-using AutoBot.Area.Collecting—ryptocurrencies.Cranes;
-using AutoBot.Area.Collecting—ryptocurrencies.Interface;
 using AutoBot.Area.Managers;
 using AutoBot.Area.Managers.Interface;
 using AutoBot.Area.PerformanceTasks.Interface;
@@ -19,14 +15,6 @@ namespace AutoBot
         {
             services.AddControllersWithViews();
 
-            services.AddScoped<IFreeBitcoin, FreeBitcoin>();
-            services.AddScoped<IRuCaptcha, RuCaptcha>();
-            services.AddScoped<IMoonBitcoin, MoonBitcoin>();
-            services.AddScoped<IBonusBitcoin, BonusBitcoin>();
-            services.AddScoped<IMoonDogecoin, MoonDogecoin>();
-            services.AddScoped<IRuCaptchaController, RuCaptchaController>();
-            services.AddScoped<IMoonLitecoin, MoonLitecoin>();
-            services.AddScoped<IMoonDash, MoonDash>();
             services.AddScoped<IVLike, VLike>();
             services.AddScoped<IVkTarget, VkTarget>();
             services.AddScoped<IVkManager, VkManager>();

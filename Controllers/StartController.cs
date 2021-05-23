@@ -1,11 +1,12 @@
-﻿using AutoBot.Area.CollectingСryptocurrencies.Interface;
-using AutoBot.Area.Enums;
+﻿using AutoBot.Area.Enums;
 using AutoBot.Area.Managers;
 using AutoBot.Area.PerformanceTasks.Interface;
 using AutoBot.Area.Services;
 using AutoBot.Models;
+using AutoBot.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,26 +15,12 @@ namespace AutoBot.Controllers
 {
     public class StartController : Controller
     {
-        private readonly IFreeBitcoin _freeBitcoin;
-        private readonly IMoonBitcoin _moonBitcoin;
-        private readonly IBonusBitcoin _bonusBitcoin;
-        private readonly IMoonDogecoin _moonDogecoin;
-        private readonly IMoonLitecoin _moonLitecoin;
-        private readonly IMoonDash _moonDash;
         private readonly IVLike _vLike;
         private readonly IVkTarget _vkTarget;
         private readonly IVkMyMarket _vkMyMarket;
 
-        public StartController(IFreeBitcoin freeBitcoin, IMoonBitcoin moonBitcoin, IBonusBitcoin bonusBitcoin,
-            IMoonDogecoin moonDogecoin, IMoonLitecoin moonLitecoin, IMoonDash moonDash, IVLike vLike, IVkTarget vkTarget,
-            IVkMyMarket vkMyMarket)
+        public StartController(IVLike vLike, IVkTarget vkTarget,IVkMyMarket vkMyMarket)
         {
-            _freeBitcoin = freeBitcoin;
-            _moonBitcoin = moonBitcoin;
-            _bonusBitcoin = bonusBitcoin;
-            _moonDogecoin = moonDogecoin;
-            _moonLitecoin = moonLitecoin;
-            _moonDash = moonDash;
             _vLike = vLike;
             _vkTarget = vkTarget;
             _vkMyMarket = vkMyMarket;
@@ -53,49 +40,43 @@ namespace AutoBot.Controllers
                 accountManager.SaveAccounts(fileData);
             }
 
-            return View(WebService.GetAllData());
+            return View(new WebSitesVM { InternetServices = new List<InternetService>(WebService.GetInternetServices()), });
         }
 
+        /// <summary>
+        /// Обновить таймер интернет-сервиса
+        /// </summary>
+        /// <param name="typeService">Тип сервиса</param>
+        /// <param name="activationTime">Время активации</param>
+        /// <returns>Результат частичного представления</returns>
         [HttpGet]
-        public PartialViewResult UpdateTimerCrane(Crane crane)
+        public PartialViewResult InternetServiceTimerUpdate(TypeService typeService, TimeSpan activationTime)
         {
-            crane.ActivityTime -= TimeSpan.FromMinutes(5);
-            if (crane.ActivityTime < TimeSpan.FromSeconds(1))
+            activationTime -= TimeSpan.FromMinutes(1);
+            if (activationTime < TimeSpan.FromSeconds(1))
             {
-                crane.ActivityTime = TimeSpan.FromSeconds(0);
+                activationTime = TimeSpan.FromSeconds(0);
             }
 
-            WebService.UpdateCrane(crane);
-            return PartialView("_Cranes", WebService.GetCranes());
-        }
+            WebService.UpdateTimerService(typeService, activationTime);
 
-        [HttpGet]
-        public PartialViewResult UpdateTimerService(InternetService service)
-        {
-            service.ActivityTime -= TimeSpan.FromMinutes(1);
-            if (service.ActivityTime < TimeSpan.FromSeconds(1))
-            {
-                service.ActivityTime = TimeSpan.FromSeconds(0);
-            }
-
-            WebService.UpdateInternetService(service);
             return PartialView("_InternetService", WebService.GetInternetServices());
         }
 
+        /// <summary>
+        /// Обновить статус интернет-сервиса
+        /// </summary>
+        /// <param name="typeService">Тип сервиса</param>
+        /// <param name="status">Статус сервиса</param>
+        /// <param name="runType">Тип запуска сервиса</param>
+        /// <returns>Результат частичного представления</returns>
         [HttpGet]
-        public PartialViewResult UpdateStatusCrane(string url, Status statusCrane)
+        public PartialViewResult InternetServiceStatusUpdate(TypeService typeService, Status status, RunType runType)
         {
-            WebService.UpdateStatusCrane(url, statusCrane);
-            return PartialView("_Cranes", WebService.GetCranes());
-        }
-
-        [HttpGet]
-        public PartialViewResult UpdateStatusService(string url, Status statusService, TypeService typeService, bool isManualStart)
-        {
-            WebService.UpdateStatusService(url, typeService, statusService);
+            WebService.UpdateStatusService(typeService, status);
 
             var internetServices = WebService.GetInternetServices();
-            if (isManualStart)
+            if (runType == RunType.Manually)
             {
                 return PartialView("_ManualStart", internetServices);
             }
@@ -103,67 +84,21 @@ namespace AutoBot.Controllers
             return PartialView("_InternetService", internetServices);
         }
 
+        /// <summary>
+        /// Перейти к интернет-сервису
+        /// </summary>
+        /// <param name="url">Интернет-адрес сервиса</param>
+        /// <param name="typeService">Тип сервиса</param>
+        /// <param name="runType">Тип запуска сервиса</param>
+        /// <returns>Результат частичного представления</returns>
         [HttpGet]
-        public PartialViewResult GoToCrane(Crane crane)
-        {
-            try
-            {
-                switch (crane.TypeCrane)
-                {
-                    case TypeCrane.FreeBitcoin:
-                        crane = _freeBitcoin.Start(crane).Result;
-                        break;
-                    case TypeCrane.MoonBitcoin:
-                        crane = _moonBitcoin.Start(crane).Result;
-                        break;
-                    case TypeCrane.BonusBitcoin:
-                        crane = _bonusBitcoin.Start(crane).Result;
-                        break;
-                    case TypeCrane.MoonDogecoin:
-                        crane = _moonDogecoin.Start(crane).Result;
-                        break;
-                    case TypeCrane.MoonLitecoin:
-                        crane = _moonLitecoin.Start(crane).Result;
-                        break;
-                    case TypeCrane.MoonDash:
-                        crane = _moonDash.Start(crane).Result;
-                        break;
-                }
-
-                WebService.UpdateCrane(crane);
-            }
-            catch
-            {
-                if (crane != null)
-                {
-                    crane.StatusCrane = Status.NoWork;
-                    WebService.UpdateCrane(crane);
-                }
-            }
-
-            return PartialView("_Cranes", WebService.GetCranes());
-        }
-
-        [HttpGet]
-        public PartialViewResult GoToInternetService(InternetService internetService)
-        {
-            switch (internetService.TypeService)
-            {
-                case TypeService.VLike:
-                    internetService = _vLike.GoTo(internetService);
-                    break;
-            }
-
-            WebService.UpdateInternetService(internetService);
-
-            return PartialView("_InternetService", WebService.GetInternetServices());
-        }
-
-        [HttpGet]
-        public void InternetServicesManualStart(string url, TypeService typeService)
+        public PartialViewResult GoToInternetService(string url, TypeService typeService, RunType runType)
         {
             switch (typeService)
             {
+                case TypeService.VLike:
+                    _vLike.GoTo(url);
+                    break;
                 case TypeService.VkTarget:
                 case TypeService.VkTarget_2:
                 case TypeService.VkTarget_3:
@@ -174,27 +109,31 @@ namespace AutoBot.Controllers
                     _vkMyMarket.GoTo(url);
                     break;
             }
-        }
 
-        [HttpGet]
-        public PartialViewResult CloseBrowserManualStart(TypeService typeService)
-        {
-            switch (typeService)
+            var internetServices = WebService.GetInternetServices();
+            if (runType == RunType.Auto)
             {
-                case TypeService.VkTarget:
-                    //_vkTarget.Quit();
-                    break;
+                return PartialView("_InternetService", internetServices);
             }
 
-            return PartialView("_ManualStart", WebService.GetInternetServices());
+            return PartialView("_ManualStart", internetServices);
         }
 
+        /// <summary>
+        /// Пришло ли время запуска
+        /// </summary>
+        /// <param name="dateTimeLaunch">Дата и время запуска</param>
+        /// <returns>True - пришло, иначе false</returns>
         [HttpGet]
         public bool IsTimeToLaunch(string dateTimeLaunch)
         {
             return DateTime.Now >= Convert.ToDateTime(dateTimeLaunch);
         }
 
+        /// <summary>
+        /// Получить представление с обновленными данными
+        /// </summary>
+        /// <returns>Результат частичного представления</returns>
         [HttpGet]
         public PartialViewResult UpdateDataManualStartView()
         {

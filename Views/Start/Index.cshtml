@@ -9,7 +9,7 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Краны</title>
+    <title>Автобот</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <script src="~/Content/jquery/jquery.js"></script>
     <script src="~/Content/ajax/jquery.unobtrusive-ajax.js"></script>
@@ -18,20 +18,14 @@
 <body>
     <div class="container-fluid">
         <div class="col-12">
-            <div id="Cranes">
-                @*@{await Html.RenderPartialAsync("_Cranes", Model.Cranes);}*@
-            </div>
-
             <div id="InternetService" class="mt-5">
-                @{await Html.RenderPartialAsync("_InternetService", Model.InternetServices);}
+                @{ await Html.RenderPartialAsync("_InternetService", Model.InternetServices); }
             </div>
 
             <div id="ManualStart" class="mt-5">
-                @{await Html.RenderPartialAsync("_ManualStart", Model.InternetServices);}
+                @{ await Html.RenderPartialAsync("_ManualStart", Model.InternetServices); }
             </div>
-
         </div>
     </div>
-
 </body>
 </html>

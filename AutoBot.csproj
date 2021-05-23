@@ -6,15 +6,19 @@
 
   <ItemGroup>
     <Compile Remove="BrowserSettings\**" />
+    <Compile Remove="core\**" />
     <Compile Remove="WebExtention\**" />
     <Compile Remove="wwwroot\node_modules - Копировать\**" />
     <Content Remove="BrowserSettings\**" />
+    <Content Remove="core\**" />
     <Content Remove="WebExtention\**" />
     <Content Remove="wwwroot\node_modules - Копировать\**" />
     <EmbeddedResource Remove="BrowserSettings\**" />
+    <EmbeddedResource Remove="core\**" />
     <EmbeddedResource Remove="WebExtention\**" />
     <EmbeddedResource Remove="wwwroot\node_modules - Копировать\**" />
     <None Remove="BrowserSettings\**" />
+    <None Remove="core\**" />
     <None Remove="WebExtention\**" />
     <None Remove="wwwroot\node_modules - Копировать\**" />
   </ItemGroup>

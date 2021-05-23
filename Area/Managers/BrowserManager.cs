@@ -126,10 +126,10 @@ namespace AutoBot.Area.Managers
             _chromeDriver.SwitchTo().Window(_chromeDriver.WindowHandles[indexTab]);
         }
         /// <summary>
-        /// Закрыть выбранную вкладку и переключиться на другую
+        /// Закрыть текущую вкладку и переключиться на другую
         /// </summary>
         /// <param name="indexTab">Индекс вкладки</param>
-        public void CloseSelectedTabAndSwitchToAnother(int indexTab = 0)
+        public void CloseCurrentTabAndSwitchToAnother(int indexTab = 0)
         {
             CloseTab();
             SwitchToTab(indexTab);

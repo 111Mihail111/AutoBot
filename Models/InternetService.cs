@@ -13,9 +13,9 @@ namespace AutoBot.Models
         /// </summary>
         public string URL { get; set; }
         /// <summary>
-        /// Время активности
+        /// Время активации
         /// </summary>
-        public TimeSpan ActivityTime { get; set; }
+        public TimeSpan ActivationTime { get; set; }
         /// <summary>
         /// Статус сервиса
         /// </summary>

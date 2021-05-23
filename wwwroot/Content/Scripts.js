@@ -1,72 +1,80 @@
-﻿setInterval(function () {
-    CheckSites("Cranes", true);
-    CheckSites("InternetService", false);
+﻿/**Статус сервиса */
+var _statusService = {
+    Work: 'Work',
+    NoWork: 'NoWork',
+    InWork: 'InWork',
+    InSleeping: 'InSleeping'
+};
+
+/**Интервал c авто-запуском интернет-сервисов */
+setInterval(function () {
+    startWork("#InternetService");
+}, 60000)
+
+/**Интервал обновления данных для интернет-сервисов руч. запуска */
+setInterval(function () {
+    $.ajax({
+        type: "GET",
+        url: "/Start/UpdateDataManualStartView",
+        success: function (data) {
+            $('#ManualStart').html(data);
+        }
+    });
+
+    checkLaunchTimeInternetService();
 }, 60000)
 
 /**
- * Проверка сайтов
- * @param {any} site Id контейнера
- * @param {any} isCrane Является ли краном
+ * Начать работу
+ * @param {any} containerId Идентификатор контейнера с элементами
  */
-function CheckSites(site, isCrane) {
-    let notes = document.getElementById(site);
-    for (var i = 2; i < notes.childElementCount; i++) {
-        let timer = notes.children[i].getElementsByTagName("input")[1].value;
-        if (timer === "00:00:00") {
+function startWork(containerId) {
+    var container = $(containerId)[0];
+    for (var i = 2; i < container.childElementCount; i++) {
 
-            let status = notes.children[i].getElementsByTagName("input")[2].value;
-            if (status === "NoWork" || status === "InWork") {
+        var modelService = getSelectedRowData(container.children[i]);
+        var typeService = modelService.TypeService;
+
+        var activationTime = modelService.ActivationTime;
+        if (activationTime != '00:00:00') {
+            internetServiceTimerUpdate(typeService, activationTime);
+            continue;
+        }
+
+        var statusService = modelService.StatusService;
+        switch (statusService) {
+            case _statusService.NoWork:
+            case _statusService.InWork:
+            case _statusService.InSleeping:
                 continue;
-            }
-
-            notes.children[i].getElementsByTagName("input")[2].value = "InWork";
-
-            var data;
-            if (isCrane) {
-                data = GetDataRow(notes.children[i]);
-                UpdatingStatusCrane(data.URL, data.Status);
-                GoToCrane(data);
-            }
-            else {
-                data = GetDataRow(notes.children[i]);
-                UpdatingStatusService(data.URL, data.Status, data.TypeService);
-                GoToService(data);
-            }
+                break;
         }
-        else {
-            if (isCrane) {
-                UpdatingTimerCrane(GetDataRow(notes.children[i]));
-                return;
-            }
-            UpdatingTimerService(GetDataRow(notes.children[i]));
-        }
+
+        var runType = modelService.RunType;
+        internetServiceStatusUpdate(typeService, _statusService.InWork, runType);
+        startCollection(modelService.URL, typeService, runType);
     }
 }
 
 /**
- * Смена статус
- * @param {any} select DropDownlList-контрол
+ * Сменить статус
+ * @param {any} select Входящий DropDownlList-контрол
  */
-function ChangeStatus(select) {
+function changeStatus(select) {
     var row = select.parentElement.parentElement.parentElement;
-    row.children[0].children[2].children[0].value = select.value;
+    var model = getSelectedRowData(row);
 
-    var model = GetDataRow(row);
-    UpdatingStatusService(model.URL, model.Status, model.TypeService)
+    internetServiceStatusUpdate(model.TypeService, select.value, model.RunType)
 }
 
-function ChangeStatusManualStart(select) {
-    var row = select.parentElement.parentElement.parentElement;
-    row.children[0].children[1].children[0].value = select.value;
-
-    var model = GetDataRow(row);
-    UpdatingStatusService(model.URL, model.Status, model.TypeService, true)
-}
-
-/*Получить данные строки*/
-function GetDataRow(row) {
+/**
+ * Получить данные выбранной строки
+ * @param {any} row Html-строка интернет-сервиса
+ */
+function getSelectedRowData(row) {
     var rowDetails = [];
     var collectionInput = row.getElementsByTagName("input");
+
     for (var i = 0; i < collectionInput.length; i++) {
         var element = collectionInput[i];
         rowDetails[element.id] = element.value;
@@ -75,40 +83,20 @@ function GetDataRow(row) {
     return rowDetails;
 }
 
-/*Обновить таймер крана*/
-function UpdatingTimerCrane(crane) {
+/**
+ * Обновить таймер интернет-сервиса
+ * @param {any} typeService Тип сервиса
+ * @param {any} activationTime Время активации
+ */
+function internetServiceTimerUpdate(typeService, activationTime) {
     $.ajax({
         type: "GET",
-        data: {
-            'URL': crane.URL,
-            'ActivityTime': crane.ActivityTime,
-            'StatusCrane': crane.Status,
-            'BalanceOnCrane': crane.BalanceOnCrane,
-            'TypeCurrencies': crane.TypeCurrencies,
-            'TypeCrane': crane.TypeCrane,
-        },
         contentType: "application/json; charset=utf-8",
-        url: "/Start/UpdateTimerCrane",
-        success: function (data) {
-            $('#Cranes').html(data);
-            CheckTimersCrane(crane);
-        }
-    });
-}
-
-/*Обновить таймер сервиса*/
-function UpdatingTimerService(internetService) {
-    $.ajax({
-        type: "GET",
+        url: "/Start/InternetServiceTimerUpdate",
         data: {
-            'URL': internetService.URL,
-            'ActivityTime': internetService.ActivityTime,
-            'StatusService': internetService.Status,
-            'BalanceOnService': internetService.BalanceOnService,
-            'TypeService': internetService.TypeService,
+            typeService: typeService,
+            activationTime: activationTime,
         },
-        contentType: "application/json; charset=utf-8",
-        url: "/Start/UpdateTimerService",
         success: function (data) {
             $('#InternetService').html(data);
             CheckTimersInternetService(internetService);
@@ -116,160 +104,116 @@ function UpdatingTimerService(internetService) {
     });
 }
 
-/*Обновить статус крана*/
-function UpdatingStatusCrane(url, status) {
+/**
+ * Обновить статус интернет-сервиса
+ * @param {any} typeService Тип интернет-сервиса
+ * @param {any} statusService Статус интернет-сервиса
+ * @param {any} runType Тип запуска интернет-сервиса
+ */
+function internetServiceStatusUpdate(typeService, statusService, runType) {
+    debugger;
     $.ajax({
         type: "GET",
-        data: {
-            url: url,
-            statusCrane: status,
-        },
         contentType: "application/json; charset=utf-8",
-        url: "/Start/UpdateStatusCrane/",
+        url: "/Start/InternetServiceStatusUpdate",
+        data: {
+            typeService: typeService,
+            status: statusService,
+            runType: runType,
+        },
         success: function (data) {
-            $('#Cranes').html(data);
-        }
-    });
-}
+            debugger;
+            if (runType === 'Auto') {
 
-/*Обновить статус сервиса*/
-function UpdatingStatusService(url, status, typeService, isManualStart = false) {
-    $.ajax({
-        type: "GET",
-        data: {
-            url: url,
-            statusService: status,
-            isManualStart: isManualStart,
-            typeService, typeService,
-        },
-        contentType: "application/json; charset=utf-8",
-        url: "/Start/UpdateStatusService/",
-        success: function (data) {
-            if (isManualStart) {
-                $('#ManualStart').html(data);
+                $('#InternetService').html(data);
                 return;
             }
-            $('#InternetService').html(data);
+
+            $('#ManualStart').html(data);
         }
     });
 }
 
-/*Перейти на кран*/
-function GoToCrane(crane) {
+/**
+ * Начать сбор
+ * @param {any} url Интернет-адрес
+ * @param {any} typeService Тип интернет-сервиса
+ * @param {any} runType Тип запуска интернет-сервиса
+ */
+function startCollection(url, typeService, runType) {
     $.ajax({
         type: "GET",
-        data: {
-            'URL': crane.URL,
-            'ActivityTime': crane.ActivityTime,
-            'StatusCrane': crane.Status,
-            'BalanceOnCrane': crane.BalanceOnCrane,
-            'TypeCurrencies': crane.TypeCurrencies,
-            'TypeCrane': crane.TypeCrane,
-        },
-        url: "/Start/GoToCrane",
-        success: function (data) {
-            $('#Cranes').html(data);
-        }
-    });
-}
-
-/*Перейти на сервис*/
-function GoToService(internetService) {
-    $.ajax({
-        type: "GET",
-        data: {
-            'URL': internetService.URL,
-            'ActivityTime': internetService.ActivityTime,
-            'StatusService': internetService.Status,
-            'BalanceOnService': internetService.BalanceOnService,
-            'TypeService': internetService.TypeService,
-        },
         url: "/Start/GoToInternetService",
-        success: function (data) {
-            $('#InternetService').html(data);
-        }
-    });
-}
-
-/*Проверка таймеров*/
-function CheckTimersCrane(crane) {
-    var row = document.getElementById("Cranes");
-    var list = [];
-
-    for (var i = 2; i < row.childElementCount; i++) {
-        list[i - 2] = GetDataRow(row.children[i]);
-    }
-
-    for (var i = 0; i < list.length; i++) {
-        var element = list[i];
-        if (crane.URL === element.URL && element.ActivityTime === "00:00:00") {
-            CheckSites("Cranes", true);
-        }
-    }
-}
-
-/*Проверка таймеров*/
-function CheckTimersInternetService(internetService) {
-    var row = document.getElementById("InternetService");
-    var list = [];
-
-    for (var i = 2; i < row.childElementCount; i++) {
-        list[i - 2] = GetDataRow(row.children[i]);
-    }
-
-    for (var i = 0; i < list.length; i++) {
-        var element = list[i];
-        if (internetService.URL === element.URL && element.ActivityTime === "00:00:00") {
-            CheckSites("InternetService", false);
-        }
-    }
-}
-
-function InternetServicesManualStart(button) {
-    var divContainer = button.parentElement;
-    var data = GetDataRow(divContainer.parentElement);
-    button.remove();
-    if (button.children[0].innerText === "Старт") {
-        divContainer.insertAdjacentHTML('beforeend',
-            '<button class="btn btn-warning btn-sm btn-block mt-1" onclick="InternetServicesManualStart(this)"><span>Стоп</span></button>');
-        UpdatingStatusService(data.URL, "InWork", data.TypeService, true);
-        GoToInternetServicesManualStart(data);
-    }
-    else {
-        divContainer.insertAdjacentHTML('beforeend',
-            '<button class="btn btn-warning btn-sm btn-block mt-1" onclick="InternetServicesManualStart(this)"><span>Старт</span></button>');
-    }    
-}
-
-function GoToInternetServicesManualStart(data) {
-    $.ajax({
-        type: "GET",
         data: {
-            'URL': data.URL,
-            'TypeService': data.TypeService,
+            url: url,
+            typeService: typeService,
+            runType: runType,
         },
-        url: "/Start/InternetServicesManualStart"
+        success: function (data) {
+            if (runType === 'Auto') {
+                $('#InternetService').html(data);
+                return;
+            }
+
+            $('#ManualStart').html(data);
+        }
     });
 }
 
-function checkLaunchTime() {
+/**
+ * Ручной запуск интернет-сервиса
+ * @param {any} button Кнопка активирующая событие
+ */
+function runManualInternetService(button) {
+    var divContainer = button.parentElement;
+    var modelService = getSelectedRowData(divContainer.parentElement);
+    var htmlButton = "<button class='btn btn-warning btn-sm btn-block mt-1' onclick='runManualInternetService(this)'><span>Стоп</span></button>";
+
+    button.remove();
+    
+    if (button.children[0].innerText != "Старт") {
+        divContainer.insertAdjacentHTML('beforeend', htmlButton.replace("Стоп", "Старт"));
+        return;
+    }
+
+    divContainer.insertAdjacentHTML('beforeend', htmlButton);
+
+    var typeService = modelService.TypeService;
+    var runType = modelService.RunType;
+
+    internetServiceStatusUpdate(typeService, _statusService.InWork, runType);
+    startCollection(modelService.URL, typeService, runType);
+}
+
+/**Проверить время запуска интернет-сервиса */
+function checkLaunchTimeInternetService() {
     var divPanel = document.getElementById("ManualStart");
     for (var i = 2; i < divPanel.childElementCount; i++) {
-        var rowDataTable = GetDataRow(divPanel.children[i]);
-        if (rowDataTable.Status != "InSleeping") {
+
+        var modelService = getSelectedRowData(divPanel.children[i]);
+        var status = modelService.Status;
+
+        if (status != "InSleeping") {
             continue;
         }
 
-        if (!isTimeToLaunch(rowDataTable.LaunchTime)) {
+        if (!isLaunchTime(modelService.LaunchTime)) {
             continue;
         }
 
-        UpdatingStatusService(rowDataTable.URL, "InWork", rowDataTable.TypeService, true);
-        GoToInternetServicesManualStart(rowDataTable);
+        var runType = modelService.RunType;
+        var typeService = modelService.TypeService;
+
+        internetServiceStatusUpdate(typeService, _statusService.InWork, runType);
+        startCollection(modelService.URL, typeService, runType);
     }
 }
 
-function isTimeToLaunch(dateTimeLaunch) {
+/**
+ * Время запуска
+ * @param {any} dateTimeLaunch Дата и время запуска
+ */
+function isLaunchTime(dateTimeLaunch) {
     var result;
     $.ajax({
         type: "GET",
@@ -285,15 +229,3 @@ function isTimeToLaunch(dateTimeLaunch) {
 
     return result;
 }
-
-setInterval(function () {
-    $.ajax({
-        type: "GET",
-        url: "/Start/UpdateDataManualStartView",
-        success: function (data) {
-            $('#ManualStart').html(data);
-        }
-    });
-
-    checkLaunchTime();
-}, 60000)

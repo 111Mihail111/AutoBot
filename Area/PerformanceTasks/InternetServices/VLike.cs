@@ -23,13 +23,14 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         private static bool _isAuthorizationSocialNetworks;
         /// <summary>
-        /// Время засыпания сервиса
-        /// </summary>
-        private static DateTime? _timeFallingAsleep = _timeFallingAsleep == null ? DateTime.Now.AddHours(10) : _timeFallingAsleep;
-        /// <summary>
         /// Идентификатор задачи
         /// </summary>
         private string _taskId;
+        /// <summary>
+        /// Дата и время засыпания
+        /// </summary>
+        private DateTime? _dateAndTimeFallingAsleep;
+        private int _countExceptions;
 
         private IVkManager _vkManager;
         private IInstagramManager _instaManager;
@@ -44,6 +45,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 AuthorizationSocialNetworks();
             }
+
+            SetSleepTimer();
         }
         /// <summary>
         /// Установить контекст для менеджеров
@@ -79,29 +82,53 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
             _isAuthorizationSocialNetworks = true;
         }
-
-        public InternetService GoTo(InternetService service)
+        /// <summary>
+        /// Установить таймер сна
+        /// </summary>
+        protected void SetSleepTimer()
         {
+            if (_dateAndTimeFallingAsleep != null)
+            {
+                return;
+            }
+
+            _dateAndTimeFallingAsleep = DateTime.Now.AddHours(13);
+        }
+
+
+        public void GoTo(string url)
+        {
+            Init();
+            GoToUrl(url);
+            AuthorizationOnService();
+
             try
             {
-                Init();
-                GoToUrl(service.URL);
-                AuthorizationOnService();
-                BeginCollecting();
+                if (IsTimeToSleep())
+                {
+                    Quit(Status.InSleeping);
+                    return;
+                }
 
-                return GetDetailsWithService(service);
+                BeginCollecting();
+                Quit(Status.Work);
             }
             catch (Exception exception)
             {
-                service.StatusService = Status.Work;
+                _countExceptions++;
                 _logManager.SendToEmail(GenerateMessage(exception, "Произошла ошибка"));
 
-                QuitBrowser();
+                Quit(Status.Work);
             }
-
-            return service;
+            finally
+            {
+                if (_countExceptions == 50)
+                {
+                    _logManager.SendToEmail("TODO:Здесь будут все возникшие ошибки за день", "Колличество ошибок за сегодня достигло своего предела.");
+                    Quit(Status.NoWork);
+                }
+            }
         }
-
         /// <summary>
         /// Начать сбор
         /// </summary>
@@ -363,6 +390,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             return button;
         }
 
+
         /// <summary>
         /// Авторизация
         /// </summary>
@@ -386,19 +414,57 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                           "}");
         }
         /// <summary>
+        /// Пришло ли время засыпать
+        /// </summary>
+        /// <returns>True - пришло, иначе false</returns>
+        protected bool IsTimeToSleep()
+        {
+            return DateTime.Now >= _dateAndTimeFallingAsleep;
+        }
+        /// <summary>
+        /// Получить случайное число
+        /// </summary>
+        /// <param name="minValue">Минимальное значение</param>
+        /// <param name="maxValue">Максимальное значение</param>
+        /// <returns>Случайное число</returns>
+        protected int GetRandomNumber(int minValue, int maxValue)
+        {
+            return new Random().Next(minValue, maxValue);
+        }
+        /// <summary>
+        /// Закрыть браузер
+        /// </summary>
+        /// <param name="status">Статус сервиса</param>
+        public void Quit(Status status)
+        {
+            UpdateModel(status);
+            QuitBrowser();
+        }
+        /// <summary>
         /// Получить детали интернет-сервиса
         /// </summary>
         /// <param name="internetService">Интернет-сервис</param>
         /// <returns>Модель интернет-сервиса</returns>
-        protected InternetService GetDetailsWithService(InternetService internetService)
+        protected void UpdateModel(Status status)
         {
-            internetService.ActivityTime = TimeSpan.FromMinutes(1);
+            var internetService = WebService.GetInternetServices().Where(w => w.TypeService == TypeService.VLike).FirstOrDefault();
+            internetService.ActivationTime = TimeSpan.FromMinutes(1);
             internetService.BalanceOnService = GetElementByClassName("balance").GetInnerText();
-            internetService.StatusService = Status.Work;
+            internetService.StatusService = status;
 
-            QuitBrowser();
+            switch (status)
+            {
+                case Status.InSleeping:
+                    _dateAndTimeFallingAsleep = null;
+                    _countExceptions = 0;
+                    internetService.LaunchTime = DateTime.Now.AddHours(11).AddMinutes(2 * GetRandomNumber(1, 4));
+                    break;
+                case Status.NoWork:
+                    _countExceptions = 0;
+                    break;
+            }
 
-            return internetService;
+            WebService.UpdateInternetService(internetService);
         }
         /// <summary>
         /// Сформировать сообщение

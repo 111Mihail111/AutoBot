@@ -4,6 +4,6 @@ namespace AutoBot.Area.PerformanceTasks.Interface
 {
     public interface IVLike
     {
-        public InternetService GoTo(InternetService internetService);
+        public void GoTo(string url);
     }
 }

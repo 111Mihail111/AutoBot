@@ -10,29 +10,11 @@ namespace AutoBot.Area.Services
     public static class WebService
     {
         /// <summary>
-        /// Краны
-        /// </summary>
-        private static List<Crane> _cranes = new()
-        {
-            new Crane { URL = "https://freebitco.in/", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
-                StatusCrane = Status.NoWork, TypeCurrencies = TypeCurrencies.Bitcoin, TypeCrane = TypeCrane.FreeBitcoin },
-            new Crane { URL = "https://moonbit.co.in/faucet", ActivityTime = TimeSpan.FromMinutes(0), BalanceOnCrane = "0",
-                StatusCrane = Status.NoWork, TypeCurrencies = TypeCurrencies.Bitcoin, TypeCrane = TypeCrane.MoonBitcoin },
-            new Crane { URL = "https://moondoge.co.in/faucet", ActivityTime = TimeSpan.FromMinutes(0), BalanceOnCrane = "0",
-                StatusCrane = Status.NoWork, TypeCurrencies = TypeCurrencies.Dogecoin, TypeCrane = TypeCrane.MoonDogecoin},
-            new Crane { URL = "http://bonusbitcoin.co/faucet", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
-                StatusCrane = Status.NoWork, TypeCurrencies = TypeCurrencies.Bitcoin, TypeCrane = TypeCrane.BonusBitcoin },
-            new Crane { URL = "https://moonliteco.in/faucet", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
-                StatusCrane = Status.NoWork, TypeCurrencies = TypeCurrencies.LiteCoin, TypeCrane = TypeCrane.MoonLitecoin, },
-            new Crane { URL = "https://moondash.co.in/faucet", ActivityTime = TimeSpan.FromHours(0), BalanceOnCrane = "0",
-                StatusCrane = Status.NoWork, TypeCurrencies = TypeCurrencies.Dash, TypeCrane = TypeCrane.MoonDash, }
-        };
-        /// <summary>
         /// Интернет-сервисы
         /// </summary>
         private static List<InternetService> _services = new()
         {
-            new InternetService { URL = "https://v-like.ru/", ActivityTime = TimeSpan.FromHours(0), BalanceOnService = "0",
+            new InternetService { URL = "https://v-like.ru/", ActivationTime = TimeSpan.FromHours(0), BalanceOnService = "0",
                 StatusService = Status.NoWork, TypeService = TypeService.VLike, RunType = RunType.Auto },
             new InternetService { URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.NoWork,
                 TypeService = TypeService.VkTarget, RunType = RunType.Manually },
@@ -47,74 +29,40 @@ namespace AutoBot.Area.Services
         };
 
         /// <summary>
-        /// Получить краны
+        /// Получить Интернет-сервисы
         /// </summary>
-        /// <returns>Лист кранов</returns>
-        public static IEnumerable<Crane> GetCranes()
-        {
-            return _cranes;
-        }
-        /// <summary>
-        /// Получить интернет сервисы
-        /// </summary>
-        /// <returns>Лист интернет сервисов</returns>
+        /// <returns>Коллекция Интернет-сервисов</returns>
         public static IEnumerable<InternetService> GetInternetServices()
         {
             return _services;
         }
         /// <summary>
-        /// Получить все данные
+        /// Обновить статус Интернет-сервиса
         /// </summary>
-        /// <returns></returns>
-        public static WebSitesVM GetAllData()
-        {
-            return new WebSitesVM 
-            { 
-                Cranes = GetCranes().ToList(), 
-                InternetServices = GetInternetServices().ToList() 
-            };
-        }
-
-
-        /// <summary>
-        /// Обновить кран
-        /// </summary>
-        /// <param name="crane">Модель крана</param>
-        public static void UpdateCrane(Crane crane)
-        {
-            int index = _cranes.FindIndex(fi => fi.URL == crane.URL);
-            _cranes[index] = crane;
-        }
-
-        /// <summary>
-        /// Обновить статус крана
-        /// </summary>
-        /// <param name="url">Url-адрес крана</param>
-        /// <param name="status">Статус крана</param>
-        public static void UpdateStatusCrane(string url, Status status)
-        {
-            int index = _cranes.FindIndex(fi => fi.URL == url);
-            _cranes[index].StatusCrane = status;
-        }
-
-        /// <summary>
-        /// Обновить статус сервиса
-        /// </summary>
-        /// <param name="url">Url-адрес сервиса</param>
+        /// <param name="typeService">Тип сервиса</param>
         /// <param name="status">Статус сервиса</param>
-        public static void UpdateStatusService(string url, TypeService typeService, Status status)
+        public static void UpdateStatusService(TypeService typeService, Status status)
         {
-            int index = _services.FindIndex(fi => fi.URL == url && fi.TypeService == typeService);
+            int index = _services.FindIndex(fi => fi.TypeService == typeService);
             _services[index].StatusService = status;
         }
-
         /// <summary>
-        /// Обновить интернет-сервис
+        /// Обновить таймер Интернет-сервиса
+        /// </summary>
+        /// <param name="typeService">Тип сервиса</param>
+        /// <param name="activationTime">Время активации</param>
+        public static void UpdateTimerService(TypeService typeService, TimeSpan activationTime)
+        {
+            int index = _services.FindIndex(fi => fi.TypeService == typeService);
+            _services[index].ActivationTime = activationTime;
+        }
+        /// <summary>
+        /// Обновить Интернет-сервис
         /// </summary>
         /// <param name="internetService">Модель интернет сервиса</param>
         public static void UpdateInternetService(InternetService internetService)
         {
-            int index = _services.FindIndex(fi => fi.URL == internetService.URL);
+            int index = _services.FindIndex(fi => fi.TypeService == internetService.TypeService);
             _services[index] = internetService;
         }
     }
