@@ -16,13 +16,37 @@ namespace AutoBot.Area.Managers
         /// <summary>
         /// Email отправителя
         /// </summary>
-        private readonly MailAddress _mailFrom = new MailAddress("desiptikon.bot@yandex.ru");
+        private readonly MailAddress _mailFrom = new("desiptikon.bot@yandex.ru");
         /// <summary>
         /// Email получателя
         /// </summary>
-        private readonly MailAddress _mailTo = new MailAddress("polowinckin.mixail@yandex.ru");
+        private readonly MailAddress _mailTo = new("polowinckin.mixail@yandex.ru");
 
+        /// <inheritdoc/>
+        public void SendToEmail(string description, string topic)
+        {
+            var message = new MailMessage(_mailFrom, _mailTo)
+            {
+                Subject = topic,
+                IsBodyHtml = true,
+                Body = $"<b>Описание</b>: {description}"
+            };
 
+            Send(message);
+        }
+        /// <inheritdoc/>
+        public void SendToEmail(string description, string topic, string url)
+        {
+            var message = new MailMessage(_mailFrom, _mailTo)
+            {
+                Subject = topic,
+                IsBodyHtml = true,
+                Body = $"<b>Тип</b>: {description}" +
+                       $"<br><b>Url-адрес</b>: {url}",
+            };
+
+            Send(message);
+        }
         /// <inheritdoc/>
         public void SendToEmail(string description, string methodName, string url, string topic)
         {
@@ -33,18 +57,6 @@ namespace AutoBot.Area.Managers
                 Body = $"<b>Тип</b>: {description}" +
                        $"<br><b>Метод</b>: {methodName}" +
                        $"<br><b>Url-адрес</b>: {url}",
-            };
-
-            Send(message);
-        }
-        /// <inheritdoc/>
-        public void SendToEmail(string description, string topic)
-        {
-            var message = new MailMessage(_mailFrom, _mailTo)
-            {
-                Subject = topic,
-                IsBodyHtml = true,
-                Body = $"<b>Описание</b>: {description}"
             };
 
             Send(message);

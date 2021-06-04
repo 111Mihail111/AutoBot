@@ -99,7 +99,6 @@ function internetServiceTimerUpdate(typeService, activationTime) {
         },
         success: function (data) {
             $('#InternetService').html(data);
-            CheckTimersInternetService(internetService);
         }
     });
 }
@@ -111,7 +110,6 @@ function internetServiceTimerUpdate(typeService, activationTime) {
  * @param {any} runType Тип запуска интернет-сервиса
  */
 function internetServiceStatusUpdate(typeService, statusService, runType) {
-    debugger;
     $.ajax({
         type: "GET",
         contentType: "application/json; charset=utf-8",
@@ -122,7 +120,6 @@ function internetServiceStatusUpdate(typeService, statusService, runType) {
             runType: runType,
         },
         success: function (data) {
-            debugger;
             if (runType === 'Auto') {
 
                 $('#InternetService').html(data);

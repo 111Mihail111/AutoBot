@@ -29,7 +29,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Дата и время засыпания
         /// </summary>
-        private DateTime? _dateAndTimeFallingAsleep;
+        private static DateTime? _dateAndTimeFallingAsleep;
         private int _countExceptions;
 
         private IVkManager _vkManager;

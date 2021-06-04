@@ -251,7 +251,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                         return false;
                     case 2:
                         {
-                            _logManager.SendToEmail(GetMessage(exception, "Произошла ошибка"));
+                            _logManager.SendToEmail(GetMessage(exception, "Ошибка при выполнении задания."));
 
                             CloseCurrentTabAndSwitchToAnother();
                             GoToUrl("https://vktarget.ru/");
@@ -271,10 +271,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             {
                 _logManager.SendToEmail(new Message 
                 { 
-                    Topic = "Ошибка при обработке исключения в методе ProcessingException()", Exception = newException 
+                    Topic = $"Ошибка в {_typeService} при обработке исключения в ProcessingException()", Exception = newException 
                 });
 
-                Quit(Status.NoWork); //TODO: Нужно как-то проверять, что у нас закрыт браузер. Если мы будем закрывать то, что и так закрыто, то получим ошибку.
+                //Quit(Status.NoWork); //TODO: Нужно как-то проверять, что у нас закрыт браузер. Если мы будем закрывать то, что и так закрыто, то получим ошибку.
                 
                 return false;
             }
@@ -348,7 +348,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// Выполнить задачу в VK
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInVk(string taskText)
+        protected void CarryOutTaskInVk(string taskText) //есть TODO
         {
             SwitchToLastTab();
             _urlByTask = GetUrlPage();
@@ -357,56 +357,70 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             switch (taskText)
             {
                 case "Вступите в сообщество":
-                    if (_vkManager.IsBlockedCommunity())
                     {
-                        isError = true;
+                        if (_vkManager.IsBlockedCommunity())
+                        {
+                            isError = true;
+                            break;
+                        }
+
+                        _vkManager.JoinToComunity();
                         break;
                     }
-                    _vkManager.JoinToComunity();
-                    break;
                 case "Поставьте лайк на странице":
-                    if (!_vkManager.IsPostFound())
                     {
-                        isError = true;
+                        if (!_vkManager.IsPostFound())
+                        {
+                            isError = true;
+                            break;
+                        }
+
+                        _vkManager.PutLike();
                         break;
-                    }
-                    _vkManager.PutLike();
-                    break;
+                    }                    
                 case "Посмотреть пост":
                     Thread.Sleep(500);
                     break;
-                case "Нажмите поделиться записью":
-                    if (!_vkManager.IsPostFound())
+                case "Нажмите поделиться записью": //https://vk.com/wall-203080055_11
                     {
-                        isError = true;
+                        if (!_vkManager.IsPostFound())
+                        {
+                            isError = true;
+                            break;
+                        }
+
+                        _vkManager.MakeRepost();
                         break;
                     }
-                    _vkManager.MakeRepost();
-                    break;
                 case "Добавить в друзья":
-                    if (_vkManager.IsBlockedAccount())
                     {
-                        isError = true;
+                        if (_vkManager.IsBlockedAccount())
+                        {
+                            isError = true;
+                            break;
+                        }
+
+                        _vkManager.AddToFriends();
                         break;
                     }
-                    _vkManager.AddToFriends();
-                    break;
                 case "Расскажите о группе":
-                    if (_vkManager.IsBlockedCommunity())
                     {
-                        isError = true;
+                        if (_vkManager.IsBlockedCommunity())
+                        {
+                            isError = true;
+                            break;
+                        }
+
+                        _vkManager.ToTellAboutGroup();
                         break;
                     }
-                    _vkManager.ToTellAboutGroup();
-                    break;
                 default:
                     _logManager.SendToEmail(taskText, "CarryOutTaskInVk()", GetUrlPage(), "Новая задача");
                     isError = true;
                     break;
             }
 
-            CloseTab();
-            SwitchToTab();
+            CloseCurrentTabAndSwitchToAnother();
 
             if (isError)
             {
@@ -1081,21 +1095,21 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 case ActionToBrowser.FocusOnTab:
                     SwitchToTab();
                     break;
-                case ActionToBrowser.RefreshPage:
-                    {
-                        if (!isRefresh)
-                        {
-                            break;
-                        }
-                        else if (randomNumber == 2)
-                        {
-                            Refresh();
-                            break;
-                        }
+                //case ActionToBrowser.RefreshPage: На сайте косяк. Пока отрубил эту функцию
+                //    {
+                //        if (!isRefresh)
+                //        {
+                //            break;
+                //        }
+                //        else if (randomNumber == 2)
+                //        {
+                //            Refresh();
+                //            break;
+                //        }
 
-                        FocusOnFirstElementMenu();
-                    }
-                    break;
+                //        FocusOnFirstElementMenu();
+                //    }
+                //    break;
                 case ActionToBrowser.ClickOnElement:
                     {
                         if (randomNumber == 2)
@@ -1272,16 +1286,14 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void Inaction()
         {
-            var url = "https://vktarget.ru/";
-            OpenPageInNewTab(url);
-            CloseCurrentTabAndSwitchToAnother();
+            GoToUrl("chrome://newtab");
 
             int randomTimerMinuts = GetRandomNumber(10, 61);
             while (true)
             {
                 if (randomTimerMinuts == 0)
                 {
-                    GoToUrl(url);
+                    GoToUrl("https://vktarget.ru/");
                     return;
                 }
 
@@ -1297,13 +1309,15 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <param name="url">Url-адрес сервиса</param>
         protected void AuthorizationOnService()
         {
-            if (GetUrlPage() == "https://users.vktarget.ru/list/")
+            var loginBtn = GetElementById("loginBtn");
+            if (loginBtn == null)
             {
                 return;
             }
 
-            GetElementsByClassName("mdl-js-button").Last().ToClick(1500);
-            ExecuteScript("document.getElementsByClassName('icon__vk')[0].click();");
+            loginBtn.ToClick(1500);
+
+            GetElementById("uloginVkontakte").ToClick();
             WaitingForAuthorization();
         }
         /// <summary>
@@ -1326,12 +1340,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 if (header != null)
                 {
                     RefreshPage();
-
-                    var liElements = GetElementByClassName("header__links").FindElements(SearchMethod.Tag, "li");
-                    if (!liElements.Any())
-                    {
-                        return;
-                    }
+                    return;
                 }
 
                 counter++;

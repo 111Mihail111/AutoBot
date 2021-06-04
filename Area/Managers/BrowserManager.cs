@@ -16,19 +16,6 @@ namespace AutoBot.Area.Managers
         private ChromeDriver _chromeDriver;
         private bool _isHeadless;
 
-        /// <summary>
-        /// Ошибка, капча неразрешима
-        /// </summary>
-        public const string ERROR_CAPTCHA_UNSOLVABLE = "ERROR_CAPTCHA_UNSOLVABLE"; //TODO:Убрать отсюда
-        /// <summary>
-        /// Ошибка, плохие совпадения
-        /// </summary>
-        public const string ERROR_BAD_DUPLICATES = "ERROR_BAD_DUPLICATES"; //TODO:Убрать отсюда
-        /// <summary>
-        /// Ошибка, нулевой остаток (на расшифровку капчи)
-        /// </summary>
-        public const string ERROR_ZERO_BALANCE = "ERROR_ZERO_BALANCE"; //TODO:Убрать отсюда
-
         public void Initialization(string pathToProfile)
         {
             var options = new ChromeOptions();
@@ -42,7 +29,7 @@ namespace AutoBot.Area.Managers
             options.AddAdditionalCapability("useAutomationExtension", false); //Скрывает указанное расширение
             options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
 
-            _chromeDriver = new ChromeDriver("./BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
+            _chromeDriver = new ChromeDriver("./BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(300));
         }
 
         public void Initialization(string pathToProfile, bool isHeadless)
@@ -60,7 +47,7 @@ namespace AutoBot.Area.Managers
             options.AddAdditionalCapability("useAutomationExtension", false); //Скрывает указанное расширение
             options.AddExcludedArgument("enable-automation"); //Скрывает панель "Браузером управляет автомат. ПО"
 
-            _chromeDriver = new ChromeDriver("./BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(200));
+            _chromeDriver = new ChromeDriver("./BrowserSettings/netcoreapp2.0", options, TimeSpan.FromSeconds(300));
             _isHeadless = isHeadless;
         }
 
@@ -485,16 +472,6 @@ namespace AutoBot.Area.Managers
         public Screenshot GetScreenshot()
         {
             return _chromeDriver.GetScreenshot();
-        }
-
-
-        /// <summary>
-        /// В фоном ли режиме запущен браузер
-        /// </summary>
-        /// <returns>True - в фоновом, иначе false</returns>
-        public bool IsBackgroundMode()
-        {
-            return _isHeadless;
         }
     }
 }
