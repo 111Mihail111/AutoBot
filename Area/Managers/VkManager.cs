@@ -3,7 +3,6 @@ using AutoBot.Area.Managers.Interface;
 using AutoBot.Extentions;
 using OpenQA.Selenium.Chrome;
 using System.Linq;
-using System.Threading;
 
 namespace AutoBot.Area.Managers
 {

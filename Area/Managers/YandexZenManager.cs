@@ -17,8 +17,7 @@ namespace AutoBot.Area.Managers
 
             if (GetUrlPage().Contains(url))
             {
-                CloseTab();
-                SwitchToTab();
+                CloseCurrentTabAndSwitchToAnother();
                 return;
             }
 
@@ -50,63 +49,131 @@ namespace AutoBot.Area.Managers
             }
 
             GetElementByClassName("Button2_view_action").ToClick(2000);
-
-            CloseTab();
-            SwitchToTab();
+            CloseCurrentTabAndSwitchToAnother();
         }
 
         /// <inheritdoc/>
         public void PutLike()
         {
-            var panelButtons = GetElementByClassName("socials-left-block__likes");
-            var divBlock = panelButtons.FindElements(SearchMethod.ClassName, "mittens__mitten").First();
-            
-            var button = divBlock.FindElement(SearchMethod.ClassName, "ui-lib-mitten");
-            if (!button.GetClass().Contains("_state_passive"))
-            {
-                return;
-            }
+            var panelElements = GetElementByCssSelector(".left-block-redesign-view");
 
-            button.ToClick(2000);
+            var buttons = panelElements.FindElements(SearchMethod.Tag, "button");
+            foreach (var button in buttons)
+            {
+                var textButton = button.GetInnerText();
+                if (textButton == "Нравится")
+                {
+                    var svgElementActive = button.FindElements(SearchMethod.Selector, "._state_active").FirstOrDefault();
+                    if (svgElementActive != null)
+                    {
+                        return;
+                    }
+
+                    button.ToClick(1500);
+                    return;
+                }
+            }
         }
 
         /// <inheritdoc/>
         public void RemoveLike()
         {
-            var panelButtons = GetElementByClassName("socials-left-block__likes");
-            var divBlock = panelButtons.FindElements(SearchMethod.ClassName, "mittens__mitten").First();
+            var panelElements = GetElementByCssSelector(".left-block-redesign-view");
 
-            var button = divBlock.FindElement(SearchMethod.ClassName, "ui-lib-mitten");
-            if (!button.GetClass().Contains("_state_active"))
+            var buttons = panelElements.FindElements(SearchMethod.Tag, "button");
+            foreach (var button in buttons)
             {
-                return;
-            }
+                var textButton = button.GetInnerText();
+                if (textButton == "Нравится")
+                {
+                    var svgElementPassive = button.FindElements(SearchMethod.Selector, "._state_passive").FirstOrDefault();
+                    if (svgElementPassive != null)
+                    {
+                        return;
+                    }
 
-            button.ToClick(2000);
+                    button.ToClick(1500);
+                    return;
+                }
+            }
         }
 
         /// <inheritdoc/>
         public void Subscribe()
         {
-            var subscribeButton = GetElementByClassName("_view-type_rounded-yellow");
-            if (subscribeButton == null)
+            //Вариант подписки с одного места
+            var panelElements = GetElementByClassName("publisher-controls__buttons");
+            if (panelElements != null)
             {
-                return;                
+                {
+                    var buttons = panelElements.FindElements(SearchMethod.Tag, "button");
+                    foreach (var button in buttons)
+                    {
+                        var textButton = button.GetInnerText();
+                        if (textButton == "Подписаться")
+                        {
+                            button.ToClick(1500);
+                            return;
+                        }
+                    }
+
+                    return;
+                }
             }
 
-            subscribeButton.ToClick(2000);
+            //Вариант подписки с другого места
+            panelElements = GetElementByCssSelector(".desktop-channel-3-social-layout");
+            {
+                var buttons = panelElements.FindElements(SearchMethod.Tag, "button");
+                foreach (var button in buttons)
+                {
+                    var textButton = button.GetInnerText();
+                    if (textButton == "Подписаться")
+                    {
+                        button.ToClick(1500);
+                        return;
+                    }
+                }
+            }
         }
 
         /// <inheritdoc/>
         public void Unsubscribe()
         {
-            var unsubscribeButton = GetElementByClassName("_view-type_rounded-white");
-            if (unsubscribeButton == null)
+            //Вариант отписки с одного места
+            var panelElements = GetElementByClassName("publisher-controls__buttons");
+            if (panelElements != null)
             {
-                return;
+                {
+                    var buttons = panelElements.FindElements(SearchMethod.Tag, "button");
+                    foreach (var button in buttons)
+                    {
+                        var textButton = button.GetInnerText();
+                        if (textButton == "Вы подписаны")
+                        {
+                            button.ToClick(1500);
+                            return;
+                        }
+                    }
+
+                    return;
+                }
             }
 
-            unsubscribeButton.ToClick(2000);
+            //Вариант отписки с другого места
+            panelElements = GetElementByCssSelector(".desktop-channel-3-social-layout");
+            {
+                var buttons = panelElements.FindElements(SearchMethod.Tag, "button");
+                foreach (var button in buttons)
+                {
+                    var textButton = button.GetInnerText();
+                    if (textButton == "Вы подписаны")
+                    {
+                        button.ToClick(1500);
+                        return;
+                    }
+                }
+            }
         }
 
         /// <inheritdoc/>
@@ -128,9 +195,7 @@ namespace AutoBot.Area.Managers
             }
 
             GetElementByClassName("Button2_view_action").ToClick(2000);
-
-            CloseTab();
-            SwitchToTab();
+            CloseCurrentTabAndSwitchToAnother();
         }
     }
 }

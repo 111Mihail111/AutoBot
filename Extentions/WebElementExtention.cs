@@ -137,21 +137,15 @@ namespace AutoBot.Extentions
         /// <returns>Элемент</returns>
         public static IWebElement FindElement(this IWebElement webElement, SearchMethod searchMethod, string attribute)
         {
-            switch (searchMethod)
+            return searchMethod switch
             {
-                case SearchMethod.Tag:
-                    return webElement.FindElement(By.TagName(attribute));
-                case SearchMethod.ClassName:
-                    return webElement.FindElement(By.ClassName(attribute));
-                case SearchMethod.Id:
-                    return webElement.FindElement(By.Id(attribute));
-                case SearchMethod.XPath:
-                    return webElement.FindElement(By.XPath(attribute));
-                case SearchMethod.Selector:
-                    return webElement.FindElement(By.CssSelector(attribute));
-                default:
-                    return null;
-            }
+                SearchMethod.Tag => webElement.FindElement(By.TagName(attribute)),
+                SearchMethod.ClassName => webElement.FindElement(By.ClassName(attribute)),
+                SearchMethod.Id => webElement.FindElement(By.Id(attribute)),
+                SearchMethod.XPath => webElement.FindElement(By.XPath(attribute)),
+                SearchMethod.Selector => webElement.FindElement(By.CssSelector(attribute)),
+                _ => null,
+            };
         }
         /// <summary>
         /// Найти элементы
@@ -162,21 +156,15 @@ namespace AutoBot.Extentions
         /// <returns>Коллекция элементов</returns>
         public static IEnumerable<IWebElement> FindElements(this IWebElement webElement, SearchMethod searchMethod, string attribute)
         {
-            switch (searchMethod)
+            return searchMethod switch
             {
-                case SearchMethod.Tag:
-                    return webElement.FindElements(By.TagName(attribute));
-                case SearchMethod.ClassName:
-                    return webElement.FindElements(By.ClassName(attribute));
-                case SearchMethod.Id:
-                    return webElement.FindElements(By.Id(attribute));
-                case SearchMethod.XPath:
-                    return webElement.FindElements(By.XPath(attribute));
-                case SearchMethod.Selector:
-                    return webElement.FindElements(By.CssSelector(attribute));
-                default:
-                    return null;
-            }
+                SearchMethod.Tag => webElement.FindElements(By.TagName(attribute)),
+                SearchMethod.ClassName => webElement.FindElements(By.ClassName(attribute)),
+                SearchMethod.Id => webElement.FindElements(By.Id(attribute)),
+                SearchMethod.XPath => webElement.FindElements(By.XPath(attribute)),
+                SearchMethod.Selector => webElement.FindElements(By.CssSelector(attribute)),
+                _ => null,
+            };
         }
 
 

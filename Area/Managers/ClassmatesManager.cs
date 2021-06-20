@@ -10,66 +10,31 @@ namespace AutoBot.Area.Managers
     public class ClassmatesManager : BrowserManager, IClassmatesManager
     {
         /// <inheritdoc/>
-        public void AuthorizationThroughMail(string email, string password)
+        public void AuthorizationThroughMail(string login, string password)
         {
             string url = "https://ok.ru/feed";
             OpenPageInNewTab(url);
 
             if (url == GetUrlPage())
             {
-                CloseTab();
-                SwitchToTab();
+                CloseCurrentTabAndSwitchToAnother();
                 return;
             }
 
-            var saveProfile = GetElementByClassName("anonym_login_user");
-            if (saveProfile != null)
-            {
-                saveProfile.ToClick();
-
-                CloseTab();
-                SwitchToTab();
-                return;
-            }
-
-            GetElementsByClassName("__gp").First().ToClick();
-            SwitchToLastTab();
-
-            var savedAccountDiv = GetElementById("profileIdentifier");
-            if (savedAccountDiv != null)
-            {
-                int tabsCount = GetTabsCount();
-
-                savedAccountDiv.ToClick(1500);
-
-                if (tabsCount > GetTabsCount())
-                {
-                    SwitchToLastTab();
-                    CloseTab();
-                    SwitchToTab();
-                    return;
-                }
-                AuthorizationUnderSavedProfile(password);
-                return;
-            }
-
-            var inputLogin = GetElementById("identifierId");
+            var inputLogin = GetElementById("field_email");
             if (string.IsNullOrWhiteSpace(inputLogin.GetValue()))
             {
-                inputLogin.SendKeys(email);
+                inputLogin.SendKeys(login);
             }
-            GetElementById("identifierNext").FindElement(SearchMethod.Tag, "button").ToClick();
 
-            var inputPassword = GetElementById("password").FindElement(SearchMethod.Tag, "input");
+            var inputPassword = GetElementById("field_password");
             if (string.IsNullOrWhiteSpace(inputPassword.GetValue()))
             {
                 inputPassword.SendKeys(password);
             }
-            GetElementById("passwordNext").FindElement(SearchMethod.Tag, "button").ToClick(2000);
 
-            SwitchToLastTab();
-            CloseTab();
-            SwitchToTab();
+            GetElementByCssSelector(".button-pro.__wide").ToClick(1500);
+            CloseCurrentTabAndSwitchToAnother();
         }
         /// <inheritdoc/>
         public void AuthorizationThroughMailOldVersionBrowser(string email, string password)
@@ -231,24 +196,44 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void AddToFriends()
         {
-            GetElementsByClassName("view_lvl1").Where(w => w.GetInnerText() == "Добавить в друзья").FirstOrDefault()?.ToClick(1500);
+            var panelMenuElements = GetElementById("hook_Block_MainMenu").FindElements(SearchMethod.Tag, "a");
+            foreach (var element in panelMenuElements)
+            {
+                var elementText = element.GetInnerText();
+                if (elementText != "Добавить в друзья" || elementText != "Подписаться")
+                {
+                    continue;
+                }
+
+                element.ToClick(1500);
+                return;
+            }
         }
         /// <inheritdoc/>
         public void RemoveToFriends()
         {
-            var span = GetElementsByClassName("toggle-dropdown").Where(w => w.GetInnerText() == "Запрос отправлен").FirstOrDefault();
-            if (span != null)
-            {
-                span.ToClick(1500);
+            var panelMenuElements = GetElementById("hook_Block_MainMenu");
 
-                GetElementByXPath("//*[@id='hook_Block_MainMenu']/div/ul/li[1]/div/div").FindElement(SearchMethod.Tag, "a").ToClick(2000);
+            var requestSentElement = panelMenuElements.FindElements(SearchMethod.Tag, "span")
+                .Where(w => w.GetInnerText() == "Запрос отправлен" || w.GetInnerText() == "Подписаны").FirstOrDefault();
+
+            if (requestSentElement != null)
+            {
+                requestSentElement.ToClick(1500);
+
+                var text = requestSentElement.GetInnerText();
+                if (text == "Подписаны")
+                {
+                    panelMenuElements.FindElement(SearchMethod.XPath, "div/ul/li[2]/div/div/ul/li/a").ToClick(1500);
+                    return;
+                }
+
+                panelMenuElements.FindElement(SearchMethod.XPath, "div/ul/li[1]/div/div/ul/li/a").ToClick(1500);
                 return;
             }
 
-            var divContainer = GetElementsByXPath("//*[@id='hook_Block_MainMenu']/div/ul/li").Last();
-            divContainer.ToClick(1500);
-            divContainer.FindElements(SearchMethod.XPath, "div/div/ul/li").Last().ToClick(2000);
-
+            panelMenuElements.FindElement(SearchMethod.Selector, "li.u-menu_li.expand-action-item").ToClick(1500);
+            panelMenuElements.FindElement(SearchMethod.XPath, "div/ul/li[4]/div/div/ul/li[8]/a").ToClick(1500);
             GetElementById("hook_FormButton_button_delete_confirm").ToClick(1500);
         }
 

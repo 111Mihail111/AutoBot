@@ -118,7 +118,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             if (accountVK != null)
             {
                 _vkManager.Authorization(accountVK.Login, accountVK.Password);
-                //_tikTokManager.Authorization(accountVK.Login, accountVK.Password);
             }
 
             //var accountReddit = accounts.Where(w => w.AccountType == AccountType.Reddit).FirstOrDefault();
@@ -142,17 +141,17 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             //    }
             //}
 
-            //var accountClassmates = accounts.Where(w => w.AccountType == AccountType.Classmates).FirstOrDefault();
-            //if (accountClassmates != null)
-            //{
-            //    _classmatesManager.AuthorizationThroughMail(accountClassmates.Login, accountClassmates.Password);
-            //}
+            var accountClassmates = accounts.Where(w => w.AccountType == AccountType.Classmates).FirstOrDefault();
+            if (accountClassmates != null)
+            {
+                _classmatesManager.AuthorizationThroughMail(accountClassmates.Login, accountClassmates.Password);
+            }
 
-            //var accountYandexZen = accounts.Where(w => w.AccountType == AccountType.YandexZen).FirstOrDefault();
-            //if (accountYandexZen != null)
-            //{
-            //    _yandexZenManager.Authorization(accountYandexZen.Login, accountYandexZen.Password);
-            //}
+            var accountYandexZen = accounts.Where(w => w.AccountType == AccountType.YandexZen).FirstOrDefault();
+            if (accountYandexZen != null)
+            {
+                _yandexZenManager.Authorization(accountYandexZen.Login, accountYandexZen.Password);
+            }
 
             //var accountTumblr = accounts.Where(w => w.AccountType == AccountType.Tumblr).FirstOrDefault();
             //if (accountTumblr != null)
@@ -201,6 +200,10 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             Init();
             GoToUrl(url);
             AuthorizationOnService();
+
+            OpenPageInNewTab("https://zen.yandex.ru/id/5c59da09c3fe9900ac04252c");
+            _yandexZenManager.Subscribe();
+            _yandexZenManager.Unsubscribe();
 
             bool isWork = true;
             while (isWork)
@@ -494,24 +497,30 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     _classmatesManager.JoinGroup();
                     break;
                 case "Поставьте класс под записью":
-                    if (_classmatesManager.IsBlokedContent())
                     {
-                        isError = true;
+                        if (_classmatesManager.IsBlokedContent())
+                        {
+                            isError = true;
+                            break;
+                        }
+
+                        _classmatesManager.PutClass();
                         break;
                     }
-                    _classmatesManager.PutClass();
-                    break;
                 case "Поставить 'Класс' на публикации":
                     _classmatesManager.PutClass();
                     break;
                 case "Поделиться записью":
-                    if (_classmatesManager.IsBlokedContent())
                     {
-                        isError = true;
+                        if (_classmatesManager.IsBlokedContent())
+                        {
+                            isError = true;
+                            break;
+                        }
+
+                        _classmatesManager.MakeRepost();
                         break;
                     }
-                    _classmatesManager.MakeRepost();
-                    break;
                 case "Добавить в друзья":
                     _classmatesManager.AddToFriends();
                     break;
@@ -521,8 +530,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     break;
             }
 
-            CloseTab();
-            SwitchToTab();
+            CloseCurrentTabAndSwitchToAnother();
 
             if (isError)
             {
