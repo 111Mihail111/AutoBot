@@ -13,7 +13,7 @@ namespace AutoBot.Area.Managers
         public void Authorization(string login, string password)
         {
             string url = "https://www.quora.com/settings";
-            OpenPageInNewTab(url);
+            OpenPageInNewTabAndSwitch(url);
 
             if (GetUrlPage() == url)
             {
@@ -95,17 +95,14 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void MakeRepost()
         {
-            var bottomPanelForPost = GetElementByClassName("qu-justifyContent--space-between");
-            var leftButtonsPanel = bottomPanelForPost.FindElement(SearchMethod.XPath, "div[1]");
+            var bottomPostDiv = GetElementByClassName("qu-justifyContent--space-between");
+            var leftButtonsPanel = bottomPostDiv.FindElement(SearchMethod.XPath, "div[1]");
             var divRepostContainer = leftButtonsPanel.FindElement(SearchMethod.XPath, "div[2]");
+            
+            divRepostContainer.FindElement(SearchMethod.Tag, "button").ToClick(2000);
 
-            divRepostContainer.FindElement(SearchMethod.Tag, "button").ToClick();
-
-            string xPathToButton = "//button[contains(@class, 'qu-bg--gray_ultralight')]";
-            GetElementsByXPath(xPathToButton).Where(w => w.GetInnerText() == "Choose a space").First().ToClick();
-
-            GetElementByCssSelector(".qu-py--small.qu-borderBottom").ToClick();
-            GetElementByClassName("puppeteer_test_modal_submit").ToClick();
+            var modalFooterDiv = GetElementByCssSelector(".q-flex.qu-flexDirection--column.qu-alignItems--center");
+            modalFooterDiv.FindElement(SearchMethod.Tag, "button").ToClick();
         }
         /// <inheritdoc/>
         public bool IsUserPageProfile()

@@ -1,9 +1,7 @@
 ﻿using AutoBot.Area.Enums;
 using AutoBot.Models;
-using AutoBot.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace AutoBot.Area.Services
 {
@@ -14,18 +12,36 @@ namespace AutoBot.Area.Services
         /// </summary>
         private static List<InternetService> _services = new()
         {
-            new InternetService { URL = "https://v-like.ru/", ActivationTime = TimeSpan.FromHours(0), BalanceOnService = "0",
-                StatusService = Status.NoWork, TypeService = TypeService.VLike, RunType = RunType.Auto },
-            new InternetService { URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.NoWork,
-                TypeService = TypeService.VkTarget, RunType = RunType.Manually },
-            new InternetService { URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.NoWork,
-                TypeService = TypeService.VkTarget_2, RunType = RunType.Manually },
-            new InternetService { URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.NoWork,
-                TypeService = TypeService.VkTarget_3, RunType = RunType.Manually },
-            new InternetService { URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.NoWork,
-                TypeService = TypeService.VkTarget_4, RunType = RunType.Manually },
-            new InternetService { URL = "http://vkmymarket.ru/", BalanceOnService = "0", StatusService = Status.NoWork, 
-                TypeService = TypeService.VkMyMarket, RunType = RunType.Manually },
+            new InternetService 
+            { 
+                URL = "https://v-like.ru/", BalanceOnService = "0", StatusService = Status.NoWork, 
+                TypeService = TypeService.VLike, RunType = RunType.Manually 
+            },
+            new InternetService 
+            { 
+                URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.NoWork,
+                TypeService = TypeService.VkTarget, RunType = RunType.Manually 
+            },
+            new InternetService 
+            { 
+                URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.NoWork,
+                TypeService = TypeService.VkTarget_2, RunType = RunType.Manually 
+            },
+            new InternetService 
+            { 
+                URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.NoWork,
+                TypeService = TypeService.VkTarget_3, RunType = RunType.Manually 
+            },
+            new InternetService 
+            { 
+                URL="https://vktarget.ru/", BalanceOnService = "0", StatusService = Status.NoWork,
+                TypeService = TypeService.VkTarget_4, RunType = RunType.Manually 
+            },
+            new InternetService 
+            { 
+                URL = "http://vkmymarket.ru/", BalanceOnService = "0", StatusService = Status.NoWork, 
+                TypeService = TypeService.VkMyMarket, RunType = RunType.Manually 
+            },
         };
 
         /// <summary>

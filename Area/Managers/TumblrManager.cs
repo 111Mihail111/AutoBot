@@ -12,7 +12,7 @@ namespace AutoBot.Area.Managers
         public void Authorization(string login, string password)
         {
             string url = "https://www.tumblr.com/dashboard";
-            OpenPageInNewTab(url);
+            OpenPageInNewTabAndSwitch(url);
 
             if (GetUrlPage() == url)
             {

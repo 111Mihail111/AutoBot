@@ -27,7 +27,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected IWebElement Task;
 
         private IVkManager _vkManager;
-        private IYouTubeManager _ytManager;
         private IClassmatesManager _classmatesManager;
 
         protected void Init()
@@ -47,13 +46,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected void SetContextForManagers()
         {
             _vkManager = new VkManager();
-            _ytManager = new YouTubeManager();
             _classmatesManager = new ClassmatesManager();
             
 
             var driver = GetDriver();
             _vkManager.SetContextBrowserManager(driver);
-            _ytManager.SetContextBrowserManager(driver);
             _classmatesManager.SetContextBrowserManager(driver);           
         }
 
@@ -65,13 +62,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             if (accountVK != null)
             {
                 _vkManager.Authorization(accountVK.Login, accountVK.Password);
-            }
-
-            var accountYouTube = accounts.Where(w => w.AccountType == AccountType.YouTube).FirstOrDefault();
-            if (accountYouTube != null)
-            {
-                _ytManager.Authorization(accountYouTube.Login, accountYouTube.Password);
-                CloseCurrentTabAndSwitchToAnother();
             }
 
             var accountClassmates = accounts.Where(w => w.AccountType == AccountType.Classmates).FirstOrDefault();

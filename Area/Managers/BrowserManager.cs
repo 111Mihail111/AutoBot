@@ -78,10 +78,10 @@ namespace AutoBot.Area.Managers
             _chromeDriver.Navigate().GoToUrl(url);
         }
         /// <summary>
-        /// Открыть страницу в новой вкладке
+        /// Открыть страницу в новой вкладке и переключиться на нее
         /// </summary>
         /// <param name="url">Url-адрес страницы</param>
-        public void OpenPageInNewTab(string url)
+        public void OpenPageInNewTabAndSwitch(string url)
         {
             Thread.Sleep(2000);
             _chromeDriver.ExecuteScript($"window.open('{url}');");
@@ -93,6 +93,16 @@ namespace AutoBot.Area.Managers
         public void CloseTab()
         {
             _chromeDriver.Close();
+        }
+        /// <summary>
+        /// Закрыть вкладку по индексу
+        /// </summary>
+        /// <param name="tabIndex">Индекс вкладки</param>
+        public void CloseTabByIndex(int tabIndex)
+        {
+            SwitchToTab(tabIndex);
+            CloseTab();
+            SwitchToTab();
         }
         /// <summary>
         /// Переключиться на последнюю вкладку
@@ -188,7 +198,6 @@ namespace AutoBot.Area.Managers
             {
                 return string.Empty;
             }
-
         }
 
 
@@ -209,9 +218,9 @@ namespace AutoBot.Area.Managers
         /// <param name="scrollHorizontalPosition">Позиция нижнего скрола</param>
         public void SetScrollPositionInWindow(string modalId, int scrollVerticalPosition = 0, int scrollHorizontalPosition = 0)
         {
-            _chromeDriver.ExecuteScript($"let modal = document.getElementById('{modalId}');" +
-                $"modal.scrollTop = {scrollVerticalPosition};" +
-                $"modal.scrollHeight = {scrollHorizontalPosition}");
+            _chromeDriver.ExecuteScript($"var modal = document.getElementById('{modalId}');" +
+                                        $"modal.scrollTop = {scrollVerticalPosition};" +
+                                        $"modal.scrollHeight = {scrollHorizontalPosition}");
         }
         /// <summary>
         /// Выполнить скрипт
@@ -231,7 +240,6 @@ namespace AutoBot.Area.Managers
         {
             return await Task.Run(() => ExecuteScript(jsScript)?.ToString());
         }
-
 
         /// <summary>
         /// Получить элемент по XPath

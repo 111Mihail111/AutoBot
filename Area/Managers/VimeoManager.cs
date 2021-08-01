@@ -12,16 +12,14 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void Authorization(string login, string password)
         {
-            OpenPageInNewTab("https://vimeo.com/");
+            OpenPageInNewTabAndSwitch("https://vimeo.com/");
 
             if (GetElementById("topnav_menu_avatar") != null)
             {
-                CloseTab();
-                SwitchToTab();
                 return;
             }
 
-            GetElementById("nav-cta-login").ToClick();
+            GetElementByClassName("js-topnav_menu_auth").ToClick();
 
             var inputLogin = GetElementById("signup_email");
             if (string.IsNullOrWhiteSpace(inputLogin.GetValue()))
@@ -36,42 +34,7 @@ namespace AutoBot.Area.Managers
             }
 
             GetElementByClassName("js-email-submit").ToClick(1500);
-
-            CloseTab();
-            SwitchToTab();
         }
-        /// <inheritdoc/>
-        /*public void AuthorizationInBrowserBackground(string login, string password)
-        {
-            OpenPageInNewTab("https://vimeo.com/");
-
-            if (GetElementById("topnav_menu_avatar") != null)
-            {
-                CloseTab();
-                SwitchToTab();
-                return;
-            }
-
-            GetElementByClassName("llpLzi").ToClick();
-            GetElementByCssSelector(".sc-btzYZH.hcldRm").FindElement(SearchMethod.XPath, "li[2]/a").ToClick();
-
-            var inputLogin = GetElementById("signup_email");
-            if (string.IsNullOrWhiteSpace(inputLogin.GetValue()))
-            {
-                inputLogin.SendKeys(login);
-            }
-
-            var inputPassword = GetElementById("login_password");
-            if (string.IsNullOrWhiteSpace(inputPassword.GetValue()))
-            {
-                inputPassword.SendKeys(password);
-            }
-
-            GetElementByClassName("js-email-submit").ToClick(1500);
-
-            CloseTab();
-            SwitchToTab();
-        }*/
         /// <inheritdoc/>
         public void LikeUnderVideo()
         {

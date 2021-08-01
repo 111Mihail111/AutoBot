@@ -13,7 +13,7 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void Authorization(string login, string password)
         {
-            OpenPageInNewTab("https://www.reddit.com/");
+            OpenPageInNewTabAndSwitch("https://www.reddit.com/");
 
             if (GetElementById("email-collection-tooltip-id") != null)
             {

@@ -56,15 +56,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         private TypeService _typeService;
 
         private IVkManager _vkManager;
-        private IYouTubeManager _ytManager;
         private IClassmatesManager _classmatesManager;
         private IYandexZenManager _yandexZenManager;
         private ITumblr _tumblrManager;
         private IReddit _redditManager;
         private IQuora _quoraManager;
-        private ISoundCloud _soundCloudManager;
         private IVimeoManager _vimeoManager;
-        private ITikTokManager _tikTokManager;
         private ILogManager _logManager;
 
         protected void Init()
@@ -84,28 +81,22 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected void SetContextForManagers()
         {
             _vkManager = new VkManager();
-            _ytManager = new YouTubeManager();
             _classmatesManager = new ClassmatesManager();
             _yandexZenManager = new YandexZenManager();
             _tumblrManager = new TumblrManager();
             _redditManager = new RedditManager();
             _quoraManager = new QuoraManager();
-            _soundCloudManager = new SoundCloudManager();
             _vimeoManager = new VimeoManager();
-            _tikTokManager = new TikTokManager();
             _logManager = new LogManager();
 
             var driver = GetDriver();
             _vkManager.SetContextBrowserManager(driver);
-            _ytManager.SetContextBrowserManager(driver);
             _classmatesManager.SetContextBrowserManager(driver);
             _yandexZenManager.SetContextBrowserManager(driver);
             _tumblrManager.SetContextBrowserManager(driver);
             _redditManager.SetContextBrowserManager(driver);
             _quoraManager.SetContextBrowserManager(driver);
-            _soundCloudManager.SetContextBrowserManager(driver);
             _vimeoManager.SetContextBrowserManager(driver);
-            _tikTokManager.SetContextBrowserManager(driver);
         }
         /// <summary>
         /// Авторизация в соц сетях
@@ -118,28 +109,14 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             if (accountVK != null)
             {
                 _vkManager.Authorization(accountVK.Login, accountVK.Password);
+                CloseCurrentTabAndSwitchToAnother();
             }
 
-            //var accountReddit = accounts.Where(w => w.AccountType == AccountType.Reddit).FirstOrDefault();
-            //if (accountReddit != null)
-            //{
-            //    _redditManager.Authorization(accountReddit.Login, accountReddit.Password);
-            //}
-
-            //var accountYouTube = accounts.Where(w => w.AccountType == AccountType.YouTube).FirstOrDefault();
-            //if (accountYouTube != null)
-            //{
-            //    if (IsBackgroundMode())
-            //    {
-            //        _ytManager.AuthorizationForOldVersionBrowser(accountYouTube.Login, accountYouTube.Password);
-            //        CloseCurrentTabAndSwitchToAnother();
-            //    }
-            //    else
-            //    {
-            //        _ytManager.Authorization(accountYouTube.Login, accountYouTube.Password);
-            //        CloseCurrentTabAndSwitchToAnother();
-            //    }
-            //}
+            var accountReddit = accounts.Where(w => w.AccountType == AccountType.Reddit).FirstOrDefault();
+            if (accountReddit != null)
+            {
+                _redditManager.Authorization(accountReddit.Login, accountReddit.Password);
+            }
 
             var accountClassmates = accounts.Where(w => w.AccountType == AccountType.Classmates).FirstOrDefault();
             if (accountClassmates != null)
@@ -151,31 +128,27 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             if (accountYandexZen != null)
             {
                 _yandexZenManager.Authorization(accountYandexZen.Login, accountYandexZen.Password);
+                CloseCurrentTabAndSwitchToAnother();
             }
 
-            //var accountTumblr = accounts.Where(w => w.AccountType == AccountType.Tumblr).FirstOrDefault();
-            //if (accountTumblr != null)
-            //{
-            //    _tumblrManager.Authorization(accountTumblr.Login, accountTumblr.Password);
-            //}
+            var accountTumblr = accounts.Where(w => w.AccountType == AccountType.Tumblr).FirstOrDefault();
+            if (accountTumblr != null)
+            {
+                _tumblrManager.Authorization(accountTumblr.Login, accountTumblr.Password);
+            }
 
-            //var accountQuora = accounts.Where(w => w.AccountType == AccountType.Quora).FirstOrDefault();
-            //if (accountQuora != null)
-            //{
-            //    _quoraManager.Authorization(accountQuora.Login, accountQuora.Password);
-            //}
+            var accountQuora = accounts.Where(w => w.AccountType == AccountType.Quora).FirstOrDefault();
+            if (accountQuora != null)
+            {
+                _quoraManager.Authorization(accountQuora.Login, accountQuora.Password);
+            }
 
-            //var accountSoundCloud = accounts.Where(w => w.AccountType == AccountType.SoundCloud).FirstOrDefault();
-            //if (accountSoundCloud != null)
-            //{
-            //    _soundCloudManager.Authorization(accountSoundCloud.Login, accountSoundCloud.Password);
-            //}
-
-            //var accountVimeo = accounts.Where(w => w.AccountType == AccountType.Vimeo).FirstOrDefault();
-            //if (accountVimeo != null)
-            //{
-            //    _vimeoManager.Authorization(accountVimeo.Login, accountVimeo.Password);
-            //}
+            var accountVimeo = accounts.Where(w => w.AccountType == AccountType.Vimeo).FirstOrDefault();
+            if (accountVimeo != null)
+            {
+                _vimeoManager.Authorization(accountVimeo.Login, accountVimeo.Password);
+                CloseCurrentTabAndSwitchToAnother();
+            }
 
             _isAuthorizationSocialNetworks = true;
         }
@@ -199,17 +172,14 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
             Init();
             GoToUrl(url);
-            AuthorizationOnService();
-
-            OpenPageInNewTab("https://zen.yandex.ru/id/5c59da09c3fe9900ac04252c");
-            _yandexZenManager.Subscribe();
-            _yandexZenManager.Unsubscribe();
 
             bool isWork = true;
             while (isWork)
             {
                 try
                 {
+                    AuthorizationOnService();
+
                     if (IsTimeToSleep())
                     {
                         Quit(Status.InSleeping);
@@ -266,19 +236,20 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                         _logManager.SendToEmail(GetMessage(exception, "Неопределенная ошибка. Количество вкладок превысило 2."));
                         return false;
                 }
-                
+
                 //TODO:Проверка авторизации
                 //TODO:Проверка работоспособности страницы
             }
             catch (Exception newException)
             {
-                _logManager.SendToEmail(new Message 
-                { 
-                    Topic = $"Ошибка в {_typeService} при обработке исключения в ProcessingException()", Exception = newException 
+                _logManager.SendToEmail(new Message
+                {
+                    Topic = $"Ошибка в {_typeService} при обработке исключения в ProcessingException()",
+                    Exception = newException
                 });
 
                 //Quit(Status.NoWork); //TODO: Нужно как-то проверять, что у нас закрыт браузер. Если мы будем закрывать то, что и так закрыто, то получим ошибку.
-                
+
                 return false;
             }
         }
@@ -294,16 +265,13 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Начать сбор
         /// </summary>
-        protected void BeginCollecting() //Есть TODO
+        protected void BeginCollecting()
         {
             GetTask();
             switch (_typeSocialNetwork)
             {
                 case "vk":
                     CarryOutTaskInVk(_task);
-                    break;
-                case "youtube":
-                    CarryOutTaskInYouTube(_task); 
                     break;
                 case "odnoklassniki":
                     CarryOutTaskInСlassmates(_task);
@@ -317,14 +285,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 case "tumblr":
                     CarryOutTaskInTumblr(_task);
                     break;
-                case "soundcloud":
-                    CarryOutTaskInSoundCloud(_task);
-                    break;
                 case "quora":
                     CarryOutTaskInQuora(_task);
-                    break;
-                case "tiktok":
-                    CarryOutTaskInTikTok(_task);
                     break;
                 case "vimeo":
                     CarryOutTaskInVimeo(_task);
@@ -380,7 +342,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
 
                         _vkManager.PutLike();
                         break;
-                    }                    
+                    }
                 case "Посмотреть пост":
                     Thread.Sleep(500);
                     break;
@@ -424,54 +386,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             }
 
             CloseCurrentTabAndSwitchToAnother();
-
-            if (isError)
-            {
-                SkipTask();
-                return;
-            }
-
-            GetPayout();
-        }
-        /// <summary>
-        /// Выполнить задачу в YouTube
-        /// </summary>
-        /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInYouTube(string taskText) //Есть TODO
-        {
-            SwitchToLastTab();
-            _urlByTask = GetUrlPage();
-
-            bool isError = false;
-            switch (taskText)
-            {
-                case "Подпишитесь на канал":
-                    _ytManager.SubscribeToChannel(); //TODO: Не работает
-                    break;
-                case "Поставьте 'Лайк' под видео":
-                    if (!_ytManager.IsVideoAvailable())
-                    {
-                        isError = true;
-                        break;
-                    }
-                    _ytManager.LikeUnderVideo();
-                    break;
-                case "Поставьте 'Не нравится' под видео":
-                    if (!_ytManager.IsVideoAvailable())
-                    {
-                        isError = true;
-                        break;
-                    }
-                    _ytManager.DislikeUnderVideo();
-                    break;
-                default:
-                    _logManager.SendToEmail(taskText, "CarryOutTaskInYouTube()", GetUrlPage(), "Новая задача");
-                    isError = true;
-                    break;
-            }
-
-            CloseTab();
-            SwitchToTab();
 
             if (isError)
             {
@@ -663,50 +577,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             GetPayout();
         }
         /// <summary>
-        /// Выполнить задачу в SoundCloud
-        /// </summary>
-        /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInSoundCloud(string taskText)
-        {
-            SwitchToLastTab();
-            _urlByTask = GetUrlPage();
-
-            bool isError = false;
-            switch (taskText)
-            {
-                case "подпишитесь на аккаунт":
-                    _soundCloudManager.Subscribe();
-                    break;
-                case "Поставить лайк на трэк":
-                    _soundCloudManager.LikeTrack();
-                    break;
-                case "Поделиться трэком":
-                    _soundCloudManager.RepostTrack();
-                    break;
-                case "Воспроизвести трэк":
-                    Thread.Sleep(500);
-                    break;
-                case "Скачать трэк":
-                    _soundCloudManager.DownloadTrack();
-                    break;
-                default:
-                    _logManager.SendToEmail(taskText, "CarryOutTaskInSoundCloud()", GetUrlPage(), "Новая задача");
-                    isError = true;
-                    break;
-            }
-
-            CloseTab();
-            SwitchToTab();
-
-            if (isError)
-            {
-                SkipTask();
-                return;
-            }
-
-            GetPayout();
-        }
-        /// <summary>
         /// Выполнить задачу в Quora
         /// </summary>
         /// <param name="taskText">Текст задачи</param>
@@ -739,42 +609,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                     break;
                 default:
                     _logManager.SendToEmail(taskText, "CarryOutTaskInQuora()", GetUrlPage(), "Новая задача");
-                    isError = true;
-                    break;
-            }
-
-            CloseTab();
-            SwitchToTab();
-
-            if (isError)
-            {
-                SkipTask();
-                return;
-            }
-
-            GetPayout();
-        }
-        /// <summary>
-        /// Выполнить задачу в TikTok
-        /// </summary>
-        /// <param name="taskText">Текст задачи</param>
-        protected void CarryOutTaskInTikTok(string taskText) //TODO
-        {
-            SwitchToLastTab();
-            _urlByTask = GetUrlPage();
-
-            bool isError = false;
-            switch (taskText)
-            {
-                case "Подпишитесь на пользователя":
-                    _tikTokManager.Subscribe();
-                    break;
-                case "Поставьте лайк на видео":
-                    isError = true;
-                    //_tikTokManager.PutLike(); //https://www.tiktok.com/@ageofclonesofficial/video/6898252422603345157
-                    break;
-                default:
-                    _logManager.SendToEmail(taskText, "CarryOutTaskInTikTok()", GetUrlPage(), "Новая задача");
                     isError = true;
                     break;
             }
@@ -837,9 +671,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 case "vk":
                     UndoTaskInVk();
                     break;
-                case "youtube":
-                    UndoTaskInYouTube();
-                    break;
                 case "odnoklassniki":
                     UndoTaskInСlassmates();
                     break;
@@ -852,14 +683,8 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 case "quora":
                     UndoTaskInQuora();
                     break;
-                case "soundcloud":
-                    UndoTaskInSoundCloud();
-                    break;
                 case "tumblr":
                     UndoTaskInTumblr();
-                    break;
-                case "tiktok":
-                    UndoTaskInTikTok();
                     break;
                 case "vimeo":
                     UndoTaskInVimeo();
@@ -871,7 +696,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void UndoTaskInVk()
         {
-            OpenPageInNewTab(_urlByTask);
+            OpenPageInNewTabAndSwitch(_urlByTask);
 
             switch (_task)
             {
@@ -890,34 +715,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToTab();
         }
         /// <summary>
-        /// Отменить задачу в YouTube
-        /// </summary>
-        protected void UndoTaskInYouTube()
-        {
-            OpenPageInNewTab(_urlByTask);
-
-            switch (_task)
-            {
-                case "Подпишитесь на канал":
-                    _ytManager.UnsubscribeFromChannel();
-                    break;
-                case "Поставьте 'Лайк' под видео":
-                    _ytManager.RemoveLike();
-                    break;
-                case "Поставьте 'Не нравится' под видео":
-                    _ytManager.RemoveDislike();
-                    break;
-            }
-
-            CloseTab();
-            SwitchToTab();
-        }
-        /// <summary>
         /// Отменить задачу в Сlassmates
         /// </summary>
         protected void UndoTaskInСlassmates()
         {
-            OpenPageInNewTab(_urlByTask);
+            OpenPageInNewTabAndSwitch(_urlByTask);
 
             switch (_task)
             {
@@ -941,7 +743,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void UndoTaskInZen()
         {
-            OpenPageInNewTab(_urlByTask);
+            OpenPageInNewTabAndSwitch(_urlByTask);
 
             switch (_task)
             {
@@ -961,7 +763,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void UndoTaskInReddit()
         {
-            OpenPageInNewTab(_urlByTask);
+            OpenPageInNewTabAndSwitch(_urlByTask);
 
             switch (_task)
             {
@@ -981,7 +783,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         protected void UndoTaskInQuora()
         {
-            OpenPageInNewTab(_urlByTask);
+            OpenPageInNewTabAndSwitch(_urlByTask);
 
             switch (_task)
             {
@@ -997,34 +799,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToTab();
         }
         /// <summary>
-        /// Отменить задачу в SoundCloud
-        /// </summary>
-        protected void UndoTaskInSoundCloud()
-        {
-            OpenPageInNewTab(_urlByTask);
-
-            switch (_task)
-            {
-                case "подпишитесь на аккаунт":
-                    _soundCloudManager.Unsubscribe();
-                    break;
-                case "Поставить лайк на трэк":
-                    _soundCloudManager.RemoveLike();
-                    break;
-                case "Поделиться трэком":
-                    _soundCloudManager.RemoveRepost();
-                    break;
-            }
-
-            CloseTab();
-            SwitchToTab();
-        }
-        /// <summary>
         /// Отменить задачу в Tumblr
         /// </summary>
         protected void UndoTaskInTumblr()
         {
-            OpenPageInNewTab(_urlByTask);
+            OpenPageInNewTabAndSwitch(_urlByTask);
 
             switch (_task)
             {
@@ -1041,31 +820,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             SwitchToTab();
         }
         /// <summary>
-        /// Отменить задачу в TikTok
-        /// </summary>
-        protected void UndoTaskInTikTok()
-        {
-            OpenPageInNewTab(_urlByTask);
-
-            switch (_task)
-            {
-                case "Подпишитесь на пользователя":
-                    _tikTokManager.Unsubscribe();
-                    break;
-                case "Поставьте лайк на видео":
-                    _tikTokManager.RemoveLike();
-                    break;
-            }
-
-            CloseTab();
-            SwitchToTab();
-        }
-        /// <summary>
         /// Отменить задачу в Vimeo
         /// </summary>
         protected void UndoTaskInVimeo()
         {
-            OpenPageInNewTab(_urlByTask);
+            OpenPageInNewTabAndSwitch(_urlByTask);
 
             switch (_task)
             {

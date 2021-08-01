@@ -188,9 +188,9 @@ function checkLaunchTimeInternetService() {
     for (var i = 2; i < divPanel.childElementCount; i++) {
 
         var modelService = getSelectedRowData(divPanel.children[i]);
-        var status = modelService.Status;
+        var statusService = modelService.StatusService;
 
-        if (status != "InSleeping") {
+        if (statusService != "InSleeping") {
             continue;
         }
 

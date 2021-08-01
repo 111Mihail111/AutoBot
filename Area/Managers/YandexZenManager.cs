@@ -3,7 +3,6 @@ using AutoBot.Area.Managers.Interface;
 using AutoBot.Extentions;
 using OpenQA.Selenium.Chrome;
 using System.Linq;
-using System.Threading;
 
 namespace AutoBot.Area.Managers
 {
@@ -13,11 +12,10 @@ namespace AutoBot.Area.Managers
         public void Authorization(string login, string password)
         {
             string url = "https://zen.yandex.ru/user/";
-            OpenPageInNewTab(url);
+            OpenPageInNewTabAndSwitch(url);
 
             if (GetUrlPage().Contains(url))
             {
-                CloseCurrentTabAndSwitchToAnother();
                 return;
             }
 
@@ -49,7 +47,6 @@ namespace AutoBot.Area.Managers
             }
 
             GetElementByClassName("Button2_view_action").ToClick(2000);
-            CloseCurrentTabAndSwitchToAnother();
         }
 
         /// <inheritdoc/>
@@ -60,8 +57,8 @@ namespace AutoBot.Area.Managers
             var buttons = panelElements.FindElements(SearchMethod.Tag, "button");
             foreach (var button in buttons)
             {
-                var textButton = button.GetInnerText();
-                if (textButton == "Нравится")
+                var textButton = button.GetInnerText().ToLower();
+                if (textButton.Contains("нравится"))
                 {
                     var svgElementActive = button.FindElements(SearchMethod.Selector, "._state_active").FirstOrDefault();
                     if (svgElementActive != null)
@@ -83,8 +80,8 @@ namespace AutoBot.Area.Managers
             var buttons = panelElements.FindElements(SearchMethod.Tag, "button");
             foreach (var button in buttons)
             {
-                var textButton = button.GetInnerText();
-                if (textButton == "Нравится")
+                var textButton = button.GetInnerText().ToLower();
+                if (textButton.Contains("нравится"))
                 {
                     var svgElementPassive = button.FindElements(SearchMethod.Selector, "._state_passive").FirstOrDefault();
                     if (svgElementPassive != null)
@@ -101,7 +98,7 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void Subscribe()
         {
-            //Вариант подписки с одного места
+            //Подписка на канал при просмотре записи с канала
             var panelElements = GetElementByClassName("publisher-controls__buttons");
             if (panelElements != null)
             {
@@ -121,8 +118,28 @@ namespace AutoBot.Area.Managers
                 }
             }
 
-            //Вариант подписки с другого места
+            //Подписка на канал с его главной страницы
             panelElements = GetElementByCssSelector(".desktop-channel-3-social-layout");
+            if (panelElements != null)
+            {
+                {
+                    var buttons = panelElements.FindElements(SearchMethod.Tag, "button");
+                    foreach (var button in buttons)
+                    {
+                        var textButton = button.GetInnerText();
+                        if (textButton == "Подписаться")
+                        {
+                            button.ToClick(1500);
+                            return;
+                        }
+                    }
+
+                    return;
+                }
+            }
+
+            //Подписка на конкретного пользователя
+            panelElements = GetElementByCssSelector(".source-page-feed-header-view__buttons");
             {
                 var buttons = panelElements.FindElements(SearchMethod.Tag, "button");
                 foreach (var button in buttons)
@@ -140,7 +157,7 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void Unsubscribe()
         {
-            //Вариант отписки с одного места
+            //Отписка при просмотре записи с канала
             var panelElements = GetElementByClassName("publisher-controls__buttons");
             if (panelElements != null)
             {
@@ -160,8 +177,28 @@ namespace AutoBot.Area.Managers
                 }
             }
 
-            //Вариант отписки с другого места
+            //Отписка от канала с его главной страницы
             panelElements = GetElementByCssSelector(".desktop-channel-3-social-layout");
+            if (panelElements != null)
+            {
+                {
+                    var buttons = panelElements.FindElements(SearchMethod.Tag, "button");
+                    foreach (var button in buttons)
+                    {
+                        var textButton = button.GetInnerText();
+                        if (textButton == "Вы подписаны")
+                        {
+                            button.ToClick(1500);
+                            return;
+                        }
+                    }
+
+                    return;
+                }
+            }
+
+            //Отписка от конкретного пользователя
+            panelElements = GetElementByCssSelector(".source-page-feed-header-view__buttons");
             {
                 var buttons = panelElements.FindElements(SearchMethod.Tag, "button");
                 foreach (var button in buttons)
@@ -195,7 +232,6 @@ namespace AutoBot.Area.Managers
             }
 
             GetElementByClassName("Button2_view_action").ToClick(2000);
-            CloseCurrentTabAndSwitchToAnother();
         }
     }
 }

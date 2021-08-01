@@ -13,7 +13,7 @@ namespace AutoBot.Area.Managers
         public void AuthorizationThroughMail(string login, string password)
         {
             string url = "https://ok.ru/feed";
-            OpenPageInNewTab(url);
+            OpenPageInNewTabAndSwitch(url);
 
             if (url == GetUrlPage())
             {
@@ -40,7 +40,7 @@ namespace AutoBot.Area.Managers
         public void AuthorizationThroughMailOldVersionBrowser(string email, string password)
         {
             string url = "https://ok.ru/feed";
-            OpenPageInNewTab(url);
+            OpenPageInNewTabAndSwitch(url);
 
             if (url == GetUrlPage())
             {
@@ -214,27 +214,33 @@ namespace AutoBot.Area.Managers
         {
             var panelMenuElements = GetElementById("hook_Block_MainMenu");
 
-            var requestSentElement = panelMenuElements.FindElements(SearchMethod.Tag, "span")
-                .Where(w => w.GetInnerText() == "Запрос отправлен" || w.GetInnerText() == "Подписаны").FirstOrDefault();
-
-            if (requestSentElement != null)
+            var spanElements = panelMenuElements.FindElements(SearchMethod.Tag, "span");
+            foreach (var span in spanElements)
             {
-                requestSentElement.ToClick(1500);
-
-                var text = requestSentElement.GetInnerText();
-                if (text == "Подписаны")
+                var innerTextSpan = span.GetInnerText().ToLower();
+                if (string.IsNullOrWhiteSpace(innerTextSpan))
                 {
+                    return;
+                }
+                else if (innerTextSpan.Contains("запрос отправлен"))
+                {
+                    span.ToClick();
+                    panelMenuElements.FindElement(SearchMethod.XPath, "div/ul/li[1]/div/div/ul/li/a").ToClick(1500);
+                    return;
+                }
+                else if (innerTextSpan.Contains("подписаны"))
+                {
+                    span.ToClick();
                     panelMenuElements.FindElement(SearchMethod.XPath, "div/ul/li[2]/div/div/ul/li/a").ToClick(1500);
                     return;
                 }
-
-                panelMenuElements.FindElement(SearchMethod.XPath, "div/ul/li[1]/div/div/ul/li/a").ToClick(1500);
-                return;
+                else if (innerTextSpan.Contains("друзья"))
+                {
+                    panelMenuElements.FindElement(SearchMethod.Selector, "li.u-menu_li.expand-action-item").ToClick(1500);
+                    panelMenuElements.FindElement(SearchMethod.XPath, "div/ul/li[4]/div/div/ul/li[8]/a").ToClick(1500);
+                    GetElementById("hook_FormButton_button_delete_confirm").ToClick(1500);
+                }
             }
-
-            panelMenuElements.FindElement(SearchMethod.Selector, "li.u-menu_li.expand-action-item").ToClick(1500);
-            panelMenuElements.FindElement(SearchMethod.XPath, "div/ul/li[4]/div/div/ul/li[8]/a").ToClick(1500);
-            GetElementById("hook_FormButton_button_delete_confirm").ToClick(1500);
         }
 
 

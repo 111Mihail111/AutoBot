@@ -19,16 +19,13 @@ namespace AutoBot
             services.AddScoped<IVkTarget, VkTarget>();
             services.AddScoped<IVkManager, VkManager>();
             services.AddScoped<IClassmatesManager, ClassmatesManager>();
-            services.AddScoped<IYouTubeManager, YouTubeManager>();
             services.AddScoped<IInstagramManager, InstagramManager>();
             services.AddScoped<IYandexZenManager, YandexZenManager>();
             services.AddScoped<ITumblr, TumblrManager>();
             services.AddScoped<IReddit, RedditManager>();
             services.AddScoped<IQuora, QuoraManager>();
-            services.AddScoped<ISoundCloud, SoundCloudManager>();
             services.AddScoped<IVimeoManager, VimeoManager>();
             services.AddScoped<IVkMyMarket, VkMyMarket>();
-            services.AddScoped<ITikTokManager, TikTokManager>();
             services.AddScoped<ILogManager, LogManager>();
         }
 

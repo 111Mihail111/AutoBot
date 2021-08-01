@@ -9,6 +9,7 @@ using AutoBot.Models;
 using Microsoft.CodeAnalysis;
 using OpenQA.Selenium;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
@@ -23,17 +24,32 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// </summary>
         private static bool _isAuthorizationSocialNetworks;
         /// <summary>
-        /// Идентификатор задачи
-        /// </summary>
-        private string _taskId;
-        /// <summary>
         /// Дата и время засыпания
         /// </summary>
         private static DateTime? _dateAndTimeFallingAsleep;
         private int _countExceptions;
+        /// <summary>
+        /// Идентификатор активной задачи
+        /// </summary>
+        private string _activeTaskId;
+
+        /// <summary>
+        /// Тип социальной сети
+        /// </summary>
+        protected enum SocialNetworkType
+        {
+            /// <summary>
+            /// Инстаграм
+            /// </summary>
+            Instagram = 0,
+            /// <summary>
+            /// Вконтакте
+            /// </summary>
+            Vkontakte = 1
+        }
 
         private IVkManager _vkManager;
-        private IInstagramManager _instaManager;
+        private IInstagramManager _instagramManager;
         private ILogManager _logManager;
 
         protected void Init()
@@ -54,12 +70,12 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         protected void SetContextForManagers()
         {
             _vkManager = new VkManager();
-            _instaManager = new InstagramManager();
+            _instagramManager = new InstagramManager();
             _logManager = new LogManager();
 
             var driver = GetDriver();
             _vkManager.SetContextBrowserManager(driver);
-            _instaManager.SetContextBrowserManager(driver);
+            _instagramManager.SetContextBrowserManager(driver);
         }
         /// <summary>
         /// Авторизация в соц. сетях
@@ -77,7 +93,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
             var accountInstagram = accounts.Where(w => w.AccountType == AccountType.Instagram).FirstOrDefault();
             if (accountInstagram != null)
             {
-                _instaManager.Authorization(accountInstagram.Login, accountInstagram.Password);
+                _instagramManager.Authorization(accountInstagram.Login, accountInstagram.Password);
             }
 
             _isAuthorizationSocialNetworks = true;
@@ -100,10 +116,11 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         {
             Init();
             GoToUrl(url);
-            AuthorizationOnService();
 
             try
             {
+                AuthorizationOnMainService();
+
                 if (IsTimeToSleep())
                 {
                     Quit(Status.InSleeping);
@@ -111,7 +128,6 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
                 }
 
                 BeginCollecting();
-                Quit(Status.Work);
             }
             catch (Exception exception)
             {
@@ -132,286 +148,397 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         /// <summary>
         /// Начать сбор
         /// </summary>
-        private void BeginCollecting()
+        protected void BeginCollecting()
         {
-            JoinVkCommunity();
-            WorkWithLikesAndRepostVK();
-            SubscriptionsInInstagram();
-            WorkWithLikeInstagram();
-        }
+            //int checksCount = 0;
 
-
-        /// <summary>
-        /// Вступить в сообщество ВК
-        /// </summary>
-        protected void JoinVkCommunity()
-        {
-            GetElementById("vk1").ToClick();
-
-            var message = GetElementByXPath("//*[@id='content']/div[3]/div/p[1]/b");
-            while (message == null)
+            while (true)
             {
-                GetElementByXPath("//*[@id='content']/div[3]/div[1]/div[3]/a").ToClick();
-                SwitchToLastTab();
+                ExecuteTasksInInstagram();
+                ExecuteTasksInVkontakte();
 
-                string url = GetUrlPage();
-
-                if (_vkManager.IsPrivateGroup() || _vkManager.IsBlockedCommunity())
-                {
-                    SkipTask("vkCommunity");
-                    message = GetElementByXPath("//*[@id='content']/div[3]/div/p[1]/b");
-                    continue;
-                }
-
-                _vkManager.JoinToComunity();
-
-                CloseTab();
-                SwitchToTab();
-
-                if (!DidPaymentPass())
-                {
-                    OpenPageInNewTab(url);
-                    _vkManager.UnsubscribeToComunity();
-                    SkipTask("vkCommunity");
-                }
-
-                message = GetElementByXPath("//*[@id='content']/div[3]/div/p[1]/b");
-            }
-        }
-        /// <summary>
-        /// Работа с лайками
-        /// </summary>
-        protected void WorkWithLikesAndRepostVK()
-        {
-            GetElementById("vk2").ToClick();
-
-            var perfomanse = GetElementByClassName("groups")?.GetInnerText();
-            while (!string.IsNullOrEmpty(perfomanse) && perfomanse != "Нет доступных заданий. Заходите позже!")
-            {
-                ButtonsVisible();
-                GetElementByXPath("//*[@id='content']/div[3]/div[1]/div[3]/a").ToClick();
-                var titleTask = GetElementByXPath("//*[@id='content']/div[3]/div[1]/div[2]/p").GetInnerText();
-
-                SwitchToLastTab();
-                if (!_vkManager.IsPostFound())
-                {
-                    SkipTask("vkLike");
-                    perfomanse = GetElementByClassName("groups").GetInnerText();
-                    continue;
-                }
-
-                if (titleTask == "Поставить Лайк + Рассказать друзьям")
-                {
-                    _vkManager.MakeRepost();
-                }
-
-                string url = GetUrlPage();
-                _vkManager.PutLike();
-                
-                CloseTab();
-                SwitchToTab();
-
-                if (!DidPaymentPass())
-                {
-                    OpenPageInNewTab(url);
-                    _vkManager.RemoveLike();
-                    SkipTask("vkLike");
-                }
-
-                perfomanse = GetElementByClassName("groups").GetInnerText();
-            }
-        }
-        /// <summary>
-        /// Подписки в инстаграмм
-        /// </summary>
-        protected void SubscriptionsInInstagram()
-        {
-            GetElementById("in0").ToClick();
-
-            var groups = GetElementsByClassName("groups");
-            while (groups.Count() != 0)
-            {
-                _taskId = groups.First().FindElement(SearchMethod.ClassName, "group").GetId();
-
-                GetElementByXPath("//*[@id='content']/div[2]/div[1]/div[3]/a").ToClick();
-                SwitchToLastTab();
-
-                if (_instaManager.IsFoundPage())
-                {
-                    SkipTask("instaSubscription");
-                    groups = GetElementsByClassName("groups");
-                    continue;
-                }
-
-                _instaManager.Subscribe();
-                string url = GetUrlPage();
-
-                CloseTab();
-                SwitchToTab();
-
-                if (!DidPaymentPass())
-                {
-                    OpenPageInNewTab(url);
-                    _instaManager.Unsubscribe();
-                    SkipTask("instaSubscription");
-                }
-
-                groups = GetElementsByClassName("groups");
-            }
-        }
-        /// <summary>
-        /// Лайки в инстаграмме
-        /// </summary>
-        protected void WorkWithLikeInstagram()
-        {
-            GetElementById("in1").ToClick();
-
-            var groups = GetElementsByClassName("groups");
-            while (groups.Count() != 0)
-            {
-                _taskId = groups.First().FindElement(SearchMethod.ClassName, "group").GetId();
-
-                GetElementByXPath("//*[@id='content']/div[2]/div[1]/div[3]/a").ToClick();
-                SwitchToLastTab();
-
-                if (_instaManager.IsFoundPage())
-                {
-                    SkipTask("instaLike");
-                    groups = GetElementsByClassName("groups");
-                    continue;
-                }
-
-                _instaManager.PutLike();
-                string url = GetUrlPage();
-
-                CloseTab();
-                SwitchToTab();
-
-                if (!DidPaymentPass())
-                {
-                    OpenPageInNewTab(url);
-                    _instaManager.RemoveLike();
-                    SkipTask("instaLike");
-                }
-
-                groups = GetElementsByClassName("groups");
+                //if (checksCount == 20)
+                //{
+                //    Inaction();
+                //    checksCount = 0;
+                //}
+                //else
+                //{
+                //    checksCount++;
+                //}
             }
         }
 
-
         /// <summary>
-        /// Прошел ли платеж
+        /// Выполнить задачу в Instagram
         /// </summary>
-        /// <returns>True - прошел, иначе false</returns>
-        public bool DidPaymentPass()
+        protected void ExecuteTasksInInstagram()
         {
-            int counter = 0;
-            var paymentButton = GetPaymentButton();
+            GoToUrl("https://v-like.ru/ru/tasks/in");
 
-            var modal = GetElementById("modal");
-            while (modal.Displayed)
+            while (true)
             {
-                if (counter == 7)
+                var activeTaskText = GetActiveTask();
+                switch (activeTaskText)
                 {
-                    return false;
-                }
-
-                paymentButton.ToClick();
-
-                if (!IsAlertExist(5))
-                {
-                    return true;
-                }
-
-                string text = GetTextFromAlert();
-                switch (text)
-                {
-                    case "К сожалению, уже было поставлено нужное количество лайков к данному объекту. Обновите список заданий.":
-                    case "Список участников скрыт, проверить выполнение нет возможности.Пожалуйста, пропустите это задание.":
-                        AlertAccept();
-                        return false;
+                    case "NoTask":
+                        return;
+                    case "Подписаться на":
+                        {
+                            var isError = ExecuteTask("Подписаться на", SocialNetworkType.Instagram);
+                            if (isError)
+                            {
+                                continue;
+                            }
+                        }
+                        break;
+                    case "Поставить лайк на пост":
+                        {
+                            var isError = ExecuteTask("Поставить лайк на пост", SocialNetworkType.Instagram);
+                            if (isError)
+                            {
+                                continue;
+                            }
+                        }
+                        break;
                     default:
-                        counter = 6;
-                        _logManager.SendToEmail(text, "DidPaymentPass()", string.Empty, "Непредвиденный кейс в alert-окне");
+                        {
+                            var isError = ExecuteTask(activeTaskText, SocialNetworkType.Instagram);
+                            if (isError)
+                            {
+                                continue;
+                            }
+                        }
                         break;
                 }
 
-                AlertAccept();
-                counter++;
-            }
+                string urlPageToTask = GetUrlPage();
+                CloseCurrentTabAndSwitchToAnother();
 
-            return true;
+                var paymentReceived = GetPaidForCompletedTask();
+                if (!paymentReceived)
+                {
+                    UndoTask(activeTaskText, urlPageToTask);
+                    RefreshPage();
+                    continue;
+                }
+
+                RefreshPage();
+            }
         }
         /// <summary>
-        /// Пропустить задание
+        /// Выполнить задачу в Vkontakte
         /// </summary>
-        public void SkipTask(string typeTask)
+        protected void ExecuteTasksInVkontakte()
         {
-            CloseTab();
-            SwitchToTab();
-            GetElementByXPath("//*[@id='buttons']/a[1]").ToClick(1500);
+            GoToUrl("https://v-like.ru/ru/tasks/vk");
 
-            switch (typeTask)
+            while (true)
             {
-                case "vkLike":
-                    GetElementByXPath("//*[@id='content']/div[3]/div/div[3]/span").ToClick();
-                    AlertAccept();
-                    break;
-                case "instaSubscription":
-                case "instaLike":
-                    string taskId = GetElementsByClassName("groups").First().FindElement(SearchMethod.ClassName, "group").GetId();
-                    if (_taskId == taskId)
+                var activeTaskText = GetActiveTask();
+                switch (activeTaskText)
+                {
+                    case "NoTask":
+                        return;
+                    case "Подписаться на сообщество":
+                        {
+                            var isError = ExecuteTask("Подписаться на сообщество", SocialNetworkType.Vkontakte);
+                            if (isError)
+                            {
+                                continue;
+                            }
+                        }
+                        break;
+                    case "Поставить лайк и репост":
+                        {
+                            var isError = ExecuteTask("Поставить лайк и репост", SocialNetworkType.Vkontakte);
+                            if (isError)
+                            {
+                                continue;
+                            }
+                        }
+                        break;
+                    default:
+                        {
+                            var isError = ExecuteTask(activeTaskText, SocialNetworkType.Vkontakte);
+                            if (isError)
+                            {
+                                continue;
+                            }
+                        }
+                        break;
+                }
+
+                string urlPageToTask = GetUrlPage();
+                CloseCurrentTabAndSwitchToAnother();
+
+                var paymentReceived = GetPaidForCompletedTask();
+                if (!paymentReceived)
+                {
+                    UndoTask(activeTaskText, urlPageToTask);
+                    RefreshPage();
+                    continue;
+                }
+
+                RefreshPage();
+            }
+        }
+
+        /// <summary>
+        /// Выполнить задачу
+        /// </summary>
+        /// <param name="activeTaskText">Текст активной задачи</param>
+        /// <param name="socialNetworkType">Тип социальной сети</param>
+        /// <returns>True - Задача не выполнена, иначе false</returns>
+        protected bool ExecuteTask(string activeTaskText, SocialNetworkType socialNetworkType)
+        {
+            SwitchToLastTab();
+
+            bool isError = false;
+
+            switch (activeTaskText)
+            {
+                case "Подписаться на":
                     {
-                        GetElementByXPath("//*[@id='content']/div[2]/div/a[1]").ToClick();
-                        AlertAccept();
+                        if (_instagramManager.IsFoundPage())
+                        {
+                            isError = true;
+                            break;
+                        }
+
+                        _instagramManager.Subscribe();
+                        break;
+                    }
+                case "Поставить лайк на пост":
+                    {
+                        if (_instagramManager.IsFoundPage())
+                        {
+                            isError = true;
+                            break;
+                        }
+
+                        _instagramManager.PutLike();
+                        break;
+                    }
+                case "Подписаться на сообщество":
+                    {
+                        if (_vkManager.IsPrivateGroup() || _vkManager.IsBlockedCommunity())
+                        {
+                            isError = true;
+                            break;
+                        }
+
+                        _vkManager.JoinToComunity();
+                        break;
+                    }
+                case "Поставить лайк и репост":
+                    {
+                        if (!_vkManager.IsPostFound())
+                        {
+                            isError = true;
+                            break;
+                        }
+
+                        _vkManager.PutLike();
+                        _vkManager.MakeRepost();
+                        break;
+                    }
+                default:
+                    {
+                        isError = true;
+
+                        if (socialNetworkType == SocialNetworkType.Instagram)
+                        {
+                            _logManager.SendToEmail(activeTaskText, "ExecuteTasksInInstagram()", GetUrlPage(), "Новая задача для сервиса V-Like");
+                            break;
+                        }
+
+                        _logManager.SendToEmail(activeTaskText, "ExecuteTasksInVkontakte()", GetUrlPage(), "Новая задача для сервиса V-Like");
                     }
                     break;
-                case "vkCommunity":
-                    GetElementByXPath("//*[@id='content']/div[3]/div/a[1]").ToClick();
+            }
+
+            if (isError)
+            {
+                CloseCurrentTabAndSwitchToAnother();
+                SkipActiveTask();
+                RefreshPage();
+            }
+
+            return isError;
+        }
+        /// <summary>
+        /// Отменить задачу
+        /// </summary>
+        protected void UndoTask(string activeTaskText, string urlPageToTask)
+        {
+            GoToUrl(urlPageToTask);
+            OpenPageInNewTabAndSwitch(urlPageToTask);
+
+            switch (activeTaskText)
+            {
+                case "Подписаться на":
+                    if (_instagramManager.IsFoundPage())
+                    {
+                        break;
+                    }
+
+                    _instagramManager.Unsubscribe();
+                    break;
+                case "Поставить лайк на пост":
+                    if (_instagramManager.IsFoundPage())
+                    {
+                        break;
+                    }
+
+                    _instagramManager.RemoveLike();
                     break;
             }
 
-            _taskId = string.Empty;
-            Thread.Sleep(2000);
+            CloseCurrentTabAndSwitchToAnother();
         }
         /// <summary>
-        /// Получить кнопку оплаты
+        /// Получить активную задачу
         /// </summary>
-        /// <returns>Кнопка готовая к нажатию</returns>
-        public IWebElement GetPaymentButton()
+        /// <returns>Активная задача для выполнения</returns>
+        protected string GetActiveTask()
         {
-            var button = GetElementByXPath("//*[@id='buttons']/a[2]");
-            while (!button.Displayed)
+            string getTaskDetailsScript = "var task = document.querySelector('.list-item.tasks');" +
+                                          "if (task === null)" +
+                                          "{" +
+                                             "return 'NoTask';" +
+                                          "}" +
+                                          "var taskId = task.id;" +
+                                          "var taskDescription = task.getElementsByTagName('a')[0].innerText;" +
+                                          "task.getElementsByTagName('a')[2].click();" +
+                                          "return taskId + '|' + taskDescription;";
+
+            var taskDetails = ExecuteScript(getTaskDetailsScript).Split("|").ToList();
+            if (taskDetails.Count == 2)
             {
-                Thread.Sleep(1000);
-                button = GetElementByXPath("//*[@id='buttons']/a[2]");
+                _activeTaskId = taskDetails.First();
+                return GetTextTask(taskDetails.Last());
             }
 
-            return button;
+            return GetTextTask(taskDetails.First());
         }
-
-
         /// <summary>
-        /// Авторизация
+        /// Получить текст задачи
         /// </summary>
-        protected void AuthorizationOnService()
+        /// <param name="task">Задача</param>
+        /// <returns>Типизированный текст задачи</returns>
+        protected string GetTextTask(string task)
         {
-            var login = GetElementByXPath("//*[@id='uLogin']/div");
-            if (login != null)
+            if (task == "NoWork")
             {
-                login.ToClick(1500);
+                return "NoWork";
+            }
+            else if (task.Contains("Подписаться на сообщество"))
+            {
+                return "Подписаться на сообщество";
+            }
+            else if (task.Contains("Поставить лайк и репост"))
+            {
+                return "Поставить лайк и репост";
+            }
+            else if (task.Contains("Подписаться на"))
+            {
+                return "Подписаться на";
+            }
+            else
+            {
+                return task;
             }
         }
         /// <summary>
-        /// Кнопки видимы
+        /// Пропустить активную задачу
         /// </summary>
-        protected void ButtonsVisible()
+        protected void SkipActiveTask()
         {
-            ExecuteScript("var buttonList = document.getElementsByClassName('button');" +
-                          "for (var i = 0; i < buttonList.length; i++)" +
-                          "{" +
-                               "buttonList[i].style.display = 'inline-block';" +
-                          "}");
+            ExecuteScript($"document.getElementById('{_activeTaskId}').getElementsByTagName('a')[3].click();");
+        }
+        /// <summary>
+        /// Получить деньги за выполненную задачу
+        /// </summary>
+        /// <returns>True - деньги получены, иначе false</returns>
+        protected bool GetPaidForCompletedTask()
+        {
+            var getPaidScript = $"document.getElementById('{_activeTaskId}').getElementsByTagName('a')[1].click();" +
+                                "setInterval(function () " +
+                                "{" +
+                                    "var alertError = document.querySelector('.animated.fadeInDown');" +
+                                    $"var buttonText = document.getElementById('{_activeTaskId}').getElementsByTagName('a')[1].innerText;" +
+                                    "if (buttonText === 'задание выполнено')" +
+                                    "{" +
+                                        "return buttonText;" +
+                                    "}" +
+                                    "else if (alertError != null)" +
+                                    "{" +
+                                        "return alertError.getElementsByTagName('span')[2].innerText;" +
+                                    "}" +
+                                "}, 2000)";
+
+            int checksCount = 0;
+            while (true)
+            {
+                var scriptResultText = ExecuteScript(getPaidScript);
+                switch (scriptResultText)
+                {
+                    case "задание выполнено":
+                        return true;
+                    case "Убедитесь, что вы подписались на страницу, и попробуйте еще раз.":
+                        {
+                            if (checksCount == 3)
+                            {
+                                return false;
+                            }
+
+                            checksCount++;
+                        }
+                        break;
+                    default:
+                        _logManager.SendToEmail(scriptResultText, "GetPaidForCompletedTask()", GetUrlPage(), "Непредвиденный кейс");
+                        return false;
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Бездействовать
+        /// </summary>
+        protected void Inaction()
+        {
+            GoToUrl("chrome://newtab");
+
+            int randomTimerMinuts = GetRandomNumber(10, 31);
+            while (true)
+            {
+                if (randomTimerMinuts == 0)
+                {
+                    GoToUrl("https://v-like.ru/");
+                    return;
+                }
+
+                Thread.Sleep(60000);
+                randomTimerMinuts--;
+            }
+        }
+        /// <summary>
+        /// Авторизация на основном сервисе
+        /// </summary>
+        protected void AuthorizationOnMainService()
+        {
+            var loginButton = GetElementByClassName("btn-login");
+            if (loginButton == null)
+            {
+                return;
+            }
+
+            loginButton.ToClick(2000);
+
+            GetElementByCssSelector(".btn-oauth.vk").ToClick(2000);
+            CloseTabByIndex(1);
         }
         /// <summary>
         /// Пришло ли время засыпать
@@ -449,7 +576,7 @@ namespace AutoBot.Area.PerformanceTasks.InternetServices
         {
             var internetService = WebService.GetInternetServices().Where(w => w.TypeService == TypeService.VLike).FirstOrDefault();
             internetService.ActivationTime = TimeSpan.FromMinutes(1);
-            internetService.BalanceOnService = GetElementByClassName("balance").GetInnerText();
+            internetService.BalanceOnService = GetElementById("sidebar_balance").GetInnerText();
             internetService.StatusService = status;
 
             switch (status)

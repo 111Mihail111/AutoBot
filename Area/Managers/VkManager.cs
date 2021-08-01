@@ -12,6 +12,7 @@ namespace AutoBot.Area.Managers
         public void JoinToComunity()
         {
             RemoveWindowMessage();
+            SetScrollPosition();
 
             var joinButton = GetElementById("join_button");
             if (joinButton != null)
@@ -107,17 +108,15 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public bool IsBlockedAccount()
         {
-            return GetElementsByClassName("profile_blocked").Count() != 0;
+            return GetElementsByClassName("profile_blocked").Any();
         }
         /// <inheritdoc/>
         public void Authorization(string loginVK, string passwordVK)
         {
-            OpenPageInNewTab("https://vk.com/");
+            OpenPageInNewTabAndSwitch("https://vk.com/");
 
             if (GetTitlePage().Contains("Новости"))
             {
-                CloseTab();
-                SwitchToTab();
                 return;
             }
 
@@ -134,9 +133,6 @@ namespace AutoBot.Area.Managers
             }
 
             GetElementById("index_login_button").ToClick(3000);
-
-            CloseTab();
-            SwitchToTab();
         }
         /// <inheritdoc/>
         public void SetContextBrowserManager(ChromeDriver chromeDriver)

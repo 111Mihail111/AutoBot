@@ -12,7 +12,7 @@ namespace AutoBot.Area.Managers
         /// <inheritdoc/>
         public void Authorization(string login, string password)
         {
-            OpenPageInNewTab("https://www.instagram.com/");
+            OpenPageInNewTabAndSwitch("https://www.instagram.com/");
 
             var loginForm = GetElementById("loginForm");
             if (loginForm == null)
