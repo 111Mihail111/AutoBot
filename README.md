@@ -1,2 +1,2 @@
 # AutoBot
-AutoBot for collecting cryptocurrency
+AutoBot for complete assignments
